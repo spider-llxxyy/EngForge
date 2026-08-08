@@ -1,0 +1,3594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EngForge — 交互原型</title>
+<style>
+  :root {
+    --primary: #2563EB;
+    --primary-dark: #1D4ED8;
+    --primary-light: #DBEAFE;
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --teal: #0891B2;
+    --teal-light: #CFFAFE;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    --green: #059669;
+    --green-light: #D1FAE5;
+    --amber: #D97706;
+    --amber-light: #FEF3C7;
+    --red: #DC2626;
+    --red-light: #FEE2E2;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ===== SCREEN SYSTEM ===== */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: block; }
+
+  /* ===== LANDING PAGE ===== */
+  #screen-landing {
+    background: linear-gradient(135deg, #2563EB 0%, #7C3AED 50%, #0891B2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .landing-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 56px 48px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+  .landing-logo {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #2563EB, #7C3AED);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+  .landing-tagline {
+    color: var(--gray-500);
+    font-size: 16px;
+    margin-bottom: 36px;
+  }
+  .landing-features {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+  .landing-feature {
+    flex: 1;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .landing-feature-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .landing-feature h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .landing-feature p { font-size: 12px; color: var(--gray-500); line-height: 1.4; }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--gray-600);
+    border: 1px solid var(--gray-300);
+    padding: 12px 32px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 12px;
+  }
+  .btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-400); }
+  .landing-invite-badge {
+    display: inline-block;
+    background: var(--amber-light);
+    color: var(--amber);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* ===== APP LAYOUT ===== */
+  .app-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  .sidebar {
+    width: 240px;
+    background: var(--gray-900);
+    color: var(--gray-300);
+    padding: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-logo {
+    padding: 20px 24px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-logo span { color: var(--primary); }
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    overflow-y: auto;
+  }
+  .sidebar-section {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    padding: 16px 12px 8px;
+    letter-spacing: 0.5px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14px;
+    color: var(--gray-300);
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-item.active { background: var(--primary); color: #fff; }
+  .nav-icon { width: 18px; text-align: center; font-size: 16px; }
+  .sidebar-user {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
+  }
+  .sidebar-user-info { font-size: 13px; }
+  .sidebar-user-info strong { color: #fff; display: block; font-weight: 500; }
+  .sidebar-user-info span { color: var(--gray-500); font-size: 12px; }
+
+  .main-area {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--gray-50);
+  }
+  .top-bar {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .breadcrumb { font-size: 14px; color: var(--gray-500); }
+  .breadcrumb strong { color: var(--gray-900); }
+  .top-bar-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-sm {
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--gray-300);
+    background: #fff;
+    color: var(--gray-700);
+    transition: all 0.15s;
+  }
+  .btn-sm:hover { background: var(--gray-50); }
+  .btn-sm.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .btn-sm.primary:hover { background: var(--primary-dark); }
+  .content-area { padding: 28px 32px; max-width: 1200px; }
+
+  /* ===== DASHBOARD ===== */
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+  .dash-title h2 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .dash-title p { color: var(--gray-500); font-size: 14px; }
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+  }
+  .stat-label { font-size: 12px; color: var(--gray-500); margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--gray-900); }
+  .stat-value.purple { color: var(--purple); }
+  .stat-value.teal { color: var(--teal); }
+  .stat-value.green { color: var(--green); }
+  .stat-sub { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+  }
+  .panel {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-header h3 { font-size: 15px; font-weight: 600; }
+  .panel-body { padding: 8px 0; }
+
+  .comp-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .comp-item:hover { background: var(--gray-50); }
+  .comp-item:last-child { border-bottom: none; }
+  .comp-status {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .comp-status.draft { background: var(--gray-400); }
+  .comp-status.review { background: var(--amber); }
+  .comp-status.published { background: var(--green); }
+  .comp-info { flex: 1; min-width: 0; }
+  .comp-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .comp-meta { font-size: 12px; color: var(--gray-500); display: flex; gap: 12px; }
+  .comp-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .tag-kaoyan { background: var(--primary-light); color: var(--primary); }
+  .tag-gaokao { background: var(--purple-light); color: var(--purple); }
+  .tag-fanyi { background: var(--teal-light); color: var(--teal); }
+
+  /* Heatmap */
+  .heatmap-container { padding: 20px; }
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(26, 1fr);
+    gap: 3px;
+    margin-bottom: 8px;
+  }
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background: var(--gray-100);
+  }
+  .heatmap-cell.l1 { background: #BBE0F8; }
+  .heatmap-cell.l2 { background: #7BBEF0; }
+  .heatmap-cell.l3 { background: #378ADD; }
+  .heatmap-cell.l4 { background: #185FA5; }
+  .heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--gray-500);
+    justify-content: flex-end;
+  }
+  .heatmap-legend .heatmap-cell { width: 12px; height: 12px; }
+
+  .activity-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 13px;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-time { color: var(--gray-400); font-size: 11px; margin-top: 2px; }
+  .activity-text strong { font-weight: 500; }
+
+  /* ===== EDITOR ===== */
+  .editor-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+  }
+  .editor-main {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+  .editor-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .editor-title-input {
+    width: 100%;
+    border: none;
+    font-size: 22px;
+    font-weight: 700;
+    outline: none;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+  }
+  .editor-title-input::placeholder { color: var(--gray-300); }
+  .editor-tags {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .editor-visibility {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .vis-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--gray-300);
+    background: #fff;
+    color: var(--gray-500);
+    transition: all 0.15s;
+  }
+  .vis-btn:hover { border-color: var(--gray-400); }
+  .vis-btn.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary);
+    font-weight: 600;
+  }
+  .vis-btn .vis-icon { font-size: 14px; }
+  .tag-select {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--gray-300);
+    background: #fff;
+    color: var(--gray-600);
+  }
+  .tag-select.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+  .editor-body {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .editor-textarea {
+    width: 100%;
+    min-height: 380px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    line-height: 1.8;
+    font-family: inherit;
+    resize: vertical;
+    color: var(--gray-800);
+  }
+  .editor-footer {
+    padding: 12px 24px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--gray-50);
+  }
+  .word-count { font-size: 13px; color: var(--gray-500); }
+
+  /* AI 标注开关 */
+  .ai-toggle-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+  .ai-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    cursor: default;
+    user-select: none;
+  }
+  .ai-toggle-label .toggle-icon { font-size: 16px; }
+  .ai-toggle-track {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--gray-300);
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .ai-toggle-track.on { background: var(--primary); }
+  .ai-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+  }
+  .ai-toggle-track.on .ai-toggle-thumb { transform: translateX(18px); }
+  .ai-toggle-hint {
+    font-size: 11px;
+    color: var(--gray-400);
+    transition: color 0.2s;
+  }
+  .ai-toggle-hint.active { color: var(--primary); font-weight: 500; }
+
+  /* 富文本编辑区 */
+  .editor-rich {
+    width: 100%;
+    min-height: 380px;
+    padding: 24px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    line-height: 1.8;
+    font-family: inherit;
+    color: var(--gray-800);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-y: auto;
+  }
+  .editor-rich:empty::before {
+    content: '开始写你的作文...';
+    color: var(--gray-300);
+  }
+  /* AI 标注样式 — L1 语法错误：保留色值用于 Badge / Popover */
+  .ai-span-l1 {
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+    text-decoration-style: wavy;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+  .ai-span-l1:hover {
+    background: var(--red-light);
+    border-radius: 2px;
+  }
+  /* AI 标注样式 — L2 词汇建议：保留色值用于 Badge / Popover */
+  .ai-span-l2 {
+    text-decoration: underline;
+    text-decoration-color: var(--primary);
+    text-decoration-style: dashed;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+  .ai-span-l2:hover {
+    background: var(--primary-light);
+    border-radius: 2px;
+  }
+  /* 已被替换的标注词（保留痕迹） */
+  .ai-span-resolved {
+    text-decoration: line-through;
+    text-decoration-color: var(--green);
+    opacity: 0.5;
+    cursor: default;
+  }
+  /* 新替换上的词高亮 */
+  .ai-span-new {
+    background: rgba(16,185,129,0.12);
+    border-bottom: 2px solid var(--green);
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  /* Popover 气泡卡片 */
+  .ai-popover {
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    min-width: 220px;
+    max-width: 300px;
+    display: none;
+    animation: popoverIn 0.18s ease-out;
+  }
+  @keyframes popoverIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .ai-popover-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .ai-popover-header.l1 { color: var(--red); }
+  .ai-popover-header.l2 { color: var(--primary); }
+  .ai-popover-type-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .ai-popover-type-badge.l1 { background: var(--red-light); color: var(--red); }
+  .ai-popover-type-badge.l2 { background: var(--primary-light); color: var(--primary); }
+  .ai-popover-body {
+    padding: 10px 14px;
+  }
+  .ai-popover-reason {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .ai-popover-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ai-suggestion-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--gray-200);
+    background: var(--gray-50);
+    transition: all 0.15s;
+    color: var(--gray-700);
+  }
+  .ai-suggestion-chip:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+  .ai-suggestion-chip .chip-replace-icon {
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    color: var(--green);
+  }
+  .ai-suggestion-chip:hover .chip-replace-icon { opacity: 1; }
+  .ai-popover-dismiss {
+    padding: 8px 14px;
+    border-top: 1px solid var(--gray-100);
+    text-align: center;
+  }
+  .ai-popover-dismiss span {
+    font-size: 11px;
+    color: var(--gray-400);
+    cursor: pointer;
+  }
+  .ai-popover-dismiss span:hover { color: var(--gray-600); }
+
+  /* 修改历史摘要 */
+  .mod-history-list {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .mod-history-item {
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    animation: slideInMod 0.25s ease-out;
+  }
+  @keyframes slideInMod {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .mod-history-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .mod-history-dot.l1 { background: var(--red); }
+  .mod-history-dot.l2 { background: var(--primary); }
+  .mod-history-body { flex: 1; }
+  .mod-history-action {
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 2px;
+  }
+  .mod-history-action .old-word {
+    text-decoration: line-through;
+    color: var(--gray-500);
+    margin: 0 2px;
+  }
+  .mod-history-action .new-word {
+    color: var(--green);
+    font-weight: 700;
+  }
+  .mod-history-time {
+    font-size: 11px;
+    color: var(--gray-400);
+  }
+  .mod-history-undo {
+    font-size: 11px;
+    color: var(--gray-400);
+    cursor: pointer;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .mod-history-undo:hover { color: var(--red); }
+  .mod-history-empty {
+    padding: 28px 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray-400);
+    line-height: 1.6;
+  }
+  .mod-history-counter {
+    font-size: 11px;
+    color: var(--gray-400);
+    padding: 8px 18px;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  /* AI Panel */
+  .ai-panel {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    position: sticky;
+    top: 20px;
+  }
+  .ai-panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai-panel-header h3 { font-size: 14px; font-weight: 600; }
+  .ai-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .ai-badge.l1 { background: var(--red-light); color: var(--red); }
+  .ai-badge.l2 { background: var(--primary-light); color: var(--primary); }
+  .ai-badge.forbidden { background: var(--gray-100); color: var(--gray-400); text-decoration: line-through; }
+  .ai-check-item {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .ai-check-item:last-child { border-bottom: none; }
+  .ai-check-type {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+  .ai-check-type.error { color: var(--red); }
+  .ai-check-type.vocab { color: var(--primary); }
+  .ai-check-text { font-size: 13px; color: var(--gray-700); }
+  .ai-check-text .highlight-error { background: var(--red-light); color: var(--red); padding: 1px 4px; border-radius: 3px; font-weight: 500; }
+  .ai-check-text .highlight-vocab { background: var(--primary-light); color: var(--primary); padding: 1px 4px; border-radius: 3px; font-weight: 500; }
+  .ai-check-suggestion { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+  .ai-guardrail {
+    padding: 14px 18px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+  .ai-guardrail strong { color: var(--gray-700); }
+
+  /* ===== COMPOSITION DETAIL ===== */
+  .detail-header {
+    margin-bottom: 24px;
+  }
+  .detail-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .detail-title-row h2 { font-size: 22px; font-weight: 700; }
+  .detail-meta-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--gray-500);
+  }
+  .detail-meta-row .avatar-sm {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    margin-right: 6px;
+  }
+  .detail-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .detail-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 24px;
+  }
+  .detail-tab {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-500);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+  }
+  .detail-tab:hover { color: var(--gray-700); }
+  .detail-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+  }
+  .essay-content {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    padding: 32px;
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--gray-800);
+  }
+  .essay-content p { margin-bottom: 16px; }
+  .essay-content .ai-mark-error {
+    background: var(--red-light);
+    border-bottom: 2px solid var(--red);
+    cursor: pointer;
+    padding: 0 2px;
+  }
+  .essay-content .ai-mark-vocab {
+    background: var(--primary-light);
+    border-bottom: 2px dashed var(--primary);
+    cursor: pointer;
+    padding: 0 2px;
+  }
+
+  /* ===== Version Switcher ===== */
+  .version-switcher {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .version-switcher-label {
+    font-size: 12px;
+    color: var(--gray-400);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .version-pills {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .version-pill {
+    padding: 5px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1.5px solid var(--gray-200);
+    background: #fff;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .version-pill:hover {
+    border-color: var(--gray-300);
+    color: var(--gray-700);
+  }
+  .version-pill.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+  }
+  .version-switcher-restore { margin-left: auto; }
+  .btn-restore {
+    background: var(--green);
+    color: #fff;
+    border: 1px solid var(--green);
+    padding: 6px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-restore:hover { opacity: 0.9; }
+  .btn-restore:disabled {
+    background: var(--gray-100);
+    border-color: var(--gray-200);
+    color: var(--gray-400);
+    cursor: not-allowed;
+  }
+  .essay-content.essay-fading { opacity: 0; transition: opacity 0.2s ease; }
+  .essay-content.essay-fading-in { opacity: 1; transition: opacity 0.2s ease; }
+
+  .essay-tooltip {
+    display: none;
+    position: absolute;
+    background: var(--gray-900);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    z-index: 100;
+    max-width: 240px;
+  }
+
+  .sidebar-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .sidebar-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--gray-700); }
+  .collaborator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .collaborator:last-child { margin-bottom: 0; }
+  .collaborator .avatar-sm {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .collaborator-info { flex: 1; }
+  .collaborator-name { font-weight: 500; font-size: 13px; }
+  .collaborator-role { font-size: 11px; color: var(--gray-500); }
+  .collaborator-role.pending { color: var(--amber); font-weight: 500; }
+
+  .invite-section { margin-top: 12px; }
+  .invite-input-row { display: flex; gap: 8px; }
+  .invite-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+    background: #fff;
+    color: var(--gray-800);
+    min-width: 0;
+  }
+  .invite-input:focus { border-color: var(--primary); }
+  .invite-input::placeholder { color: var(--gray-400); }
+  .invite-btn {
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    transition: background 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .invite-btn:hover { background: var(--primary-dark); }
+  .invite-btn:disabled {
+    background: var(--gray-200);
+    color: var(--gray-400);
+    cursor: not-allowed;
+  }
+  .invite-toast {
+    display: none;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--green-light);
+    color: var(--green);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    align-items: center;
+    gap: 6px;
+  }
+  .invite-toast.show { display: flex; }
+  .invite-toast::before { content: '\2713'; font-weight: 700; }
+
+  /* Invite Code Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 36px;
+    width: 420px;
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    text-align: center;
+    animation: modalIn 0.22s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-icon-wrap {
+    width: 56px; height: 56px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .modal-desc { font-size: 13px; color: var(--gray-500); line-height: 1.5; margin-bottom: 20px; }
+  .invite-code-box {
+    background: var(--gray-50);
+    border: 2px dashed var(--gray-300);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .invite-code-text {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--primary);
+    font-family: 'Courier New', monospace;
+  }
+  .modal-copy-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 12px;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .modal-copy-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .modal-copy-btn.copied { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .modal-meta { font-size: 11px; color: var(--gray-400); margin-bottom: 18px; }
+  .modal-close-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--purple));
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .modal-close-btn:hover { opacity: 0.9; }
+
+  /* Notification Bell */
+  .notif-bell {
+    position: relative;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--gray-200);
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.15s;
+  }
+  .notif-bell:hover { border-color: var(--primary); }
+  .notif-dot {
+    display: none;
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 2px solid #fff;
+  }
+  .notif-dot.show { display: block; }
+  .notif-dot.show { animation: dotPulse 1.2s ease-in-out infinite; }
+  @keyframes dotPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+  }
+  .notif-dropdown {
+    display: none;
+    position: absolute;
+    top: 44px; right: 0;
+    width: 340px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+    border: 1px solid var(--gray-100);
+    z-index: 500;
+    overflow: hidden;
+  }
+  .notif-dropdown.show { display: block; animation: dropIn 0.18s ease; }
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .notif-dropdown-header {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .notif-dropdown-header .notif-count {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-400);
+  }
+  .notif-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-50);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item.unread { background: rgba(37,99,235,0.03); }
+  .notif-icon-sm {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .notif-item-text { font-size: 13px; color: var(--gray-700); line-height: 1.5; }
+  .notif-item-time { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+  .notif-empty {
+    padding: 32px 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray-400);
+  }
+
+  /* Merge Confirm Modal — extends modal-overlay/modal-box */
+  .merge-confirm-body {
+    text-align: left;
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.7;
+    margin-bottom: 22px;
+    padding: 16px 18px;
+    background: var(--gray-50);
+    border-radius: 10px;
+    border-left: 4px solid var(--primary);
+  }
+  .merge-confirm-body strong { color: var(--gray-900); }
+  .merge-confirm-actions { display: flex; gap: 12px; }
+  .merge-confirm-actions button { flex: 1; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.15s; }
+  .btn-cancel { background: var(--gray-100); color: var(--gray-600); }
+  .btn-cancel:hover { background: var(--gray-200); }
+  .btn-confirm { background: linear-gradient(135deg, var(--green), #059669); color: #fff; }
+  .btn-confirm:hover { opacity: 0.9; }
+
+  /* v4 new version highlight */
+  .version-item.new-merge {
+    animation: glowPulse 2s ease-in-out;
+  }
+  @keyframes glowPulse {
+    0% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(124,58,237,0.1); }
+    100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); }
+  }
+  .version-badge.new-pr {
+    background: var(--purple-light);
+    color: var(--purple);
+    border: 1px dashed var(--purple);
+  }
+  .version-banner-merged {
+    display: none;
+    margin-bottom: 16px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, var(--primary-light), rgba(124,58,237,0.08));
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--gray-700);
+    align-items: center;
+    gap: 8px;
+  }
+  .version-banner-merged.show { display: flex; }
+  .version-banner-merged strong { color: var(--primary); }
+  .version-banner-merged .vb-link { margin-left: auto; color: var(--purple); font-weight: 600; cursor: pointer; text-decoration: underline; }
+
+  /* ===== PR 合并动画 ===== */
+  /* 内容区淡入淡出遮罩 */
+  .pr-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.15);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .pr-overlay.active { opacity: 1; pointer-events: all; }
+
+  /* PR 变更容器 */
+  .pr-change-container {
+    display: inline;
+    position: relative;
+  }
+  /* 旧文本：正常显示，触发动画后添加 .pr-fading */
+  .pr-old {
+    transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .pr-old.pr-fading {
+    text-decoration: line-through;
+    text-decoration-color: var(--red);
+    text-decoration-thickness: 2px;
+    color: var(--red);
+    opacity: 0;
+    animation: prFadeOut 0.55s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes prFadeOut {
+    0% { opacity: 1; color: var(--gray-800); text-decoration-color: transparent; }
+    30% { opacity: 0.9; text-decoration-color: var(--red); }
+    100% { opacity: 0; color: var(--red); text-decoration-color: var(--red); }
+  }
+  /* 新增文本：初始隐藏 */
+  .pr-new {
+    opacity: 0;
+    display: inline;
+    background: rgba(16,185,129,0.15);
+    border-bottom: 2px solid var(--green);
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: 500;
+    transition: none;
+  }
+  .pr-new.typing {
+    opacity: 1;
+  }
+  /* 块级新增段落 */
+  .pr-new-block {
+    display: block;
+    margin-top: 12px;
+  }
+  .pr-new-block.typing {
+    display: block;
+    opacity: 1;
+  }
+
+  /* v4 更新摘要悬浮标签 */
+  .pr-summary-label {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: linear-gradient(135deg, #7C3AED, #2563EB);
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 12px;
+    box-shadow: 0 6px 24px rgba(124,58,237,0.3);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.5s cubic-bezier(0.22,0.61,0.36,1);
+    pointer-events: none;
+    z-index: 10;
+    min-width: 180px;
+  }
+  .pr-summary-label.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .pr-summary-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+  }
+  .pr-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    line-height: 1.6;
+    font-size: 12px;
+    opacity: 0.9;
+  }
+  .pr-summary-item::before {
+    content: '•';
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  .pr-summary-label.fading {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.6s ease;
+  }
+
+  /* Fork Button Loading State */
+  .btn-forking {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.75;
+    pointer-events: none;
+  }
+  .fork-spinner {
+    width: 12px; height: 12px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Global Fork Toast (top-right fixed) */
+  .global-toast {
+    position: fixed;
+    top: 24px; right: 24px;
+    z-index: 10000;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+    border-left: 4px solid var(--green);
+    max-width: 380px;
+  }
+  .global-toast.show {
+    display: flex;
+    animation: toastSlideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .global-toast.hide {
+    animation: toastSlideOut 0.3s ease forwards;
+  }
+  @keyframes toastSlideIn {
+    from { opacity: 0; transform: translateX(60px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes toastSlideOut {
+    to { opacity: 0; transform: translateX(60px); }
+  }
+  .toast-icon-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .toast-body { font-size: 13px; color: var(--gray-700); line-height: 1.5; }
+  .toast-body strong { color: var(--green); }
+
+  /* Forked item appear animation in dashboard list */
+  .comp-item.fork-new {
+    animation: itemAppear 0.4s ease;
+    background: rgba(34,197,94,0.04);
+  }
+  @keyframes itemAppear {
+    from { opacity: 0; transform: translateY(-10px); background: rgba(34,197,94,0.12); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fork-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    background: var(--purple-light);
+    color: var(--purple);
+  }
+
+  /* Version History */
+  .version-timeline {
+    position: relative;
+    padding-left: 24px;
+  }
+  .version-timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--gray-200);
+  }
+  .version-item {
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .version-item::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--gray-300);
+  }
+  .version-item.current::before { border-color: var(--green); background: var(--green); }
+  .version-item.fork::before { border-color: var(--purple); background: var(--purple); }
+  .version-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .version-num { font-size: 13px; font-weight: 600; }
+  .version-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .version-badge.current { background: var(--green-light); color: var(--green); }
+  .version-badge.fork { background: var(--purple-light); color: var(--purple); }
+  .version-desc { font-size: 13px; color: var(--gray-600); }
+  .version-meta { font-size: 12px; color: var(--gray-400); }
+
+  /* ===== PR / REVIEW VIEW ===== */
+  .pr-header {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .pr-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .pr-status {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .pr-status.open { background: var(--green-light); color: var(--green); }
+  .pr-meta { font-size: 13px; color: var(--gray-500); }
+
+  .diff-container {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+  }
+  .diff-header {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-50);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .diff-line {
+    display: flex;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .diff-line-num {
+    width: 40px;
+    text-align: right;
+    padding: 2px 8px;
+    color: var(--gray-400);
+    background: var(--gray-50);
+    border-right: 1px solid var(--gray-200);
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .diff-line-content {
+    padding: 2px 12px;
+    flex: 1;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .diff-line.added { background: #f0fdf4; }
+  .diff-line.added .diff-line-num { background: #dcfce7; color: var(--green); }
+  .diff-line.removed { background: #fef2f2; }
+  .diff-line.removed .diff-line-num { background: #fee2e2; color: var(--red); }
+  .diff-line-content.added { color: #166534; }
+  .diff-line-content.removed { color: #991b1b; }
+
+  .pr-review-bar {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    align-items: center;
+  }
+  .pr-comment-box {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    background: #fff;
+    color: var(--gray-500);
+  }
+
+  .inline-comment {
+    margin: 8px 20px 8px 60px;
+    padding: 10px 14px;
+    background: var(--primary-light);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 13px;
+  }
+  .inline-comment-author { font-weight: 600; color: var(--primary); font-size: 12px; margin-bottom: 2px; }
+
+  /* Comments section */
+  .comments-section { margin-top: 24px; }
+  .comment-item {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .comment-author { font-weight: 600; font-size: 13px; }
+  .comment-time { font-size: 12px; color: var(--gray-400); }
+  .comment-body { font-size: 14px; color: var(--gray-700); line-height: 1.7; }
+  .comment-input {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .comment-input textarea {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+  }
+  .comment-input textarea:focus { border-color: var(--primary); }
+
+  /* Misc */
+  .invite-banner {
+    background: linear-gradient(135deg, var(--primary-light), var(--purple-light));
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .invite-banner-icon { font-size: 24px; }
+  .invite-banner-text { flex: 1; font-size: 13px; color: var(--gray-700); }
+  .invite-banner-text strong { display: block; font-weight: 600; margin-bottom: 2px; }
+
+  .screen-label {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--gray-900);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== SCREEN 1: LANDING ===== -->
+<div class="screen active" id="screen-landing">
+  <div class="landing-card">
+    <div class="landing-invite-badge">邀请制内测中</div>
+    <div class="landing-logo">EngForge</div>
+    <p class="landing-tagline">用 GitHub 的方式学英语 — 锻造你的写作能力</p>
+
+    <div class="landing-features">
+      <div class="landing-feature">
+        <div class="landing-feature-icon" style="background: var(--primary-light); color: var(--primary);">F</div>
+        <h4>Fork 借鉴</h4>
+        <p>复制范文到自己的工坊，在原文基础上改写练习</p>
+      </div>
+      <div class="landing-feature">
+        <div class="landing-feature-icon" style="background: var(--purple-light); color: var(--purple);">P</div>
+        <h4>PR 互改</h4>
+        <p>邀请伙伴批改你的作文，逐句修改像代码 Review</p>
+      </div>
+      <div class="landing-feature">
+        <div class="landing-feature-icon" style="background: var(--teal-light); color: var(--teal);">S</div>
+        <h4>Star 收藏</h4>
+        <p>收藏优质语料和范文，构建你的个人语料库</p>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="navigate('dashboard')">进入我的工坊</button>
+    <button class="btn-secondary" onclick="navigate('editor')">快速写一篇</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN 2: DASHBOARD ===== -->
+<div class="screen" id="screen-dashboard">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo">Eng<span>Forge</span></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">工坊</div>
+        <div class="nav-item active" onclick="navigate('dashboard')">
+          <span class="nav-icon">H</span> 我的工坊
+        </div>
+        <div class="nav-item" onclick="navigate('editor')">
+          <span class="nav-icon">+</span> 新建作文
+        </div>
+        <div class="sidebar-section">协作</div>
+        <div class="nav-item" onclick="navigate('detail')">
+          <span class="nav-icon">D</span> 作品详情
+        </div>
+        <div class="nav-item" onclick="navigate('review')">
+          <span class="nav-icon">R</span> 批改请求
+          <span style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;">2</span>
+        </div>
+        <div class="sidebar-section">发现</div>
+        <div class="nav-item" style="opacity:0.5;cursor:not-allowed;">
+          <span class="nav-icon">G</span> 广场
+          <span style="margin-left:auto;font-size:10px;color:var(--gray-500);">Phase 2.5</span>
+        </div>
+        <div class="nav-item" style="opacity:0.5;cursor:not-allowed;">
+          <span class="nav-icon">B</span> 真题句子库
+          <span style="margin-left:auto;font-size:10px;color:var(--gray-500);">Phase 2</span>
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">LY</div>
+        <div class="sidebar-user-info">
+          <strong>李同学</strong>
+          <span>考研英语 · Day 47</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="top-bar">
+        <div class="breadcrumb"><strong>我的工坊</strong></div>
+        <div class="top-bar-actions">
+          <button class="btn-sm" onclick="navigate('editor')">+ 新建作文</button>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="invite-banner">
+          <span class="invite-banner-icon">I</span>
+          <div class="invite-banner-text">
+            <strong>邀请制工坊模式</strong>
+            你的作文默认私密，除非你手动设为公开，否则任何人（包括广场）都看不到。
+          </div>
+          <button class="btn-sm primary" onclick="showInviteCode()">生成我的邀请码</button>
+        </div>
+
+        <div class="modal-overlay" id="invite-code-modal" onclick="closeInviteCode(event)">
+          <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-icon-wrap">🎟️</div>
+            <div class="modal-title">你的专属邀请码</div>
+            <div class="modal-desc">将此邀请码分享给同学，对方注册时填写即可加入 EngForge 内测</div>
+            <div class="invite-code-box">
+              <span class="invite-code-text" id="invite-code-text">EF-7K2M-9X4P</span>
+              <button class="modal-copy-btn" id="copy-code-btn" onclick="copyInviteCode()">复制</button>
+            </div>
+            <div class="modal-meta">剩余邀请名额：3 / 5 · 邀请码 7 天内有效</div>
+            <button class="modal-close-btn" onclick="closeInviteCode()">完成</button>
+          </div>
+        </div>
+
+        <div class="dash-header">
+          <div class="dash-title">
+            <h2>早上好，李同学</h2>
+            <p>你已经连续学习 47 天，今天写一篇吧</p>
+          </div>
+        </div>
+
+        <div class="dash-stats">
+          <div class="stat-card">
+            <div class="stat-label">我的作文</div>
+            <div class="stat-value">12</div>
+            <div class="stat-sub">3 篇草稿</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">收到批改</div>
+            <div class="stat-value purple">28</div>
+            <div class="stat-sub">2 条待处理</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">被 Star</div>
+            <div class="stat-value teal">15</div>
+            <div class="stat-sub">来自 4 位同学</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">连续天数</div>
+            <div class="stat-value green">47</div>
+            <div class="stat-sub">历史最长 47</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div>
+            <div class="panel" style="margin-bottom:24px;">
+              <div class="panel-header">
+                <h3>我的作品</h3>
+                <button class="btn-sm" onclick="navigate('editor')">+ 新建</button>
+              </div>
+              <div class="panel-body" id="essay-list-container"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h3>贡献热力图</h3>
+                <span style="font-size:12px;color:var(--gray-500);">过去 26 周</span>
+              </div>
+              <div class="heatmap-container">
+                <div class="heatmap-grid" id="heatmap"></div>
+                <div class="heatmap-legend">
+                  <span>少</span>
+                  <div class="heatmap-cell"></div>
+                  <div class="heatmap-cell l1"></div>
+                  <div class="heatmap-cell l2"></div>
+                  <div class="heatmap-cell l3"></div>
+                  <div class="heatmap-cell l4"></div>
+                  <span>多</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="panel" style="margin-bottom:24px;">
+              <div class="panel-header">
+                <h3>最近活动</h3>
+              </div>
+              <div class="panel-body">
+                <div class="activity-item">
+                  <div class="activity-text"><strong>王同学</strong> 向你的作文发起了 PR 批改</div>
+                  <div class="activity-time">2 小时前</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-text"><strong>张同学</strong> Star 了你的 "Environmental Protection"</div>
+                  <div class="activity-time">5 小时前</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-text">你完成了 <strong>第 3 版</strong> 修改 "Social Media Impact"</div>
+                  <div class="activity-time">昨天</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-text"><strong>赵同学</strong> 评论了你的翻译练习</div>
+                  <div class="activity-time">2 天前</div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-text">你 Fork 了 <strong>范文仓库</strong> 的 "Climate Change Essay"</div>
+                  <div class="activity-time">3 天前</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sidebar-card">
+              <h4>学习目标</h4>
+              <div style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">本周写 3 篇大作文</div>
+              <div style="background:var(--gray-100);border-radius:6px;height:8px;overflow:hidden;">
+                <div style="background:var(--primary);height:100%;width:67%;border-radius:6px;"></div>
+              </div>
+              <div style="font-size:12px;color:var(--gray-500);margin-top:6px;">已完成 2/3 篇</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 3: EDITOR ===== -->
+<div class="screen" id="screen-editor">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo">Eng<span>Forge</span></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">工坊</div>
+        <div class="nav-item" onclick="navigate('dashboard')">
+          <span class="nav-icon">H</span> 我的工坊
+        </div>
+        <div class="nav-item active" onclick="navigate('editor')">
+          <span class="nav-icon">+</span> 新建作文
+        </div>
+        <div class="sidebar-section">协作</div>
+        <div class="nav-item" onclick="navigate('detail')">
+          <span class="nav-icon">D</span> 作品详情
+        </div>
+        <div class="nav-item" onclick="navigate('review')">
+          <span class="nav-icon">R</span> 批改请求
+          <span style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;">2</span>
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">LY</div>
+        <div class="sidebar-user-info">
+          <strong>李同学</strong>
+          <span>考研英语 · Day 47</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="top-bar">
+        <div class="breadcrumb"><span onclick="navigate('dashboard')" style="cursor:pointer;">我的工坊</span> / <strong>新建作文</strong></div>
+        <div class="top-bar-actions">
+          <button class="btn-sm">保存草稿</button>
+          <button class="btn-sm primary" onclick="publishEssay()">发布</button>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="editor-layout">
+          <div class="editor-main">
+            <div class="editor-header">
+              <input type="text" class="editor-title-input" value="The Impact of Social Media on Interpersonal Communication" placeholder="给你的作文起个标题...">
+              <div class="editor-visibility">
+                <div class="vis-btn active" data-vis="private" onclick="selectVisibility(this)"><span class="vis-icon">&#128274;</span> 私密</div>
+                <div class="vis-btn" data-vis="invite" onclick="selectVisibility(this)"><span class="vis-icon">&#128101;</span> 仅邀请</div>
+                <div class="vis-btn" data-vis="public" onclick="selectVisibility(this)"><span class="vis-icon">&#127757;</span> 公开</div>
+              </div>
+              <div class="editor-tags">
+                <span class="tag-select active">考研大作文</span>
+                <span class="tag-select">高考作文</span>
+                <span class="tag-select">翻译练习</span>
+                <span class="tag-select">自由写作</span>
+              </div>
+            </div>
+            <div class="editor-body">
+              <div class="ai-toggle-bar">
+                <div class="ai-toggle-track on" id="ai-toggle-track" onclick="toggleAIAnnotations()">
+                  <div class="ai-toggle-thumb"></div>
+                </div>
+                <span class="ai-toggle-label"><span class="toggle-icon">&#128269;</span> 显示 AI 标注</span>
+                <span class="ai-toggle-hint active" id="ai-toggle-hint">标注已开启 · 点击词汇即可查看 AI 修改建议</span>
+              </div>
+              <div class="editor-rich" contenteditable="true" id="essay-editor">In recent years, social media has become an integral part of our daily lives, fundamentally transforming the way we communicate with each other. While some argue that social media brings people closer together, others believe it actually creates barriers between individuals. In my opinion, social media has both positive and negative impacts on interpersonal communication.
+
+On the one hand, social media platforms provide us with unprecedented convenience in staying connected with friends and family. We can share our thoughts, photos, and experiences instantly with people across the globe. This is particularly good for maintaining long-distance relationships.
+
+On the other hand, excessive reliance on social media can lead to superficial interactions. Many people spend so much time on their phones that they neglect face-to-face communication. This phenomenon is especially common among young people, who often prefer texting to talking.
+
+In conclusion, while social media offers great convenience, we should not allow it to replace genuine human interaction. The key lies in finding a balance between digital and real-world communication.</div>
+              <div class="ai-popover" id="ai-popover">
+                <div class="ai-popover-header" id="popover-header">
+                  <span class="ai-popover-type-badge" id="popover-badge"></span>
+                  <span id="popover-word-label"></span>
+                </div>
+                <div class="ai-popover-body">
+                  <div class="ai-popover-reason" id="popover-reason"></div>
+                  <div class="ai-popover-suggestions" id="popover-suggestions"></div>
+                </div>
+                <div class="ai-popover-dismiss">
+                  <span onclick="closePopover()">忽略此处</span>
+                </div>
+              </div>
+            </div>
+            <div class="editor-footer">
+              <div class="word-count">248 词 · 4 段</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-sm">邀请批改</button>
+                <button class="btn-sm primary" onclick="publishEssay()">发布</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-panel">
+            <div class="ai-panel-header">
+              <h3>修改历史</h3>
+              <span class="ai-badge l2" id="mod-count-badge" style="display:none;">0 处</span>
+            </div>
+            <div class="mod-history-list" id="mod-history-list">
+              <div class="mod-history-empty" id="mod-history-empty">
+                &#128221;<br>尚未通过 AI 修改任何词汇。<br>点击编辑区内词汇即可开始。
+              </div>
+            </div>
+            <div class="mod-history-counter" id="mod-history-footer" style="display:none;">
+              共 <strong id="mod-total-count">0</strong> 处修改 · 修改可撤销
+            </div>
+            <div class="ai-guardrail">
+              <strong>AI 护栏说明：</strong><br>
+              L1 标出错误，不给答案<br>
+              L2 给词汇建议，你自己选<br>
+              L3 全文改写 — <strong style="color:var(--red);">已禁用</strong><br>
+              <span style="font-size:11px;margin-top:4px;display:block;">所有修改由你主动点击确认，AI 不自动改写。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 4: COMPOSITION DETAIL ===== -->
+<div class="screen" id="screen-detail">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo">Eng<span>Forge</span></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">工坊</div>
+        <div class="nav-item" onclick="navigate('dashboard')">
+          <span class="nav-icon">H</span> 我的工坊
+        </div>
+        <div class="nav-item" onclick="navigate('editor')">
+          <span class="nav-icon">+</span> 新建作文
+        </div>
+        <div class="sidebar-section">协作</div>
+        <div class="nav-item active" onclick="navigate('detail')">
+          <span class="nav-icon">D</span> 作品详情
+        </div>
+        <div class="nav-item" onclick="navigate('review')">
+          <span class="nav-icon">R</span> 批改请求
+          <span style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;">2</span>
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">LY</div>
+        <div class="sidebar-user-info">
+          <strong>李同学</strong>
+          <span>考研英语 · Day 47</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="top-bar">
+        <div class="breadcrumb"><span onclick="navigate('dashboard')" style="cursor:pointer;">我的工坊</span> / <strong>Social Media Impact</strong></div>
+        <div class="top-bar-actions">
+          <button class="btn-sm" id="fork-btn" onclick="handleFork()">Fork</button>
+          <button class="btn-sm">Star (15)</button>
+          <button class="btn-sm primary" onclick="toggleInviteSection()">邀请批改</button>
+          <div style="position:relative;">
+            <div class="notif-bell" onclick="toggleNotifDropdown()">
+              🔔
+              <span class="notif-dot" id="notif-dot"></span>
+            </div>
+            <div class="notif-dropdown" id="notif-dropdown">
+              <div class="notif-dropdown-header">
+                通知
+                <span class="notif-count" id="notif-count">0 条新</span>
+              </div>
+              <div id="notif-list">
+                <div class="notif-empty">暂无新通知</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="detail-header">
+          <div class="detail-title-row">
+            <h2>The Impact of Social Media on Interpersonal Communication</h2>
+            <span class="comp-tag tag-kaoyan">考研大作文</span>
+          </div>
+          <div class="detail-meta-row">
+            <span><span class="avatar-sm" style="background:var(--primary);">LY</span> 李同学</span>
+            <span>3 天前发布</span>
+            <span>248 词</span>
+            <span>当前版本 v3</span>
+            <span style="color:var(--green);">已发布</span>
+          </div>
+        </div>
+
+        <div class="detail-tabs">
+          <div class="detail-tab active" onclick="switchDetailTab('content')">内容</div>
+          <div class="detail-tab" onclick="switchDetailTab('version')">版本历史 (3)</div>
+          <div class="detail-tab" onclick="switchDetailTab('comments')">批改记录 (5)</div>
+        </div>
+
+        <div class="version-switcher" id="version-switcher">
+          <span class="version-switcher-label">版本切换</span>
+          <div class="version-pills">
+            <button class="version-pill" data-version="v1" onclick="switchVersion('v1')">v1</button>
+            <button class="version-pill" data-version="v2" onclick="switchVersion('v2')">v2</button>
+            <button class="version-pill active" data-version="v3" onclick="switchVersion('v3')">v3</button>
+            <button class="version-pill" data-version="v4" onclick="switchVersion('v4')">v4</button>
+          </div>
+          <div class="version-switcher-restore">
+            <button class="btn-restore" id="btn-restore" disabled onclick="restoreVersion()">恢复到此版本</button>
+          </div>
+        </div>
+
+        <div id="detail-tab-content">
+          <div class="version-banner-merged" id="merged-banner">
+            <strong>🌿 当前展示 v4</strong>（最新合并版），
+            <span class="vb-link" onclick="switchDetailTab('version')">点击版本历史可查看 v3 原文</span>
+          </div>
+          <div class="detail-grid">
+            <div>
+              <div class="essay-content" id="essay-detail" style="position:relative;">
+                <p>In recent years, social media has become an integral part of our daily lives, fundamentally transforming the way we communicate with each other. While some argue that social media <span class="ai-mark-vocab pr-change-container"><span class="pr-old">brings</span><span class="pr-new">unites</span></span> people closer together, others believe it actually <span class="ai-mark-error pr-change-container"><span class="pr-old">creates barriers</span><span class="pr-new">erects barriers</span></span> between individuals. In my opinion, social media has both positive and negative impacts on interpersonal communication.</p>
+
+                <p>On the one hand, social media platforms provide us with unprecedented convenience in staying connected with friends and family. We can share our thoughts, photos, and experiences instantly with people across the globe. This is particularly <span class="ai-mark-error pr-change-container"><span class="pr-old">good</span><span class="pr-new">beneficial</span></span> for maintaining long-distance relationships.</p>
+
+                <p>On the other hand, excessive reliance on social media can lead to superficial interactions. Many people spend so much time on their phones that they neglect face-to-face communication. This phenomenon is especially common among young people, who often prefer texting to talking.<span class="pr-new pr-new-block" data-text="For instance, the prevalence of &quot;phubbing&quot;—snubbing someone in favor of a mobile phone—has become a significant social concern, highlighting the urgent need to restore genuine human connection."></span></p>
+
+                <p>In conclusion, while social media offers <span class="ai-mark-vocab pr-change-container"><span class="pr-old">great</span><span class="pr-new">unparalleled</span></span> convenience, we should not allow it to replace genuine human interaction. The key lies in finding a balance between digital and real-world communication.</p>
+
+                <div class="pr-summary-label" id="pr-summary-label" style="display:none;">
+                  <div class="pr-summary-title">v4 更新摘要</div>
+                  <div class="pr-summary-item">替换口语词 4 处</div>
+                  <div class="pr-summary-item">新增论证句子 1 处</div>
+                </div>
+              </div>
+
+              <div class="comments-section">
+                <h3 style="font-size:16px;font-weight:600;margin-bottom:16px;">评论 (3)</h3>
+                <div class="comment-item">
+                  <div class="comment-header">
+                    <div class="avatar-sm" style="background:var(--purple);">WX</div>
+                    <span class="comment-author">王同学</span>
+                    <span class="comment-time">2 小时前</span>
+                  </div>
+                  <div class="comment-body">第二段的 "good" 太口语了，考研作文建议换成 beneficial 或者 advantageous。另外第三段可以加一个具体例子，比如 "phubbing"（低头族现象），会让论证更有说服力。</div>
+                </div>
+                <div class="comment-item">
+                  <div class="comment-header">
+                    <div class="avatar-sm" style="background:var(--teal);">ZX</div>
+                    <span class="comment-author">张同学</span>
+                    <span class="comment-time">5 小时前</span>
+                  </div>
+                  <div class="comment-body">整体结构很清晰，四段式很标准。但是开头 "In recent years" 有点老套了，可以试试用问句开头，比如 "Have you ever found yourself scrolling through social media..."</div>
+                </div>
+                <div class="comment-item">
+                  <div class="comment-header">
+                    <div class="avatar-sm" style="background:var(--amber);">RX</div>
+                    <span class="comment-author">赵同学</span>
+                    <span class="comment-time">1 天前</span>
+                  </div>
+                  <div class="comment-body">结尾段 "The key lies in finding a balance" 这个表达不错，学习了！不过 "great convenience" 可以升级成 "unparalleled convenience"。</div>
+                </div>
+
+                <div class="comment-input">
+                  <div class="avatar-sm" style="background:var(--primary);width:36px;height:36px;font-size:13px;">LY</div>
+                  <textarea rows="2" placeholder="写下你的评论..."></textarea>
+                </div>
+                <div style="text-align:right;margin-top:8px;">
+                  <button class="btn-sm primary">发表评论</button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="sidebar-card">
+                <h4>协作者 (3)</h4>
+                <div class="collaborator">
+                  <div class="avatar-sm" style="background:var(--primary);">LY</div>
+                  <div class="collaborator-info">
+                    <div class="collaborator-name">李同学 (你)</div>
+                    <div class="collaborator-role">作者</div>
+                  </div>
+                </div>
+                <div class="collaborator">
+                  <div class="avatar-sm" style="background:var(--purple);">WX</div>
+                  <div class="collaborator-info">
+                    <div class="collaborator-name">王同学</div>
+                    <div class="collaborator-role">已批改 2 次</div>
+                  </div>
+                </div>
+                <div class="collaborator">
+                  <div class="avatar-sm" style="background:var(--teal);">ZX</div>
+                  <div class="collaborator-info">
+                    <div class="collaborator-name">张同学</div>
+                    <div class="collaborator-role">已批改 1 次</div>
+                  </div>
+                </div>
+                <button class="btn-sm" style="width:100%;margin-top:12px;" id="toggle-invite-btn" onclick="toggleInviteSection()">+ 邀请批改</button>
+                <div class="invite-section" id="invite-section" style="display:none;">
+                  <div class="invite-input-row">
+                    <input type="text" class="invite-input" id="invite-email" placeholder="输入对方的用户名（如 @张三）" oninput="updateInviteBtn()">
+                    <button class="invite-btn" id="invite-send-btn" disabled onclick="sendInvite()">发送邀请</button>
+                  </div>
+                  <div class="invite-toast" id="invite-toast">邀请已发送，等待对方接受</div>
+                </div>
+              </div>
+
+              <div class="sidebar-card">
+                <h4>这篇作文的数据</h4>
+                <div style="font-size:13px;color:var(--gray-600);line-height:2;">
+                  <div>Star: <strong style="color:var(--amber);">15</strong></div>
+                  <div>Fork: <strong style="color:var(--purple);">3</strong></div>
+                  <div>评论: <strong>8</strong></div>
+                  <div>PR 合并: <strong style="color:var(--green);">2</strong></div>
+                  <div>修改版本: <strong>3</strong></div>
+                </div>
+              </div>
+
+              <div class="sidebar-card" style="background:var(--primary-light);border-color:var(--primary);">
+                <h4 style="color:var(--primary);">AI 检测摘要</h4>
+                <div style="font-size:13px;color:var(--gray-700);line-height:1.8;">
+                  <div>L1 错误: <strong style="color:var(--red);">2 处</strong></div>
+                  <div>L2 词汇升级: <strong style="color:var(--primary);">3 处</strong></div>
+                  <div>L3 全文改写: <strong style="color:var(--gray-400);">已禁用</strong></div>
+                </div>
+                <div style="font-size:12px;color:var(--gray-500);margin-top:8px;">AI 只标注问题，不代替你思考</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="detail-tab-version" style="display:none;">
+          <div class="panel" style="max-width:700px;">
+            <div class="panel-header">
+              <h3>版本历史</h3>
+            </div>
+            <div class="panel-body" style="padding:20px;">
+              <div class="version-timeline">
+                <div class="version-item new-merge" id="v4-item" style="display:none;">
+                  <div class="version-header">
+                    <span class="version-num">v4</span>
+                    <span class="version-badge new-pr">合并自 PR #3</span>
+                    <span class="version-badge current">当前版本</span>
+                  </div>
+                  <div class="version-desc">合并了王同学的 PR #3：优化词汇表达和论证结构，新增 marginalized 群体论证段落</div>
+                  <div class="version-meta">李同学合并 · 刚刚</div>
+                </div>
+                <div class="version-item current" id="v3-item">
+                  <div class="version-header">
+                    <span class="version-num">v3</span>
+                    <span class="version-badge current" id="v3-badge">当前版本</span>
+                  </div>
+                  <div class="version-desc">合并了王同学的 PR：替换 "good" → "beneficial"，第三段加入 phubbing 例子</div>
+                  <div class="version-meta">李同学 · 3 天前</div>
+                </div>
+                <div class="version-item fork">
+                  <div class="version-header">
+                    <span class="version-num">v2</span>
+                    <span class="version-badge fork">Fork 合并</span>
+                  </div>
+                  <div class="version-desc">合并了张同学的 PR：开头改为问句式，调整第二段过渡词</div>
+                  <div class="version-meta">张同学发起 PR · 李同学合并 · 5 天前</div>
+                </div>
+                <div class="version-item">
+                  <div class="version-header">
+                    <span class="version-num">v1</span>
+                  </div>
+                  <div class="version-desc">初稿发布</div>
+                  <div class="version-meta">李同学 · 1 周前</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="detail-tab-comments" style="display:none;">
+          <div class="panel" style="max-width:700px;">
+            <div class="panel-header">
+              <h3>批改记录</h3>
+            </div>
+            <div class="panel-body" style="padding:0;">
+              <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div class="avatar-sm" style="background:var(--purple);">WX</div>
+                  <strong style="font-size:13px;">王同学</strong>
+                  <span class="version-badge fork" style="background:var(--purple-light);color:var(--purple);">PR #2 已合并</span>
+                </div>
+                <div style="font-size:13px;color:var(--gray-600);">替换了 2 处口语化词汇，增加了 phubbing 论证段落。修改 4 行，新增 2 行。</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px;">3 天前 · 合并到 v3</div>
+              </div>
+              <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div class="avatar-sm" style="background:var(--teal);">ZX</div>
+                  <strong style="font-size:13px;">张同学</strong>
+                  <span class="version-badge fork" style="background:var(--purple-light);color:var(--purple);">PR #1 已合并</span>
+                </div>
+                <div style="font-size:13px;color:var(--gray-600);">开头改为问句式，调整了第二段和第三段的过渡连接词。</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px;">5 天前 · 合并到 v2</div>
+              </div>
+              <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div class="avatar-sm" style="background:var(--amber);">RX</div>
+                  <strong style="font-size:13px;">赵同学</strong>
+                  <span style="font-size:11px;padding:1px 6px;border-radius:3px;background:var(--gray-100);color:var(--gray-500);">评论</span>
+                </div>
+                <div style="font-size:13px;color:var(--gray-600);">建议将 "great convenience" 升级为 "unparalleled convenience"。</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px;">1 天前 · 待作者采纳</div>
+              </div>
+              <div style="padding:16px 20px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                  <div class="avatar-sm" style="background:var(--purple);">WX</div>
+                  <strong style="font-size:13px;">王同学</strong>
+                  <span style="font-size:11px;padding:1px 6px;border-radius:3px;background:var(--gray-100);color:var(--gray-500);">评论</span>
+                </div>
+                <div style="font-size:13px;color:var(--gray-600);">第二段 good 太口语，建议 beneficial。第三段可以加 phubbing 例子。</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px;">2 天前 · 已在 PR #2 中采纳</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 5: PR / REVIEW ===== -->
+<div class="screen" id="screen-review">
+  <div class="app-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo">Eng<span>Forge</span></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">工坊</div>
+        <div class="nav-item" onclick="navigate('dashboard')">
+          <span class="nav-icon">H</span> 我的工坊
+        </div>
+        <div class="nav-item" onclick="navigate('editor')">
+          <span class="nav-icon">+</span> 新建作文
+        </div>
+        <div class="sidebar-section">协作</div>
+        <div class="nav-item" onclick="navigate('detail')">
+          <span class="nav-icon">D</span> 作品详情
+        </div>
+        <div class="nav-item active" onclick="navigate('review')">
+          <span class="nav-icon">R</span> 批改请求
+          <span style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;">2</span>
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">LY</div>
+        <div class="sidebar-user-info">
+          <strong>李同学</strong>
+          <span>考研英语 · Day 47</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-area">
+      <div class="top-bar">
+        <div class="breadcrumb"><span onclick="navigate('dashboard')" style="cursor:pointer;">我的工坊</span> / <span onclick="navigate('detail')" style="cursor:pointer;">Lifelong Learning</span> / <strong>PR #3</strong></div>
+        <div class="top-bar-actions">
+          <button class="btn-sm">关闭请求</button>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="pr-header">
+          <div class="pr-title-row">
+            <h2 style="font-size:20px;font-weight:700;">PR #3: 优化词汇表达和论证结构</h2>
+            <span class="pr-status open">待审核</span>
+          </div>
+          <div class="pr-meta">
+            <div class="avatar-sm" style="background:var(--purple);display:inline-flex;">WX</div>
+            <strong>王同学</strong> 向 <strong>李同学</strong> 的 "On the Importance of Lifelong Learning" 发起了批改请求 · 2 小时前
+          </div>
+          <div style="margin-top:12px;font-size:13px;color:var(--gray-600);line-height:1.7;">
+            帮你改了几个口语化的词，另外第三段的论证感觉有点单薄，加了一个终身学习在职场中的具体应用场景。你看下合不合适~
+          </div>
+        </div>
+
+        <div class="diff-container">
+          <div class="diff-header">
+            <strong style="color:var(--gray-700);">第 1 段 · 开头</strong>
+            <span style="color:var(--gray-400);">2 处修改</span>
+          </div>
+          <div class="diff-line removed">
+            <div class="diff-line-num">1</div>
+            <div class="diff-line-content">Lifelong learning is very important in modern society.</div>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">1</div>
+            <div class="diff-line-content">Lifelong learning has become indispensable in modern society.</div>
+          </div>
+          <div class="inline-comment">
+            <div class="inline-comment-author">王同学</div>
+            "very important" 太口语了，indispensable 更适合考研大作文的语域。
+          </div>
+          <div class="diff-line removed">
+            <div class="diff-line-num">3</div>
+            <div class="diff-line-content">It is good for people to keep learning new things.</div>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">3</div>
+            <div class="diff-line-content">It is beneficial for individuals to continuously acquire new knowledge and skills.</div>
+          </div>
+        </div>
+
+        <div style="height:16px;"></div>
+
+        <div class="diff-container">
+          <div class="diff-header">
+            <strong style="color:var(--gray-700);">第 3 段 · 论证补充</strong>
+            <span style="color:var(--gray-400);">新增 3 行</span>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">12</div>
+            <div class="diff-line-content">Moreover, in today's rapidly evolving workplace, professionals</div>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">13</div>
+            <div class="diff-line-content">who fail to update their knowledge risk being marginalized.</div>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">14</div>
+            <div class="diff-line-content">For instance, many IT engineers pursue certifications annually</div>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">15</div>
+            <div class="diff-line-content">to stay competitive in the job market.</div>
+          </div>
+          <div class="inline-comment">
+            <div class="inline-comment-author">王同学</div>
+            原来第三段只有观点没有例子，加了一个 IT 工程师考证的例子，让论证更落地。你觉得这个例子合适吗？
+          </div>
+        </div>
+
+        <div style="height:16px;"></div>
+
+        <div class="diff-container">
+          <div class="diff-header">
+            <strong style="color:var(--gray-700);">第 4 段 · 结尾</strong>
+            <span style="color:var(--gray-400);">1 处修改</span>
+          </div>
+          <div class="diff-line removed">
+            <div class="diff-line-num">18</div>
+            <div class="diff-line-content">In a word, we should never stop learning.</div>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">18</div>
+            <div class="diff-line-content">In conclusion, embracing lifelong learning is not merely a choice</div>
+          </div>
+          <div class="diff-line added">
+            <div class="diff-line-num">19</div>
+            <div class="diff-line-content">but a necessity for thriving in an ever-changing world.</div>
+          </div>
+        </div>
+
+        <div style="height:24px;"></div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>AI 辅助审核</h3>
+            <span style="font-size:12px;color:var(--gray-500);">仅检测 PR 中的语言问题</span>
+          </div>
+          <div style="padding:16px 20px;font-size:13px;color:var(--gray-600);line-height:1.8;">
+            <div style="margin-bottom:8px;"><span class="ai-badge l1" style="display:inline-block;">L1</span> 未发现新的语法错误</div>
+            <div style="margin-bottom:8px;"><span class="ai-badge l2" style="display:inline-block;">L2</span> "indispensable" 用词准确，符合考研语域</div>
+            <div><span class="ai-badge l2" style="display:inline-block;">L2</span> "marginalized" 可考虑替换为 "left behind"（更简洁）</div>
+          </div>
+        </div>
+
+        <div class="pr-review-bar" style="margin-top:16px;border-radius:var(--radius);border:1px solid var(--gray-200);background:#fff;">
+          <div class="pr-comment-box">写下你的回复...</div>
+          <button class="btn-sm">请求修改</button>
+          <button class="btn-sm primary" style="background:var(--green);border-color:var(--green);" onclick="showMergeConfirm()">合并 PR</button>
+        </div>
+
+        <div class="modal-overlay" id="merge-confirm-modal" onclick="closeMergeConfirm(event)">
+          <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-icon-wrap" style="background:linear-gradient(135deg,var(--green),#059669);">🌿</div>
+            <div class="modal-title">合并后将生成新版本</div>
+            <div class="merge-confirm-body">
+              此操作将把 PR 中的修改（<strong style="color:var(--green);">绿色部分</strong>）应用到原文，生成一个全新的 <strong>v4</strong> 版本。你的原始版本（<strong>v3</strong>）将完好保留在版本历史中，<strong>不会被覆盖</strong>。确定继续吗？
+            </div>
+            <div class="merge-confirm-actions">
+              <button class="btn-cancel" onclick="closeMergeConfirm()">取消</button>
+              <button class="btn-confirm" onclick="prepareForMerge(); confirmMergePR()">确认合并，生成 v4</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PR 合并动画遮罩 -->
+<div class="pr-overlay" id="pr-overlay"></div>
+
+<div class="screen-label" id="screen-label">首页</div>
+
+<div class="global-toast" id="fork-toast">
+  <div class="toast-icon-check">✓</div>
+  <div class="toast-body">
+    <strong>已 Fork 到你的工坊</strong>，可在「我的作品」列表顶部查看
+  </div>
+</div>
+
+<script>
+  function navigate(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('screen-' + screen);
+    if (target) target.classList.add('active');
+    window.scrollTo(0, 0);
+
+    const labels = {
+      'landing': '首页',
+      'dashboard': '我的工坊',
+      'editor': '写作编辑器',
+      'detail': '作品详情',
+      'review': '批改请求 (PR)'
+    };
+    document.getElementById('screen-label').textContent = labels[screen] || '';
+  }
+
+  function switchDetailTab(tab) {
+    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+
+    document.getElementById('detail-tab-content').style.display = 'none';
+    document.getElementById('detail-tab-version').style.display = 'none';
+    document.getElementById('detail-tab-comments').style.display = 'none';
+
+    if (tab === 'content') document.getElementById('detail-tab-content').style.display = 'block';
+    else if (tab === 'version') document.getElementById('detail-tab-version').style.display = 'block';
+    else if (tab === 'comments') document.getElementById('detail-tab-comments').style.display = 'block';
+  }
+
+  // ===== VERSION ARCHIVE — single source of truth for essay content =====
+  var versionArchive = {
+    v1: '<p>In recent years, social media has become a very important part of our daily lives. Many people use it every day to talk with friends and share pictures. Some people think social media is good for us, but others think it makes our communication worse. In my opinion, both sides have good points.</p>\n\n<p>In conclusion, social media has both good and bad sides. We should use it carefully and remember to talk to people face to face.</p>',
+
+    v2: '<p>Have you ever found yourself scrolling through social media late at night, wondering whether it truly brings us closer or quietly pushes us apart? Social media has become an integral part of our daily lives, fundamentally transforming the way we communicate with each other. In my opinion, social media has both positive and negative impacts on interpersonal communication.</p>\n\n<p>Furthermore, social media platforms provide us with unprecedented convenience in staying connected with friends and family. We can share our thoughts, photos, and experiences instantly with people across the globe. This is particularly good for maintaining long-distance relationships.</p>\n\n<p>In conclusion, while social media offers great convenience, we should not allow it to replace genuine human interaction. The key lies in finding a balance between digital and real-world communication.</p>',
+
+    v3: '<p>In recent years, social media has become an integral part of our daily lives, fundamentally transforming the way we communicate with each other. While some argue that social media brings people closer together, others believe it actually creates barriers between individuals. In my opinion, social media has both positive and negative impacts on interpersonal communication.</p>\n\n<p>On the one hand, social media platforms provide us with unprecedented convenience in staying connected with friends and family. We can share our thoughts, photos, and experiences instantly with people across the globe. This is particularly good for maintaining long-distance relationships.</p>\n\n<p>On the other hand, excessive reliance on social media can lead to superficial interactions. Many people spend so much time on their phones that they neglect face-to-face communication. This phenomenon is especially common among young people, who often prefer texting to talking.</p>\n\n<p>In conclusion, while social media offers great convenience, we should not allow it to replace genuine human interaction. The key lies in finding a balance between digital and real-world communication.</p>',
+
+    v4: '<p>In recent years, social media has become an integral part of our daily lives, fundamentally transforming the way we communicate with each other. While some argue that social media unites people closer together, others believe it actually erects barriers between individuals. In my opinion, social media has both positive and negative impacts on interpersonal communication.</p>\n\n<p>On the one hand, social media platforms provide us with unprecedented convenience in staying connected with friends and family. We can share our thoughts, photos, and experiences instantly with people across the globe. This is particularly beneficial for maintaining long-distance relationships.</p>\n\n<p>On the other hand, excessive reliance on social media can lead to superficial interactions. Many people spend so much time on their phones that they neglect face-to-face communication. This phenomenon is especially common among young people, who often prefer texting to talking. For instance, the prevalence of "phubbing"—snubbing someone in favor of a mobile phone—has become a significant social concern, highlighting the urgent need to restore genuine human connection.</p>\n\n<p>In conclusion, while social media offers unparalleled convenience, we should not allow it to replace genuine human interaction. The key lies in finding a balance between digital and real-world communication.</p>\n\n<div class="pr-summary-label" id="pr-summary-label" style="display:none;">\n  <div class="pr-summary-title">v4 更新摘要</div>\n  <div class="pr-summary-item">替换口语词 4 处</div>\n  <div class="pr-summary-item">新增论证句子 1 处</div>\n</div>'
+  };
+
+  // ===== Version state variables =====
+  var currentVersion = 'v3';
+  var latestVersion = 'v3';
+  var hasMerged = false;
+  var preMergeEssayHTML = '';
+
+  // ===== Capture pre-merge essay HTML on page load =====
+  setTimeout(function() {
+    var essay = document.getElementById('essay-detail');
+    if (essay) preMergeEssayHTML = essay.innerHTML;
+  }, 0);
+
+  // ===== Switch version view (0.2s fade out → replace → fade in) =====
+  function switchVersion(v) {
+    if (v === currentVersion) return;
+    var essay = document.getElementById('essay-detail');
+    if (!essay) return;
+
+    essay.classList.add('essay-fading');
+
+    setTimeout(function() {
+      essay.innerHTML = versionArchive[v] || '';
+
+      // Handle merged banner visibility
+      var banner = document.getElementById('merged-banner');
+      if (banner) {
+        if (v === 'v4' && hasMerged) banner.classList.add('show');
+        else banner.classList.remove('show');
+      }
+
+      // Handle summary label (v4 post-merge only)
+      if (v === 'v4' && hasMerged) {
+        var label = document.getElementById('pr-summary-label');
+        if (label) {
+          label.style.display = 'block';
+          void label.offsetWidth;
+          label.classList.add('show');
+        }
+      }
+
+      essay.classList.remove('essay-fading');
+
+      currentVersion = v;
+      updateVersionPills();
+      updateRestoreButton();
+    }, 200);
+  }
+
+  // ===== Update pill active states =====
+  function updateVersionPills() {
+    document.querySelectorAll('.version-pill').forEach(function(pill) {
+      if (pill.getAttribute('data-version') === currentVersion) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
+    });
+  }
+
+  // ===== Smart disable restore button =====
+  function updateRestoreButton() {
+    var btn = document.getElementById('btn-restore');
+    if (!btn) return;
+    btn.disabled = (currentVersion === latestVersion);
+  }
+
+  // ===== Restore to selected version =====
+  function restoreVersion() {
+    if (currentVersion === latestVersion) return;
+
+    var restored = currentVersion;
+
+    // A. Update metadata version label
+    var metaRow = document.querySelector('.detail-meta-row');
+    if (metaRow) {
+      var spans = metaRow.querySelectorAll('span');
+      spans.forEach(function(s) {
+        if (s.textContent.indexOf('当前版本 v') !== -1) {
+          s.textContent = '当前版本 ' + restored.toUpperCase();
+        }
+      });
+    }
+
+    // B. Increment version history count
+    var versionTab = document.querySelectorAll('.detail-tab')[1];
+    if (versionTab) {
+      var match = versionTab.textContent.match(/\((\d+)\)/);
+      if (match) {
+        var count = parseInt(match[1]) + 1;
+        versionTab.textContent = '版本历史 (' + count + ')';
+      }
+    }
+
+    // Update latest version
+    latestVersion = restored;
+
+    // Persist
+    saveData();
+
+    // C. Show global toast
+    showVersionToast(restored);
+
+    // Disable restore button
+    updateRestoreButton();
+  }
+
+  // ===== Show version restore toast (reuses fork-toast mechanism) =====
+  function showVersionToast(version) {
+    var toast = document.getElementById('fork-toast');
+    if (!toast) return;
+    toast.querySelector('.toast-body').innerHTML = '<strong>已成功恢复到 ' + version.toUpperCase() + '</strong>';
+    toast.classList.remove('hide');
+    toast.classList.add('show');
+
+    setTimeout(function() {
+      toast.classList.remove('show');
+      toast.classList.add('hide');
+      setTimeout(function() {
+        toast.querySelector('.toast-body').innerHTML = '<strong>已 Fork 到你的工坊</strong>，可在「我的作品」列表顶部查看';
+      }, 300);
+    }, 4000);
+  }
+
+  // ===== Prepare essay for merge animation (restore pre-merge DOM) =====
+  function prepareForMerge() {
+    var essay = document.getElementById('essay-detail');
+    if (essay && preMergeEssayHTML) {
+      essay.innerHTML = preMergeEssayHTML;
+      currentVersion = 'v3';
+      updateVersionPills();
+      updateRestoreButton();
+    }
+  }
+
+  // ===== Sync version switcher after merge completes =====
+  function syncVersionSwitcherAfterMerge() {
+    hasMerged = true;
+    latestVersion = 'v4';
+    currentVersion = 'v4';
+    updateVersionPills();
+    updateRestoreButton();
+    saveData();
+  }
+
+  // ===== Fork micro-interaction state =====
+  var forkState = {
+    forkCount: 0,
+    toastVisible: false,
+    isForking: false
+  };
+
+  // ===== Dashboard 作文列表（数据驱动） =====
+  var essayList = [
+    { id: 'essay-1', title: 'The Impact of Social Media on Interpersonal Communication', status: 'published', tag: '考研大作文', wordCount: 248, dateText: '3 天前', navigateTo: 'detail' },
+    { id: 'essay-2', title: 'On the Importance of Lifelong Learning in Modern Society', status: 'review', tag: '考研大作文', wordCount: 215, dateText: '2 条 PR 待审', navigateTo: 'review' },
+    { id: 'essay-3', title: 'Environmental Protection: Individual Responsibility vs Government Action', status: 'published', tag: '高考作文', wordCount: 180, dateText: '1 周前', navigateTo: 'detail' },
+    { id: 'essay-4', title: 'The Role of Artificial Intelligence in Education (草稿)', status: 'draft', tag: '考研大作文', wordCount: 87, dateText: '昨天编辑', navigateTo: 'detail' },
+    { id: 'essay-5', title: '翻译练习：中国文化走出去 (Translation Practice)', status: 'published', tag: '翻译练习', wordCount: '中译英', dateText: '2 周前', navigateTo: 'detail' }
+  ];
+
+  function getTagClass(tag) {
+    var map = { '考研大作文': 'tag-kaoyan', '高考作文': 'tag-gaokao', '翻译练习': 'tag-fanyi', '自由写作': 'tag-free' };
+    return map[tag] || 'tag-kaoyan';
+  }
+
+  function renderEssayList(flashNewId) {
+    var container = document.getElementById('essay-list-container');
+    if (!container) return;
+    var html = '';
+    for (var i = 0; i < essayList.length; i++) {
+      var e = essayList[i];
+      var isFlash = flashNewId && e.id === flashNewId;
+      html +=
+        '<div class="comp-item' + (isFlash ? ' fork-new' : '') + '" onclick="navigate(\'' + e.navigateTo + '\')">' +
+        '<div class="comp-status ' + e.status + '"></div>' +
+        '<div class="comp-info">' +
+        '<div class="comp-title">' + e.title + '</div>' +
+        '<div class="comp-meta">' +
+        '<span class="comp-tag ' + getTagClass(e.tag) + '">' + e.tag + '</span>' +
+        '<span>' + e.wordCount + (typeof e.wordCount === 'number' ? ' 词' : '') + '</span>' +
+        '<span>' + e.dateText + '</span>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+    }
+    container.innerHTML = html;
+
+    // 更新 stat 统计
+    updateDashboardStats();
+  }
+
+  function updateDashboardStats() {
+    var statCards = document.querySelectorAll('#screen-dashboard .stat-card .stat-value');
+    var total = essayList.length + forkState.forkCount;
+    var draftCount = essayList.filter(function(e) { return e.status === 'draft'; }).length + forkState.forkCount;
+    if (statCards[0]) statCards[0].textContent = total;
+    var statSubs = document.querySelectorAll('#screen-dashboard .stat-card .stat-sub');
+    if (statSubs[0]) statSubs[0].textContent = draftCount + ' 篇草稿';
+  }
+
+  // ===== 编辑器发布 → 详情页同步 =====
+  function publishEssay() {
+    // 1. 获取编辑器内容
+    var editor = document.getElementById('essay-editor');
+    var titleInput = document.querySelector('#screen-editor .editor-title-input');
+    if (!editor) return;
+    var text = (editor.textContent || '').trim();
+    var title = titleInput ? titleInput.value.trim() : 'Untitled';
+    if (!text) { alert('请先输入作文内容'); return; }
+
+    // 2. 文本转 <p> 段落（保留 pr-summary-label div）
+    var paragraphs = text.split(/\n{2,}/).filter(function(p) { return p.trim().length > 0; });
+    var html = '';
+    for (var i = 0; i < paragraphs.length; i++) {
+      html += '<p>' + paragraphs[i].replace(/\n/g, '<br>') + '</p>\n';
+    }
+    var summaryDiv = document.getElementById('pr-summary-label');
+    if (summaryDiv) {
+      summaryDiv.style.display = 'none';
+      html += summaryDiv.outerHTML;
+    }
+
+    // 3. 更新详情页
+    var essayDetail = document.getElementById('essay-detail');
+    if (essayDetail) essayDetail.innerHTML = html;
+
+    var detailTitle = document.querySelector('#screen-detail .detail-title-row h2');
+    if (detailTitle) detailTitle.textContent = title;
+
+    // 更新元数据
+    var metaRow = document.querySelector('#screen-detail .detail-meta-row');
+    if (metaRow) {
+      var spans = metaRow.querySelectorAll('span');
+      if (spans[2]) spans[2].textContent = text.split(/\s+/).filter(function(w) { return /[a-zA-Z]/.test(w); }).length + ' \u8BCD';
+      if (spans[3]) spans[3].textContent = '\u5F53\u524D\u7248\u672C v3';
+      if (spans[4]) spans[4].textContent = '\u521A\u521A\u53D1\u5E03';
+    }
+
+    // 4. 添加到作文列表
+    var words = text.split(/\s+/).filter(function(w) { return /[a-zA-Z]/.test(w); }).length;
+    var newId = 'essay-pub-' + Date.now();
+    essayList.unshift({
+      id: newId,
+      title: title,
+      status: 'published',
+      tag: getActiveTag(),
+      wordCount: words,
+      dateText: '\u521A\u521A\u53D1\u5E03',
+      navigateTo: 'detail'
+    });
+    renderEssayList(newId);
+
+    // 5. 持久化
+    saveData();
+
+    // 6. 跳转
+    navigate('detail');
+  }
+
+  function getActiveTag() {
+    var activeTag = document.querySelector('#screen-editor .tag-select.active');
+    return activeTag ? activeTag.textContent : '\u8003\u7814\u5927\u4F5C\u6587';
+  }
+
+  function handleFork() {
+    if (forkState.isForking) return;
+    forkState.isForking = true;
+
+    // 1. Button → loading state
+    var btn = document.getElementById('fork-btn');
+    btn.classList.add('btn-forking');
+    btn.innerHTML = '<span class="fork-spinner"></span> Forking...';
+
+    // 2. After 1.5s: toast + dashboard data update + reset button
+    setTimeout(function() {
+      // Reset button
+      btn.classList.remove('btn-forking');
+      btn.innerHTML = 'Fork';
+      forkState.isForking = false;
+      forkState.forkCount++;
+
+      // Persist
+      saveData();
+
+      // Show global toast
+      showForkToast();
+
+      // Mutate dashboard data
+      updateDashboardAfterFork();
+    }, 1500);
+  }
+
+  function showForkToast() {
+    var toast = document.getElementById('fork-toast');
+    toast.classList.remove('hide');
+    toast.classList.add('show');
+    forkState.toastVisible = true;
+
+    // Auto-dismiss after 4s
+    setTimeout(function() {
+      toast.classList.add('hide');
+      setTimeout(function() {
+        toast.classList.remove('show', 'hide');
+        forkState.toastVisible = false;
+      }, 300);
+    }, 4000);
+  }
+
+  function updateDashboardAfterFork() {
+    // 添加新作文到列表
+    var newId = 'essay-fork-' + Date.now();
+    essayList.unshift({
+      id: newId,
+      title: 'Fork: The Impact of Social Media on Interpersonal Communication',
+      status: 'draft',
+      tag: '考研大作文',
+      wordCount: 248,
+      dateText: '刚刚',
+      navigateTo: 'detail'
+    });
+    renderEssayList(newId);
+    // 移除 fork-new 闪动效果
+    setTimeout(function() {
+      var el = document.querySelector('#essay-list-container .fork-new');
+      if (el) el.classList.remove('fork-new');
+    }, 2000);
+    saveData();
+  }
+
+  function animateNumber(el, from, to) {
+    var current = from;
+    var step = 1;
+    var interval = setInterval(function() {
+      current += step;
+      el.textContent = current;
+      if (current >= to) {
+        clearInterval(interval);
+        el.textContent = to;
+        // Brief highlight pulse
+        el.style.transition = 'color 0.3s';
+        el.style.color = 'var(--green)';
+        setTimeout(function() {
+          el.style.color = '';
+        }, 800);
+      }
+    }, 80);
+  }
+
+  function showMergeConfirm() {
+    document.getElementById('merge-confirm-modal').classList.add('show');
+  }
+  function closeMergeConfirm(e) {
+    if (e && e.target !== document.getElementById('merge-confirm-modal')) return;
+    document.getElementById('merge-confirm-modal').classList.remove('show');
+  }
+  function confirmMergePR() {
+    // Close modal
+    document.getElementById('merge-confirm-modal').classList.remove('show');
+
+    // --- 1. Navigate to detail page ---
+    navigate('detail');
+
+    // --- 2. 切换到内容 Tab ---
+    switchDetailTab('content');
+
+    // --- 3. 激活遮罩层 ---
+    var overlay = document.getElementById('pr-overlay');
+    overlay.classList.add('active');
+
+    // --- 4. 等待 DOM 渲染完成后开始动画 ---
+    setTimeout(function() {
+      var essay = document.getElementById('essay-detail');
+      if (!essay) { overlay.classList.remove('active'); return; }
+
+      // 滚动到可见位置
+      essay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // --- Phase A: 删除线淡出动画 (600ms) ---
+      var oldSpans = essay.querySelectorAll('.pr-old');
+      var delay = 0;
+      var stagger = 80; // 每个删除项错开 80ms
+
+      oldSpans.forEach(function(span, i) {
+        setTimeout(function() {
+          span.classList.add('pr-fading');
+        }, i * stagger);
+      });
+
+      var totalFadeTime = (oldSpans.length - 1) * stagger + 600;
+
+      // --- Phase B: 打字机动画 (每个新增项依次出现) ---
+      setTimeout(function() {
+        var newSpans = essay.querySelectorAll('.pr-new');
+        var allDone = 0;
+        var totalNew = newSpans.length;
+        var typeDelay = 0;
+
+        newSpans.forEach(function(span, i) {
+          setTimeout(function() {
+            if (span.classList.contains('pr-new-block')) {
+              // 块级新增：从 data-text 获取完整句子
+              typewriterBlock(span, function() {
+                allDone++;
+                if (allDone === totalNew) showSummary(essay, overlay);
+              });
+            } else {
+              // 内联新增：直接显示（短词不需要打字机，但保持风格）
+              // 对于单个单词，直接显示即可；对于多词短语用快速打字机
+              var text = span.textContent.trim();
+              if (text.split(' ').length <= 2) {
+                // 1-2个单词：直接淡入
+                span.style.opacity = '1';
+                span.style.transition = 'opacity 0.3s ease';
+                span.classList.add('typing');
+                allDone++;
+                if (allDone === totalNew) showSummary(essay, overlay);
+              } else {
+                // 更多单词：打字机效果
+                typewriterSpan(span, function() {
+                  allDone++;
+                  if (allDone === totalNew) showSummary(essay, overlay);
+                });
+              }
+            }
+          }, typeDelay);
+          typeDelay += 250; // 每个新增项间隔 250ms
+        });
+      }, totalFadeTime + 200); // 删除完成后等 200ms 再开始新增
+
+    }, 200); // 等待导航完成
+  }
+
+  // ===== 打字机：逐字显示（内联 span）=====
+  function typewriterSpan(span, callback) {
+    var fullText = span.textContent;
+    span.textContent = '';
+    span.style.opacity = '1';
+    span.style.transition = 'none';
+    span.classList.add('typing');
+
+    var i = 0;
+    var speed = 28; // 每个字符 28ms
+    function type() {
+      if (i < fullText.length) {
+        span.textContent += fullText.charAt(i);
+        i++;
+        setTimeout(type, speed);
+      } else {
+        if (callback) callback();
+      }
+    }
+    type();
+  }
+
+  // ===== 打字机：块级新增段落 =====
+  function typewriterBlock(span, callback) {
+    var fullText = span.getAttribute('data-text') || '';
+    // 先解码 HTML 实体
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = fullText;
+    fullText = tempDiv.textContent;
+
+    span.style.display = 'block';
+    span.style.opacity = '1';
+    span.style.transition = 'none';
+    span.classList.add('typing');
+
+    var i = 0;
+    var speed = 18; // 每个字符 18ms（块级更快）
+    function type() {
+      if (i < fullText.length) {
+        span.textContent += fullText.charAt(i);
+        i++;
+        // 滚动跟随
+        span.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(type, speed);
+      } else {
+        if (callback) callback();
+      }
+    }
+    type();
+  }
+
+  // ===== 显示 v4 摘要标签 + 收尾 =====
+  function showSummary(essay, overlay) {
+    // 显示 v4 摘要标签
+    var summaryLabel = document.getElementById('pr-summary-label');
+    if (summaryLabel) {
+      summaryLabel.style.display = 'block';
+      // 强制回流再添加 class
+      void summaryLabel.offsetWidth;
+      summaryLabel.classList.add('show');
+    }
+
+    // 更新版本历史（静默，不打断用户看内容）
+    updateVersionHistory();
+
+    // 3 秒后移除遮罩 + 淡出摘要标签
+    setTimeout(function() {
+      overlay.classList.remove('active');
+      if (summaryLabel) {
+        summaryLabel.classList.add('fading');
+        setTimeout(function() {
+          summaryLabel.classList.remove('show');
+          summaryLabel.classList.remove('fading');
+        }, 600);
+      }
+    }, 4000);
+  }
+
+  // ===== 更新版本历史（非视觉焦点，静默执行）=====
+  function updateVersionHistory() {
+    // Show v4 in version history, demote v3
+    var v4 = document.getElementById('v4-item');
+    if (v4) v4.style.display = 'block';
+    var v3Badge = document.getElementById('v3-badge');
+    if (v3Badge) {
+      v3Badge.textContent = '历史版本';
+      v3Badge.classList.remove('current');
+      v3Badge.style.background = 'var(--gray-100)';
+      v3Badge.style.color = 'var(--gray-500)';
+    }
+    var v3Item = document.getElementById('v3-item');
+    if (v3Item) v3Item.classList.remove('current');
+
+    // Show annotation banner in content area
+    var banner = document.getElementById('merged-banner');
+    if (banner) banner.classList.add('show');
+
+    // Update version count in tab
+    var versionTab = document.querySelectorAll('.detail-tab')[1];
+    if (versionTab) versionTab.textContent = '版本历史 (4)';
+
+    // Update detail meta row version label
+    var metaRow = document.querySelector('.detail-meta-row');
+    if (metaRow) {
+      var spans = metaRow.querySelectorAll('span');
+      spans.forEach(function(s) {
+        if (s.textContent.indexOf('当前版本 v') !== -1) {
+          s.textContent = '当前版本 v4';
+          s.style.color = 'var(--purple)';
+          s.style.fontWeight = '600';
+        }
+      });
+    }
+
+    // Sync version switcher state
+    syncVersionSwitcherAfterMerge();
+  }
+
+  function showInviteCode() {
+    document.getElementById('invite-code-modal').classList.add('show');
+  }
+  function closeInviteCode(e) {
+    if (e && e.target !== document.getElementById('invite-code-modal')) return;
+    document.getElementById('invite-code-modal').classList.remove('show');
+    var copyBtn = document.getElementById('copy-code-btn');
+    copyBtn.textContent = '复制';
+    copyBtn.classList.remove('copied');
+  }
+  function copyInviteCode() {
+    var code = document.getElementById('invite-code-text').textContent;
+    var btn = document.getElementById('copy-code-btn');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(function() {
+        btn.textContent = '已复制';
+        btn.classList.add('copied');
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = '已复制';
+      btn.classList.add('copied');
+    }
+  }
+
+  // ===== AI 标注系统：动态词库（无 span 模式） =====
+  const WORD_SUGGESTIONS = {
+    'good': { type: 'l1', suggestions: ['beneficial', 'advantageous', 'positive'], reason: '口语化表达，建议使用更正式的形容词' },
+    'great': { type: 'l2', suggestions: ['exceptional', 'remarkable', 'unparalleled'], reason: '可用更精准的词汇提升表达层次' },
+    'very': { type: 'l1', suggestions: ['extremely', 'profoundly', 'exceedingly'], reason: '"very" 是典型的口语填充词' },
+    'really': { type: 'l1', suggestions: ['truly', 'genuinely', 'particularly'], reason: '建议使用更书面化的副词' },
+    'important': { type: 'l2', suggestions: ['crucial', 'vital', 'essential', 'paramount'], reason: '可用更高阶词汇' },
+    'bad': { type: 'l1', suggestions: ['detrimental', 'harmful', 'adverse'], reason: '过于笼统和口语化' },
+    'things': { type: 'l1', suggestions: ['aspects', 'elements', 'factors'], reason: '指代不清，建议用具体名词' },
+    'bring': { type: 'l2', suggestions: ['generate', 'produce', 'foster'], reason: '可用更书面化的动词' },
+    'people': { type: 'l2', suggestions: ['individuals', 'citizens', 'the public'], reason: '可用更具体的指代' },
+    'brings': { type: 'l2', suggestions: ['unites', 'draws', 'connects'], reason: '更地道的搭配表达' },
+    'creates': { type: 'l2', suggestions: ['generates', 'produces', 'forms'], reason: '可用更书面化的动词' }
+  };
+  const modificationHistory = [];
+  let aiAnnotationsOn = true;
+  let currentPopoverTarget = null;
+
+  // ===== 词提取：从点击位置获取完整单词 =====
+  function getWordAtPoint(x, y) {
+    var range, textNode, offset;
+    if (document.caretRangeFromPoint) {
+      range = document.caretRangeFromPoint(x, y);
+      if (range) {
+        textNode = range.startContainer;
+        offset = range.startOffset;
+      }
+    } else if (document.caretPositionFromPoint) {
+      var pos = document.caretPositionFromPoint(x, y);
+      if (pos) {
+        textNode = pos.offsetNode;
+        offset = pos.offset;
+      }
+    }
+    if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return null;
+
+    var data = textNode.data;
+    var start = offset;
+    while (start > 0 && /[a-zA-Z']/.test(data[start - 1])) { start--; }
+    var end = offset;
+    while (end < data.length && /[a-zA-Z']/.test(data[end])) { end++; }
+    if (end <= start) return null;
+    var word = data.substring(start, end);
+
+    return {
+      word: word,
+      textNode: textNode,
+      start: start,
+      end: end,
+      context: data.substring(Math.max(0, start - 20), Math.min(data.length, end + 20))
+    };
+  }
+
+  // ===== 文本替换：Range API 安全替换 =====
+  function replaceWordInEditor(wordInfo, newWord) {
+    var editor = document.getElementById('essay-editor');
+    var range = document.createRange();
+    range.setStart(wordInfo.textNode, wordInfo.start);
+    range.setEnd(wordInfo.textNode, wordInfo.end);
+    range.deleteContents();
+    var newTextNode = document.createTextNode(newWord);
+    range.insertNode(newTextNode);
+    editor.normalize();
+    var newRange = document.createRange();
+    newRange.setStartAfter(newTextNode);
+    newRange.collapse(true);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+  }
+
+  // ===== localStorage 持久化 =====
+  var essaySaveTimer;
+  function saveData() {
+    var data = {
+      modificationHistory: modificationHistory,
+      forkCount: forkState.forkCount,
+      essayContent: document.getElementById('essay-editor').innerHTML,
+      currentVersion: currentVersion,
+      latestVersion: latestVersion,
+      hasMerged: hasMerged,
+      essayList: essayList
+    };
+    localStorage.setItem('engforge_data', JSON.stringify(data));
+  }
+
+  // ===== 动态字数统计 =====
+  function updateWordCount() {
+    var editor = document.getElementById('essay-editor');
+    var countEl = document.querySelector('#screen-editor .word-count');
+    if (!editor || !countEl) return;
+    var text = (editor.textContent || '').trim();
+    var words = text ? text.split(/\s+/).filter(function(w) { return /[a-zA-Z]/.test(w); }).length : 0;
+    var paragraphs = text ? text.split(/\n{2,}/).filter(function(p) { return p.trim().length > 0; }).length : 0;
+    if (paragraphs === 0 && text.length > 0) paragraphs = 1;
+    countEl.textContent = words + ' \u8BCD \u00B7 ' + paragraphs + ' \u6BB5';
+  }
+
+  // ===== AI 标注开关（无 span 模式：仅控制布尔标志） =====
+  function toggleAIAnnotations() {
+    aiAnnotationsOn = !aiAnnotationsOn;
+    var track = document.getElementById('ai-toggle-track');
+    var hint = document.getElementById('ai-toggle-hint');
+
+    if (aiAnnotationsOn) {
+      track.classList.add('on');
+      hint.textContent = '标注已开启 · 点击词汇查看 AI 建议';
+      hint.classList.add('active');
+    } else {
+      track.classList.remove('on');
+      hint.textContent = '标注已关闭 · 开启后可点击词汇查看 AI 建议';
+      hint.classList.remove('active');
+      closePopover();
+    }
+  }
+
+  // ===== 绑定标注点击事件（无 span：实时词提取） =====
+  function setupAnnotationClickHandlers() {
+    var editor = document.getElementById('essay-editor');
+    if (!editor) return;
+    editor.addEventListener('click', function(e) {
+      if (!aiAnnotationsOn) return;
+
+      var wordInfo = getWordAtPoint(e.clientX, e.clientY);
+      if (!wordInfo) { closePopover(); return; }
+
+      var key = wordInfo.word.toLowerCase();
+      if (!WORD_SUGGESTIONS[key]) { closePopover(); return; }
+
+      var entry = WORD_SUGGESTIONS[key];
+      var ann = {
+        word: wordInfo.word,
+        type: entry.type,
+        suggestions: entry.suggestions,
+        reason: entry.reason,
+        wordInfo: wordInfo
+      };
+
+      showPopover(ann, e);
+    });
+  }
+
+  // ===== 显示 Popover（无 span：接收 ann 对象） =====
+  function showPopover(ann, event) {
+    currentPopoverTarget = ann;
+    var popover = document.getElementById('ai-popover');
+    var badge = document.getElementById('popover-badge');
+    var header = document.getElementById('popover-header');
+    var wordLabel = document.getElementById('popover-word-label');
+    var reason = document.getElementById('popover-reason');
+    var suggestions = document.getElementById('popover-suggestions');
+
+    badge.textContent = ann.type === 'l1' ? 'L1 错误' : 'L2 升级';
+    badge.className = 'ai-popover-type-badge ' + ann.type;
+    header.className = 'ai-popover-header ' + ann.type;
+    wordLabel.textContent = '\u201C' + ann.word + '\u201D ' + (ann.type === 'l1' ? '可优化' : '可升级');
+    reason.textContent = ann.reason;
+
+    var chipsHTML = '';
+    ann.suggestions.forEach(function(word) {
+      chipsHTML += '<div class="ai-suggestion-chip" onclick="acceptSuggestion(\'' + escapeHTML(word) + '\')"><span class="chip-replace-icon">\u2192</span>' + word + '</div>';
+    });
+    suggestions.innerHTML = chipsHTML;
+
+    popover.style.display = 'block';
+
+    requestAnimationFrame(function() {
+      var editorBody = document.querySelector('#screen-editor .editor-body');
+      var editorRect = editorBody.getBoundingClientRect();
+      var popoverWidth = popover.offsetWidth;
+      var left = event.clientX - editorRect.left - (popoverWidth / 2);
+      var top = event.clientY - editorRect.top + 18;
+      if (left < 8) left = 8;
+      if (left + popoverWidth > editorRect.width - 8) left = editorRect.width - popoverWidth - 8;
+      popover.style.left = left + 'px';
+      popover.style.top = top + 'px';
+    });
+  }
+
+  // ===== 关闭 Popover =====
+  function closePopover() {
+    document.getElementById('ai-popover').style.display = 'none';
+    currentPopoverTarget = null;
+  }
+
+  // 点击页面其他地方关闭 popover
+  document.addEventListener('click', function(e) {
+    var popover = document.getElementById('ai-popover');
+    if (!popover || popover.style.display === 'none') return;
+    if (!popover.contains(e.target)) {
+      closePopover();
+    }
+  });
+
+  // ===== 接受建议：Range API 替换 + 记录历史 =====
+  function acceptSuggestion(suggestion) {
+    var ann = currentPopoverTarget;
+    if (!ann || !ann.wordInfo) return;
+
+    var oldWord = ann.word;
+    var wordInfo = ann.wordInfo;
+    var type = ann.type;
+
+    // 1. 使用 Range API 替换文本
+    replaceWordInEditor(wordInfo, suggestion);
+
+    // 2. 记录修改历史
+    modificationHistory.push({
+      oldWord: oldWord,
+      newWord: suggestion,
+      type: type,
+      time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+      context: wordInfo.context
+    });
+
+    // 3. 更新 UI
+    renderModHistory();
+    updateModCount();
+    closePopover();
+
+    // 4. 持久化
+    saveData();
+  }
+
+  // ===== 修改历史渲染 =====
+  function renderModHistory() {
+    var list = document.getElementById('mod-history-list');
+    var empty = document.getElementById('mod-history-empty');
+    var footer = document.getElementById('mod-history-footer');
+    var countBadge = document.getElementById('mod-count-badge');
+
+    if (modificationHistory.length === 0) {
+      list.innerHTML = '<div class="mod-history-empty" id="mod-history-empty">&#128221;<br>尚未通过 AI 修改任何词汇。<br>点击编辑区词汇即可开始。</div>';
+      footer.style.display = 'none';
+      countBadge.style.display = 'none';
+      return;
+    }
+
+    countBadge.style.display = 'inline-block';
+    countBadge.textContent = modificationHistory.length + ' \u5904';
+    footer.style.display = 'block';
+    document.getElementById('mod-total-count').textContent = modificationHistory.length;
+
+    var html = '';
+    for (var i = modificationHistory.length - 1; i >= 0; i--) {
+      var e = modificationHistory[i];
+      html +=
+        '<div class="mod-history-item" data-history-idx="' + i + '">' +
+        '<div class="mod-history-dot ' + e.type + '"></div>' +
+        '<div class="mod-history-body">' +
+        '<div class="mod-history-action">' +
+        '<span class="old-word">' + e.oldWord + '</span> \u2192 ' +
+        '<span class="new-word">' + e.newWord + '</span>' +
+        '</div>' +
+        '<div class="mod-history-time">' + e.time + '</div>' +
+        '</div>' +
+        '<span class="mod-history-undo" onclick="undoModification(' + i + ')" title="撤销此修改">撤销</span>' +
+        '</div>';
+    }
+    list.innerHTML = html;
+  }
+
+  function updateModCount() {
+    var badge = document.getElementById('mod-count-badge');
+    var footer = document.getElementById('mod-history-footer');
+    if (modificationHistory.length === 0) {
+      badge.style.display = 'none';
+      footer.style.display = 'none';
+    } else {
+      badge.style.display = 'inline-block';
+      badge.textContent = modificationHistory.length + ' \u5904';
+      footer.style.display = 'block';
+      document.getElementById('mod-total-count').textContent = modificationHistory.length;
+    }
+  }
+
+  // ===== 撤销修改（无 span：TreeWalker + context 匹配） =====
+  function undoModification(historyIdx) {
+    var entry = modificationHistory[historyIdx];
+    if (!entry) return;
+
+    var editor = document.getElementById('essay-editor');
+    var walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+    var node, found = false;
+    var firstMatchNode = null, firstMatchStart = -1;
+
+    while ((node = walker.nextNode())) {
+      var data = node.data;
+      var idx = data.indexOf(entry.newWord);
+      if (idx === -1) continue;
+
+      var surrounding = data.substring(
+        Math.max(0, idx - 20),
+        Math.min(data.length, idx + entry.newWord.length + 20)
+      );
+      if (entry.context && surrounding.indexOf(entry.context.substring(0, 10)) !== -1) {
+        var range = document.createRange();
+        range.setStart(node, idx);
+        range.setEnd(node, idx + entry.newWord.length);
+        range.deleteContents();
+        range.insertNode(document.createTextNode(entry.oldWord));
+        editor.normalize();
+        found = true;
+        break;
+      }
+
+      if (firstMatchStart === -1) {
+        firstMatchNode = node;
+        firstMatchStart = idx;
+      }
+    }
+
+    if (!found && firstMatchNode) {
+      var fallbackRange = document.createRange();
+      fallbackRange.setStart(firstMatchNode, firstMatchStart);
+      fallbackRange.setEnd(firstMatchNode, firstMatchStart + entry.newWord.length);
+      fallbackRange.deleteContents();
+      fallbackRange.insertNode(document.createTextNode(entry.oldWord));
+      editor.normalize();
+    }
+
+    modificationHistory.splice(historyIdx, 1);
+    renderModHistory();
+    updateModCount();
+    saveData();
+  }
+
+  // HTML 转义辅助
+  function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+  }
+
+  // ===== 页面加载：绑定事件 + 防抖监听 + localStorage 恢复 =====
+  document.addEventListener('DOMContentLoaded', function() {
+    setupAnnotationClickHandlers();
+
+    // 编辑器 input 防抖保存 + 动态字数
+    var editor = document.getElementById('essay-editor');
+    if (editor) {
+      updateWordCount();
+      editor.addEventListener('input', function() {
+        updateWordCount();
+        clearTimeout(essaySaveTimer);
+        essaySaveTimer = setTimeout(saveData, 500);
+      });
+    }
+
+    // localStorage 恢复
+    restoreFromStorage();
+
+    // 首屏渲染（若 restore 未触发则用默认列表）
+    if (!localStorage.getItem('engforge_data')) {
+      renderEssayList();
+    }
+  });
+  // 兜底：立即执行一次（以防 DOMContentLoaded 已触发）
+  setupAnnotationClickHandlers();
+
+  // ===== localStorage 恢复逻辑 =====
+  function restoreFromStorage() {
+    var raw = localStorage.getItem('engforge_data');
+    if (!raw) return;
+    try {
+      var data = JSON.parse(raw);
+
+      // A. 恢复变量
+      if (data.modificationHistory) {
+        modificationHistory.length = 0;
+        data.modificationHistory.forEach(function(e) { modificationHistory.push(e); });
+      }
+      if (typeof data.forkCount !== 'undefined') forkState.forkCount = data.forkCount;
+
+      // A2. 恢复作文列表
+      if (data.essayList && data.essayList.length > 0) {
+        essayList.length = 0;
+        data.essayList.forEach(function(e) { essayList.push(e); });
+      }
+      renderEssayList();
+
+      // B. 恢复编辑器内容
+      var editor = document.getElementById('essay-editor');
+      if (editor && data.essayContent) {
+        editor.innerHTML = data.essayContent;
+      }
+
+      // C. 恢复版本状态
+      if (data.currentVersion) currentVersion = data.currentVersion;
+      if (data.latestVersion) latestVersion = data.latestVersion;
+      if (typeof data.hasMerged !== 'undefined') hasMerged = data.hasMerged;
+
+      // D. 更新 UI
+      renderModHistory();
+      updateModCount();
+      updateVersionPills();
+      updateRestoreButton();
+
+      // E. 更新 Dashboard 统计（基于 essayList）
+      updateDashboardStats();
+    } catch(e) {
+      console.warn('EngForge: localStorage 恢复失败，使用默认数据', e);
+    }
+  }
+
+  function selectVisibility(btn) {
+    var container = btn.parentElement;
+    container.querySelectorAll('.vis-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+
+  function toggleInviteSection() {
+    const section = document.getElementById('invite-section');
+    const btn = document.getElementById('toggle-invite-btn');
+    if (section.style.display === 'none') {
+      section.style.display = 'block';
+      btn.textContent = '\u6536\u8d77';
+      document.getElementById('invite-email').focus();
+    } else {
+      section.style.display = 'none';
+      btn.textContent = '+ \u9080\u8bf7\u6279\u6539';
+    }
+  }
+
+  function updateInviteBtn() {
+    const email = document.getElementById('invite-email').value.trim();
+    const btn = document.getElementById('invite-send-btn');
+    btn.disabled = email === '';
+  }
+
+  function sendInvite() {
+    const input = document.getElementById('invite-email');
+    let username = input.value.trim();
+    if (!username) return;
+
+    // Normalize username: strip leading @
+    var display = username.replace(/^@/, '');
+    var initial = display.charAt(0).toUpperCase();
+
+    // Show inline toast
+    var toast = document.getElementById('invite-toast');
+    toast.classList.add('show');
+
+    // Add pending collaborator to the list
+    var card = document.querySelector('#screen-detail .sidebar-card');
+    var inviteSection = document.getElementById('invite-section');
+    var newCollaborator = document.createElement('div');
+    newCollaborator.className = 'collaborator';
+    newCollaborator.setAttribute('data-pending', 'true');
+    newCollaborator.innerHTML =
+      '<div class="avatar-sm" style="background:var(--amber);">' + initial + '</div>' +
+      '<div class="collaborator-info">' +
+      '<div class="collaborator-name">@' + display + '</div>' +
+      '<div class="collaborator-role pending">待接受</div>' +
+      '</div>';
+    card.insertBefore(newCollaborator, inviteSection);
+
+    // Update collaborator count
+    var countEl = card.querySelector('h4');
+    var match = countEl.textContent.match(/\((\d+)\)/);
+    if (match) {
+      var count = parseInt(match[1]) + 1;
+      countEl.textContent = '协作者 (' + count + ')';
+    }
+
+    // Fire site-internal notification
+    addNotification(display);
+
+    // Reset input
+    input.value = '';
+    document.getElementById('invite-send-btn').disabled = true;
+  }
+
+  function addNotification(username) {
+    var dot = document.getElementById('notif-dot');
+    var list = document.getElementById('notif-list');
+    var countEl = document.getElementById('notif-count');
+    if (!dot) return;
+
+    // Show red dot
+    dot.classList.add('show');
+
+    // Remove empty placeholder
+    var empty = list.querySelector('.notif-empty');
+    if (empty) empty.remove();
+
+    // Add notification item
+    var item = document.createElement('div');
+    item.className = 'notif-item unread';
+    item.innerHTML =
+      '<div class="notif-icon-sm" style="background:var(--primary-light);color:var(--primary);">👥</div>' +
+      '<div>' +
+      '<div class="notif-item-text">你已向 <strong>@' + username + '</strong> 发出了协作邀请，等待对方接受</div>' +
+      '<div class="notif-item-time">刚刚</div>' +
+      '</div>';
+    list.insertBefore(item, list.firstChild);
+
+    // Update count
+    var items = list.querySelectorAll('.notif-item');
+    countEl.textContent = items.length + ' 条新';
+  }
+
+  function toggleNotifDropdown() {
+    var dropdown = document.getElementById('notif-dropdown');
+    dropdown.classList.toggle('show');
+    // Mark as read after opening
+    setTimeout(function() {
+      var items = dropdown.querySelectorAll('.notif-item.unread');
+      items.forEach(function(i) { i.classList.remove('unread'); });
+      var dot = document.getElementById('notif-dot');
+      setTimeout(function() { dot.classList.remove('show'); }, 2000);
+    }, 1500);
+  }
+
+  // Generate heatmap
+  (function() {
+    const grid = document.getElementById('heatmap');
+    if (!grid) return;
+    const levels = ['', '', 'l1', '', 'l2', '', 'l1', '', '', 'l3', 'l2', '', 'l1', '', 'l4', 'l3', 'l2', '', 'l1', '', 'l2', 'l3', '', 'l1', '', 'l4', '', '', 'l1', 'l2', '', 'l3', '', '', 'l1', '', 'l2', 'l3', 'l4', '', 'l2', '', 'l1', '', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4', 'l2', '', 'l1', '', '', 'l2', 'l3', '', 'l1', '', 'l4', 'l3', '', 'l2', 'l1', '', '', 'l3', '', 'l2', 'l1', '', 'l4', '', 'l3', 'l2', '', '', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l1', 'l2', '', 'l3', '', '', 'l2', 'l1', 'l3', '', 'l4', 'l2', '', 'l1', '', 'l3', '', 'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', '', 'l1', 'l2', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4', '', 'l2', '', 'l1', '', 'l3', '', 'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l2', 'l1', '', 'l3', '', 'l4', 'l2', '', 'l1', 'l3', '', '', 'l2', 'l4', 'l1', '', 'l3', '', 'l2', '', 'l1', 'l4', 'l3', '', 'l2', '', 'l1', '', 'l3', 'l4', 'l2', '', '', 'l1', 'l3', '', 'l2', 'l4', '', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l1', 'l2', 'l3', '', 'l4', '', 'l2', 'l1', 'l3', '', '', 'l4', 'l2', '', 'l1', '', 'l3', 'l2', 'l4', '', 'l1', '', 'l3', '', 'l2', 'l4', 'l1', '', 'l3', '', 'l2', '', 'l4', 'l1', 'l3', 'l2', '', '', 'l4', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l2', 'l1', '', 'l3', 'l4', '', 'l2', 'l1', '', 'l3', '', '', 'l2', 'l4', 'l1', 'l3', '', '', 'l4', 'l2', '', 'l1', 'l3', 'l2', '', 'l4', '', 'l1', 'l3', '', 'l2', 'l4', '', 'l1', 'l2', 'l3', 'l4', '', '', 'l1', 'l2', '', 'l3', 'l4', '', 'l2', 'l1', 'l3', '', 'l4', 'l2', '', 'l1', 'l3', 'l4', '', 'l2', '', 'l1', 'l3', '', 'l4', 'l2'];
+    
+    const cells = 26 * 7;
+    for (let i = 0; i < cells; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'heatmap-cell ' + (levels[i] || '');
+      grid.appendChild(cell);
+    }
+  })();
+</script>
+
+</body>
+</html>

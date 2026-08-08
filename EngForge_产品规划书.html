@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EngForge — 英语学习协作工坊 产品规划书 v2.0</title>
+<style>
+  :root {
+    --primary: #2563EB;
+    --primary-light: #DBEAFE;
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --teal: #0891B2;
+    --teal-light: #CFFAFE;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --green: #059669;
+    --green-light: #D1FAE5;
+    --amber: #D97706;
+    --amber-light: #FEF3C7;
+    --red: #DC2626;
+    --red-light: #FEE2E2;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #fff;
+    color: var(--gray-900);
+    line-height: 1.75;
+    font-size: 15px;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+  .cover {
+    background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 50%, #7C3AED 100%);
+    color: #fff;
+    padding: 80px 24px 60px;
+    text-align: center;
+  }
+  .cover h1 { font-size: 42px; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
+  .cover .tagline { font-size: 18px; opacity: 0.9; margin-bottom: 32px; }
+  .cover .meta { display: flex; justify-content: center; gap: 32px; font-size: 14px; opacity: 0.8; flex-wrap: wrap; }
+  .cover .meta span { display: flex; align-items: center; gap: 6px; }
+  .cover .changelog {
+    margin-top: 24px; background: rgba(255,255,255,0.15); border-radius: 8px;
+    padding: 12px 20px; display: inline-block; font-size: 13px; max-width: 600px;
+  }
+  section { margin-top: 56px; }
+  h2 {
+    font-size: 24px; font-weight: 600; color: var(--gray-900);
+    margin-bottom: 8px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--gray-200);
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2 .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--primary); color: #fff; font-size: 14px;
+  }
+  h2 .rev { font-size: 12px; color: var(--red); font-weight: 500; margin-left: 8px; }
+  h3 { font-size: 18px; font-weight: 600; color: var(--gray-700); margin: 24px 0 12px; }
+  p { margin-bottom: 12px; color: var(--gray-700); }
+  ul, ol { margin: 8px 0 16px 20px; }
+  li { margin-bottom: 6px; color: var(--gray-700); }
+  strong { color: var(--gray-900); }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+  .card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: 12px;
+    padding: 20px; transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 28px; margin-bottom: 12px; }
+  .card h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--gray-900); }
+  .card p { font-size: 13px; color: var(--gray-500); margin: 0; }
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 6px;
+    font-size: 12px; font-weight: 500; margin: 0 4px 4px 0;
+  }
+  .tag-blue { background: var(--primary-light); color: var(--primary); }
+  .tag-purple { background: var(--purple-light); color: var(--purple); }
+  .tag-teal { background: var(--teal-light); color: var(--teal); }
+  .tag-green { background: var(--green-light); color: var(--green); }
+  .tag-amber { background: var(--amber-light); color: var(--amber); }
+  .tag-red { background: var(--red-light); color: var(--red); }
+  .tag-gray { background: var(--gray-100); color: var(--gray-500); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th { background: var(--gray-50); padding: 12px; text-align: left; font-weight: 600; color: var(--gray-700); border-bottom: 2px solid var(--gray-200); }
+  td { padding: 12px; border-bottom: 1px solid var(--gray-200); color: var(--gray-700); }
+  tr:hover td { background: var(--gray-50); }
+  .callout {
+    border-left: 4px solid; border-radius: 0 8px 8px 0;
+    padding: 16px 20px; margin: 16px 0; font-size: 14px;
+  }
+  .callout-blue { border-color: var(--primary); background: var(--primary-light); }
+  .callout-amber { border-color: var(--amber); background: var(--amber-light); }
+  .callout-green { border-color: var(--green); background: var(--green-light); }
+  .callout-red { border-color: var(--red); background: var(--red-light); }
+  .callout strong { display: block; margin-bottom: 4px; }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0; }
+  .flow-step {
+    background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px;
+    padding: 10px 16px; font-size: 13px; font-weight: 500; color: var(--gray-700);
+  }
+  .flow-arrow { color: var(--gray-300); font-size: 18px; }
+  .phase {
+    border: 1px solid var(--gray-200); border-radius: 12px;
+    padding: 24px; margin: 16px 0; position: relative;
+  }
+  .phase-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+  .phase-title { font-size: 18px; font-weight: 600; }
+  .phase-badge { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .phase-1 { border-left: 4px solid var(--green); }
+  .phase-1 .phase-badge { background: var(--green-light); color: var(--green); }
+  .phase-2 { border-left: 4px solid var(--primary); }
+  .phase-2 .phase-badge { background: var(--primary-light); color: var(--primary); }
+  .phase-25 { border-left: 4px solid var(--teal); }
+  .phase-25 .phase-badge { background: var(--teal-light); color: var(--teal); }
+  .phase-3 { border-left: 4px solid var(--purple); }
+  .phase-3 .phase-badge { background: var(--purple-light); color: var(--purple); }
+  .tech-item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .tech-item:last-child { border-bottom: none; }
+  .tech-role { font-weight: 600; min-width: 120px; color: var(--gray-900); }
+  .tech-name { color: var(--primary); font-weight: 600; }
+  .tech-desc { color: var(--gray-500); font-size: 13px; }
+  .toc {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 12px; padding: 24px; margin: 32px 0;
+  }
+  .toc h3 { margin: 0 0 12px; font-size: 16px; }
+  .toc ol { margin: 0 0 0 20px; }
+  .toc a { color: var(--primary); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc li { margin-bottom: 4px; font-size: 14px; }
+  .persona { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .persona-card { border: 1px solid var(--gray-200); border-radius: 12px; padding: 20px; }
+  .persona-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .persona-card .pains { margin-top: 12px; }
+  .persona-card .pains li { font-size: 13px; color: var(--red); margin-bottom: 4px; }
+  .persona-card .goals li { font-size: 13px; color: var(--green); margin-bottom: 4px; }
+  .mock-ui { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 12px; padding: 24px; margin: 16px 0; }
+  .mock-nav { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--gray-200); margin-bottom: 16px; }
+  .mock-nav .logo { font-weight: 700; font-size: 18px; color: var(--primary); }
+  .mock-nav .nav-item { font-size: 13px; color: var(--gray-500); }
+  .mock-nav .nav-item.active { color: var(--gray-900); font-weight: 600; }
+  .mock-repo { background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .mock-repo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .mock-repo-title { font-weight: 600; font-size: 15px; color: var(--primary); }
+  .mock-repo-desc { font-size: 13px; color: var(--gray-700); margin-bottom: 8px; }
+  .mock-repo-tags { display: flex; gap: 6px; }
+  .mock-stat { font-size: 12px; color: var(--gray-500); display: flex; align-items: center; gap: 4px; }
+  .badge-new { background: var(--green-light); color: var(--green); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-private { background: var(--amber-light); color: var(--amber); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .ai-guard { border: 1px solid var(--gray-200); border-radius: 12px; overflow: hidden; margin: 16px 0; }
+  .ai-guard-row { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--gray-100); gap: 16px; }
+  .ai-guard-row:last-child { border-bottom: none; }
+  .ai-guard-level { font-weight: 700; font-size: 14px; min-width: 40px; }
+  .ai-guard-func { font-weight: 600; min-width: 160px; font-size: 14px; }
+  .ai-guard-status { font-size: 13px; min-width: 60px; font-weight: 600; }
+  .ai-guard-reason { font-size: 13px; color: var(--gray-500); flex: 1; }
+  .compare-old { text-decoration: line-through; color: var(--gray-300); }
+
+  /* === 1.5 Governance Section === */
+  .tombstone-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: 12px;
+    padding: 22px 24px; position: relative; transition: box-shadow 0.2s;
+  }
+  .tombstone-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .tombstone-card .ts-icon { font-size: 28px; margin-bottom: 10px; }
+  .tombstone-card .ts-label {
+    font-size: 11px; font-weight: 700; color: var(--gray-400);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  .tombstone-card .ts-statement {
+    font-size: 15px; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 10px; line-height: 1.55;
+  }
+  .tombstone-card .ts-explain {
+    font-size: 13px; color: var(--gray-500); line-height: 1.65; margin: 0;
+  }
+  .tombstone-card.ts-identity { border-left: 4px solid var(--primary); }
+  .tombstone-card.ts-bottomline { border-left: 4px solid var(--red); }
+  .tombstone-card.ts-default { border-left: 4px solid var(--amber); }
+
+  .decision-log-note {
+    font-size: 13px; color: var(--red); background: var(--red-light);
+    border-radius: 8px; padding: 12px 16px; margin-top: 12px; line-height: 1.6;
+  }
+  .decision-log-note strong { color: var(--red); }
+
+  .precheck-box {
+    border: 2px dashed var(--purple); border-radius: 12px; padding: 22px;
+    margin: 16px 0; background: var(--purple-light);
+  }
+  .precheck-box .pc-title {
+    font-size: 14px; font-weight: 700; color: var(--purple); margin-bottom: 4px;
+  }
+  .precheck-box .pc-sub { font-size: 12px; color: var(--gray-500); margin-bottom: 14px; }
+  .precheck-box .pc-template {
+    font-family: 'Courier New', 'Consolas', monospace; font-size: 13px;
+    background: #fff; border-radius: 8px; padding: 18px 20px;
+    line-height: 1.9; color: var(--gray-700);
+    border: 1px solid var(--gray-200); white-space: pre-wrap;
+  }
+  .precheck-box .pc-template .pc-key { color: var(--purple); font-weight: 700; }
+  .precheck-box .pc-template .pc-fill { color: var(--gray-400); font-style: italic; }
+
+  .gov-board {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: 12px;
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .gov-board .gb-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--gray-100);
+  }
+  .gov-board .gb-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 6px; font-size: 12px; font-weight: 700;
+  }
+  .gov-board.gb-1 .gb-num { background: var(--primary-light); color: var(--primary); }
+  .gov-board.gb-1 { border-top: 3px solid var(--primary); }
+  .gov-board.gb-2 .gb-num { background: var(--amber-light); color: var(--amber); }
+  .gov-board.gb-2 { border-top: 3px solid var(--amber); }
+  .gov-board.gb-3 .gb-num { background: var(--purple-light); color: var(--purple); }
+  .gov-board.gb-3 { border-top: 3px solid var(--purple); }
+  .gov-board.gb-4 .gb-num { background: var(--teal-light); color: var(--teal); }
+  .gov-board.gb-4 { border-top: 3px solid var(--teal); }
+  .gov-board .gb-title { font-size: 15px; font-weight: 700; color: var(--gray-900); }
+
+  /* 板块四：四层纠偏执行体系 */
+  .layer-row {
+    display: flex; align-items: flex-start; gap: 12px; padding: 14px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .layer-row:last-child { border-bottom: none; }
+  .layer-row .lr-num {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .layer-row .lr-body { flex: 1; }
+  .layer-row .lr-title { font-size: 14px; font-weight: 600; color: var(--gray-900); margin-bottom: 2px; }
+  .layer-row .lr-desc { font-size: 13px; color: var(--gray-500); line-height: 1.6; }
+  .layer-row .lr-trigger { font-size: 12px; font-weight: 600; color: var(--teal); margin-bottom: 4px; }
+
+  .checklist-box {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: 8px; padding: 16px 20px; margin: 12px 0;
+    font-family: 'Courier New', 'Consolas', monospace; font-size: 13px;
+    line-height: 2.0; color: var(--gray-700); white-space: pre-wrap;
+  }
+  .checklist-box .cl-label {
+    font-weight: 700; color: var(--gray-900); display: block;
+    margin-bottom: 2px; margin-top: 10px;
+  }
+  .checklist-box .cl-label:first-child { margin-top: 0; }
+
+  .footer { text-align: center; padding: 40px 24px; border-top: 1px solid var(--gray-200); color: var(--gray-500); font-size: 13px; }
+  @media (max-width: 640px) {
+    .persona { grid-template-columns: 1fr; }
+    .cover h1 { font-size: 30px; }
+    .cover .meta { flex-direction: column; gap: 8px; }
+    .ai-guard-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>EngForge</h1>
+  <p class="tagline">用 GitHub 的方式学英语 — 私密工坊 · 邀请协作 · 范文迭代</p>
+  <div class="meta">
+    <span>产品规划书 v2.0（修订版）</span>
+    <span>目标用户：考研 & 上海高考英语</span>
+    <span>日期：2026-08-02</span>
+  </div>
+  <div class="changelog">
+    v2.0 修订要点：① 工坊优先，广场延后（Phase 2.5） ② 阅读精读降级为附属功能 ③ AI 设立硬性护栏 ④ 收费门槛提高至 500 活跃用户 + 留存 > 40% ⑤ 1.5 章新增板块四：四层纠偏执行体系
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="toc">
+    <h3>目录</h3>
+    <ol>
+      <li><a href="#vision">产品愿景与一句话定位</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li style="margin-left:20px;list-style:none;"><a href="#governance" style="font-size:13px;color:var(--purple);">1.5 产品治理与纠偏机制（掌舵人守则）</a> <span class="tag tag-purple" style="font-size:10px;">更新</span></li>
+      <li><a href="#problem">痛点分析 — 为什么需要这个产品</a></li>
+      <li><a href="#users">目标用户画像</a></li>
+      <li><a href="#core">核心功能设计</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li><a href="#flow">典型用户流程</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li><a href="#architecture">产品架构</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li><a href="#ui">界面原型示意</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li><a href="#roadmap">开发路线图（四阶段）</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li><a href="#tech">技术选型建议</a></li>
+      <li><a href="#competitors">竞品分析与差异化</a></li>
+      <li><a href="#monetization">商业模式</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li><a href="#risks">风险与对策</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+      <li><a href="#next">下一步行动建议</a> <span class="tag tag-red" style="font-size:10px;">修订</span></li>
+    </ol>
+  </div>
+
+  <!-- ========== 1. VISION ========== -->
+  <section id="vision">
+    <h2><span class="num">1</span> 产品愿景与一句话定位 <span class="rev">v2.0 修订</span></h2>
+    <div class="callout callout-blue">
+      <strong>一句话定位（修订后）</strong>
+      EngForge 是一个面向考研和上海高考英语的<strong>邀请制写作工坊</strong>，学生用「写作仓库」的形式管理作文和翻译，通过邀请指定的人 Fork 借鉴、PR 互改，让主观题练习从「孤独的死记硬背」变成「看得见进步的协作打磨」。当高质量范文积累到 100 篇以上后，再逐步开放公开广场。
+    </div>
+    <div class="callout callout-amber">
+      <strong>为什么从"公开社区"改为"私密工坊"？</strong>
+      <ul style="margin-top:8px;">
+        <li><strong>冷启动悖论</strong>：空广场比没广场更劝退 — 一个人维护的公开社区上线后只会看到广告、灌水和冷清</li>
+        <li><strong>质量控制</strong>：邀请制天然过滤低质量用户，早期每篇作文的质量都能保证</li>
+        <li><strong>工具优先</strong>：先让用户觉得"这个工具好用"，再让他们觉得"这个社区热闹"</li>
+        <li><strong>GitHub 先例</strong>：GitHub 自己起步时也是 invite-only，验证了工具价值后才开放</li>
+      </ul>
+    </div>
+    <h3>核心理念</h3>
+    <ul>
+      <li><strong>写作即仓库</strong> — 每篇作文/翻译都是一个 Repository，有版本历史、有分支、有合并</li>
+      <li><strong>批改即协作</strong> — PR 机制让批改变成结构化的对话，不是简单打分，而是逐句讨论</li>
+      <li><strong>进步可追溯</strong> — Commit 历史让你看到从初稿到终稿的每一步变化，理解"为什么这样改"</li>
+      <li><strong>工坊即语料库</strong> — Star 收藏的优质范文组成你的个人语料库，比任何词汇书都实用</li>
+      <li><strong>公开发布是可选的</strong> — 作文默认私密，作者可主动选择"发布到广场"，内容自然积累</li>
+    </ul>
+  </section>
+
+  <!-- ========== 1.5 GOVERNANCE ========== -->
+  <section id="governance">
+    <h2><span class="num">1.5</span> 产品治理与纠偏机制（掌舵人守则） <span class="rev" style="color:var(--purple);">新增</span></h2>
+    <div class="callout callout-blue">
+      <strong>为什么需要这一章？</strong>
+      产品在迭代过程中最危险的敌人不是竞品，而是掌舵人自己在反馈压力下的「方向漂移」。每一次看似合理的小妥协，累积起来就会偏离墓碑上的锚点。本章是一套自我约束机制 —— 在你想要「加个功能」「放开 AI 权限」「默认公开」时，先回到这里照一照镜子。
+    </div>
+
+    <!-- 板块一：产品墓碑 -->
+    <div class="gov-board gb-1">
+      <div class="gb-header">
+        <span class="gb-num">1</span>
+        <span class="gb-title">产品墓碑（永恒锚点）</span>
+      </div>
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">三条不可动摇的产品宪法。无论迭代多少版本，这三句话写在墓碑上，任何修改提案都须先与墓碑对照。</p>
+      <div class="card-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
+        <div class="tombstone-card ts-identity">
+          <div class="ts-icon">🎯</div>
+          <div class="ts-label">WHO AM I</div>
+          <div class="ts-statement">我是谁？ —— 一个帮考研/高考生改作文的工具，不是泛英语学习平台。</div>
+          <p class="ts-explain">这是产品的身份锚。意味着：功能优先级永远向「写作 + 翻译的主观题练习」倾斜，不做词汇打卡、不做听力练习、不做泛读社区。如果一个需求不服务于「帮考研/高考生改作文」这个核心身份，即使技术上容易实现，也应该拒绝。</p>
+        </div>
+        <div class="tombstone-card ts-bottomline">
+          <div class="ts-icon">🚫</div>
+          <div class="ts-label">MY BOTTOM LINE</div>
+          <div class="ts-statement">我的底线是什么？ —— AI 只准报错和提示词汇升级，绝不准代写全文（L3 硬性禁用）。</div>
+          <p class="ts-explain">这是产品的生存锚。AI 一旦越线代写，用户会直接复制 AI 结果交作业，社区协作的价值归零，产品失去差异化壁垒。L1（标错误）和 L2（给词汇建议让人自己选）是允许的；L3（生成/重写段落）是硬性禁用，无论商业压力多大、用户呼声多高，这条线不可越过。</p>
+        </div>
+        <div class="tombstone-card ts-default">
+          <div class="ts-icon">🔒</div>
+          <div class="ts-label">MY DEFAULT STATE</div>
+          <div class="ts-statement">我的默认状态是什么？ —— 所有内容默认私密，用户不主动点「公开」，任何人不可见。</div>
+          <p class="ts-explain">这是产品的信任锚。作文是学生的隐私资产，默认私密是建立信任的前提。只有用户主动选择公开，内容才会进入广场。这条锚点防止产品在「提升活跃度」的诱惑下擅自改默认值，把私密工坊偷偷变成公开广场。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 板块二：产品决策日志 -->
+    <div class="gov-board gb-2">
+      <div class="gb-header">
+        <span class="gb-num">2</span>
+        <span class="gb-title">产品决策日志（防止自我欺骗）</span>
+      </div>
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">每次重大决策请填写此表。决策的「理由」必须追溯到具体的用户反馈或深入思考，不能是「我觉得应该加」。连续三次为同一理由违背墓碑，须强制暂停产品方向。</p>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:11%;">日期</th>
+            <th style="width:24%;">修改决定</th>
+            <th style="width:33%;">修改理由（源于哪条反馈 / 思考）</th>
+            <th style="width:32%;">是否违背墓碑（若违背，理由是什么）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2026-08-02</td>
+            <td>从「公开广场」改为「邀请制私密工坊」</td>
+            <td>Solo founder 无法维护社区氛围；空广场比没广场更劝退；GitHub 起步也是 invite-only</td>
+            <td>未违背。加强了墓碑第 3 条（默认私密）</td>
+          </tr>
+          <tr>
+            <td>2026-08-02</td>
+            <td>AI 护栏正式化为 L1/L2/L3 三层</td>
+            <td>发现「AI 润色全文」会让用户跳过社区协作，产品差异化归零</td>
+            <td>未违背。将墓碑第 2 条从理念变为硬编码限制</td>
+          </tr>
+          <tr>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+          </tr>
+          <tr>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+          </tr>
+          <tr>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td style="color:var(--gray-300);">— 待填写 —</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="decision-log-note">
+        <strong>⚠ 触发条件：</strong>连续三次为同一理由违背墓碑，须强制暂停产品方向，重新评估产品定位是否仍然成立。这不是建议，是硬性规则。
+      </div>
+    </div>
+
+    <!-- 板块三：AI 纠偏预检流程 -->
+    <div class="gov-board gb-3">
+      <div class="gb-header">
+        <span class="gb-num">3</span>
+        <span class="gb-title">AI 纠偏预检流程（应对表述不清）</span>
+      </div>
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:14px;">在每次向 AI 或开发工具提出修改需求前，先发送以下纠偏预检。这一步确保你的需求不会在表述模糊时被 AI「自由发挥」带偏方向，同时把口语化需求翻译成精确的开发指令。</p>
+      <div class="precheck-box">
+        <div class="pc-title">📋 纠偏预检模板（复制使用）</div>
+        <div class="pc-sub">每次提需求前，先发这段给 AI / 开发工具</div>
+        <div class="pc-template"><span class="pc-key">我的核心三原则是：</span>
+1. 我是帮考研/高考生改作文的工具，不是泛英语学习平台（墓碑 §1）
+2. AI 只准报错和提示词汇升级，绝不准代写全文，L3 硬性禁用（墓碑 §2）
+3. 所有内容默认私密，用户不主动点公开，任何人不可见（墓碑 §3）
+
+<span class="pc-key">我即将提出的需求是：</span><span class="pc-fill">[填入你的需求]</span>
+
+<span class="pc-key">请做两件事：</span>
+1. <span class="pc-key">纠偏检查</span> —— 判断此需求是否违背上述三原则中的任何一条。若违背，指出违背了哪一条、为什么，并拒绝执行或给出替代方案。
+2. <span class="pc-key">翻译校准</span> —— 将我的口语化需求翻译成明确的开发指令（包含：改什么文件 / 改什么交互 / 改什么数据结构），消除歧义后再执行。</div>
+      </div>
+    </div>
+
+    <!-- 板块四：四层纠偏执行体系 -->
+    <div class="gov-board gb-4">
+      <div class="gb-header">
+        <span class="gb-num">4</span>
+        <span class="gb-title">四层纠偏执行体系（从声明到落地）</span>
+      </div>
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">前三板块定义了「规则是什么」，本板块定义「什么时候用这些规则」。四层从高频到低频递进，当一层无法解决时升级到上一层。如果某个功能反复在 Layer 1 卡住（每次都要争论是否违背墓碑），说明墓碑本身需要复审 —— 那是 Layer 4 的事。</p>
+
+      <div class="layer-row">
+        <div class="lr-num" style="background:var(--primary-light);color:var(--primary);">L1</div>
+        <div class="lr-body">
+          <div class="lr-title">迭代检查清单</div>
+          <div class="lr-trigger">触发：每次开始写新功能时</div>
+          <div class="lr-desc">开发前读一遍产品墓碑（板块一），开发后在决策日志（板块二）中新增一行。如果接受了 AI 建议的设计，跑一遍纠偏预检（板块三）。耗时 25 分钟，产出一行决策日志。</div>
+          <div class="checklist-box">
+<span class="cl-label">迭代前（15 分钟）</span>
+□ 打开产品墓碑，问自己：这个功能服务于哪条锚点？
+  - 身份锚（帮考研/高考生改作文）
+  - 生存锚（AI 不代写全文）
+  - 信任锚（默认私密）
+  三个都套不上 → 先停，这个功能可能不应该做
+□ 打开决策日志，看上次迭代的遗留问题是否已解决
+
+<span class="cl-label">迭代后（10 分钟）</span>
+□ 在决策日志中新增一行：日期 | 完成的功能 | 是否有妥协 | 妥协是否已记录为技术债务
+□ 如果本次接受了 AI 设计建议，跑一遍纠偏预检模板</div>
+        </div>
+      </div>
+
+      <div class="layer-row">
+        <div class="lr-num" style="background:var(--teal-light);color:var(--teal);">L2</div>
+        <div class="lr-body">
+          <div class="lr-title">技术债务看板</div>
+          <div class="lr-trigger">触发：每次你说出「先这样，后面再改」时</div>
+          <div class="lr-desc">记录所有妥协与 trade-off，防止「Phase 2 再补」变成「永不补」。维护项目根目录的 <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:12px;">TECH_DEBT.md</code> 文件。耗时 30 秒，产出一行债务记录。</div>
+        </div>
+      </div>
+
+      <div class="layer-row">
+        <div class="lr-num" style="background:var(--purple-light);color:var(--purple);">L3</div>
+        <div class="lr-body">
+          <div class="lr-title">对话同步协议</div>
+          <div class="lr-trigger">触发：每次与 AI 助手开始新对话时</div>
+          <div class="lr-desc">长线项目跨越几十次对话，AI 最容易因丢失上下文而给出偏离方向的建议。每次新对话开始时，用一句话同步状态，而非让 AI 猜测历史。</div>
+          <div class="checklist-box">
+<span class="cl-label">对话开场模板（复制使用）</span>
+「上次完成了 [具体成果]。今天要做 [具体目标]。
+ 上次遗留的决策点是 [如果有]。」
+
+示例：
+「上次完成了 Dashboard 列表数据化 + localStorage 持久化，
+ 今天要正式搭建 Next.js 项目。上次确认的 6 个 Phase 1 边界已定。」</div>
+        </div>
+      </div>
+
+      <div class="layer-row">
+        <div class="lr-num" style="background:var(--red-light);color:var(--red);">L4</div>
+        <div class="lr-body">
+          <div class="lr-title">里程碑复盘</div>
+          <div class="lr-trigger">触发：每完成一个 Phase 时</div>
+          <div class="lr-desc">最低频但最重要的战略层。每完成 Phase 1 / Phase 2 的一个里程碑（如「账号系统可用了」「PR 合并流程可用了」），停下来做一次复盘。耗时 1 小时。</div>
+          <div class="checklist-box">
+<span class="cl-label">复盘固定流程</span>
+1. 对照产品墓碑：过去这个 Phase 做的所有东西，有没有违背三条锚点？
+2. 重读技术债务看板：哪些债务该在下一个 Phase 偿还？哪些不需要还了？
+3. 更新项目记忆文档（.workbuddy/memory/MEMORY.md）
+4. 问自己：如果重新开始这个 Phase，我会怎么做不同的决策？
+5. 在 PROGRESS_LOG.md 追加一段周记：实际开发时长、最大困难、最重要的技术收获</div>
+        </div>
+      </div>
+
+      <div class="callout callout-amber" style="margin-top:16px;">
+        <strong>升级规则</strong>
+        Layer 1 解决不了 → 进 Layer 2（记录为技术债务）。Layer 2 解决不了 → 进 Layer 3（找 AI 对话纠偏）。Layer 3 解决不了 → 进 Layer 4（里程碑复盘）。连续三次为同一理由违背墓碑，强制暂停产品方向 —— 这是板块二已定义的硬性规则。
+      </div>
+    </div>
+
+    <div class="callout callout-green">
+      <strong>掌舵人守则一句话总结</strong>
+      墓碑定方向，日志防漂移，预检堵表述，四层定节奏 —— 四道闸门守住产品灵魂。当你在某个深夜觉得「加一个 AI 自动续写功能也挺好的吧」时，回到这一章，读一遍墓碑，填一张决策日志，发一段纠偏预检，然后你会知道答案。
+    </div>
+  </section>
+
+  <!-- ========== 2. PROBLEM ========== -->
+  <section id="problem">
+    <h2><span class="num">2</span> 痛点分析 — 为什么需要这个产品</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="icon">✍️</div>
+        <h4>主观题练习无处反馈</h4>
+        <p>写作和翻译没有标准答案，自己写完不知道好不好，老师批改频率低、周期长，同学互改缺乏专业性。</p>
+      </div>
+      <div class="card">
+        <div class="icon">📖</div>
+        <h4>范文太多不会用</h4>
+        <p>市面上范文无数，但都是"成品"。看不到修改过程，不知道怎么从平庸到优秀，背了也用不上。</p>
+      </div>
+      <div class="card">
+        <div class="icon">孤独</div>
+        <h4>备考过程太孤独</h4>
+        <p>一个人背单词、一个人写作文、一个人对答案。没有交流氛围，容易放弃，也看不到别人的学习路径。</p>
+      </div>
+      <div class="card">
+        <div class="icon">📊</div>
+        <h4>进步看不见</h4>
+        <p>写了一个月的作文，感觉自己没进步。没有可视化的学习轨迹，动力难以维持。</p>
+      </div>
+    </div>
+    <div class="callout callout-amber">
+      <strong>关键洞察</strong>
+      客观题（阅读/完形）有标准答案，刷题软件已解决；但主观题（写作/翻译）的核心痛点是"反馈缺失"和"过程不可见"。这正是 GitHub 协作模型能解决的 — 多人协作 + 版本追踪 = 看得见的进步。
+    </div>
+  </section>
+
+  <!-- ========== 3. USERS ========== -->
+  <section id="users">
+    <h2><span class="num">3</span> 目标用户画像</h2>
+    <div class="persona">
+      <div class="persona-card">
+        <h4>考研英语备考者</h4>
+        <p style="font-size:13px;color:var(--gray-500);">大三/大四学生，备考周期6-12个月</p>
+        <p><strong>核心需求：</strong></p>
+        <ul class="goals">
+          <li>大作文（图画作文）反复修改打磨</li>
+          <li>小作文（应用文）模板迭代</li>
+          <li>翻译题（英译汉）技巧积累</li>
+        </ul>
+        <p><strong>主要痛点：</strong></p>
+        <ul class="pains">
+          <li>作文写完没人改，或改得不专业</li>
+          <li>背模板千篇一律，不会灵活运用</li>
+          <li>翻译只看参考答案，不理解翻译思路</li>
+        </ul>
+      </div>
+      <div class="persona-card">
+        <h4>上海高考英语考生</h4>
+        <p style="font-size:13px;color:var(--gray-500);">高中生，上海地区，备考周期1-2年</p>
+        <p><strong>核心需求：</strong></p>
+        <ul class="goals">
+          <li>Summary writing（概要写作）练习</li>
+          <li>Translation（中译英）句型积累</li>
+          <li>作文（议论文/记叙文）素材拓展</li>
+        </ul>
+        <p><strong>主要痛点：</strong></p>
+        <ul class="pains">
+          <li>概要写作是上海特有题型，资源少</li>
+          <li>学校老师批改名额有限，轮不到</li>
+          <li>缺乏同龄人交流，闭门造车</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 4. CORE FEATURES ========== -->
+  <section id="core">
+    <h2><span class="num">4</span> 核心功能设计 <span class="rev">v2.0 修订</span></h2>
+
+    <h3>4.1 写作仓库 (Essay Repository)</h3>
+    <p>每篇作文/翻译都是一个「仓库」，包含完整的版本历史和协作记录。</p>
+    <table>
+      <tr><th>字段</th><th>说明</th><th>示例</th></tr>
+      <tr><td>标题</td><td>作文题目/主题</td><td>2024考研英语一大作文：文化传承</td></tr>
+      <tr><td>类型</td><td>作文/翻译/概要</td><td>大作文 / 中译英 / Summary</td></tr>
+      <tr><td>标签</td><td>考试类型 + 题型 + 话题</td><td>考研英语 / 图画作文 / 文化类</td></tr>
+      <tr><td>正文</td><td>富文本编辑器，支持中英混排</td><td>作文内容</td></tr>
+      <tr><td>可见性</td><td><strong>默认私密，可选公开发布</strong></td><td>私密 / 仅邀请 / 公开</td></tr>
+      <tr><td>版本历史</td><td>每次修改自动生成 Commit</td><td>v1 初稿 → v2 修改语法 → v3 升级词汇</td></tr>
+      <tr><td>批注</td><td>逐句/逐段批注讨论</td><td>第二段开头逻辑不够连贯</td></tr>
+      <tr><td>Star 数</td><td>被收藏次数（公开后）</td><td>⭐ 128</td></tr>
+      <tr><td>Fork 数</td><td>被借鉴改写次数</td><td>🔀 34</td></tr>
+    </table>
+
+    <h3>4.2 Fork & PR 协作机制</h3>
+    <div class="callout callout-green">
+      <strong>这是产品的核心差异化功能</strong>
+      Fork/PR 机制让"批改作文"从单向打分变成双向对话，让"学习范文"从被动阅读变成主动改写。
+    </div>
+    <p><strong>Fork（借鉴改写）流程：</strong></p>
+    <div class="flow">
+      <span class="flow-step">看到一篇优秀作文</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">Fork 到自己的空间</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">基于范文改写自己的版本</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">保留原文对照</span>
+    </div>
+    <p><strong>PR（批改建议）流程：</strong></p>
+    <div class="flow">
+      <span class="flow-step">阅读他人作文</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">逐句标注修改建议</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">提交 PR（附修改理由）</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">作者审阅：接受/拒绝/讨论</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">合并修改，生成新版本</span>
+    </div>
+
+    <h3>4.3 Star & Follow 社交系统（Phase 2.5+）</h3>
+    <div class="callout callout-amber">
+      <strong>v2.0 修订：社交功能延后至广场开放后</strong>
+      Phase 1-2 只有"邀请协作"和"个人收藏"，不做 Follow/排行榜/广场 Feed。等公开内容积累到 100 篇后再开放。
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <h4>Star 收藏</h4>
+        <p>收藏优质作文/翻译到个人语料库。支持按标签分类整理，随时检索引用。</p>
+      </div>
+      <div class="card">
+        <h4>Follow 关注</h4>
+        <p>关注高分作者、活跃批改者。新作品/新批改推送通知。</p>
+      </div>
+      <div class="card">
+        <h4>排行榜</h4>
+        <p>本周热榜作文、活跃批改者TOP10、连续打卡榜。</p>
+      </div>
+      <div class="card">
+        <h4>讨论区</h4>
+        <p>每个公开仓库下方有讨论区，可交流写作思路、分享备考经验。</p>
+      </div>
+    </div>
+
+    <h3>4.4 阅读功能 — 降级为写作附属 <span class="rev">v2.0 修订</span></h3>
+    <div class="callout callout-red">
+      <strong>v2.0 核心修订：阅读精读不再是独立板块</strong>
+      <span class="compare-old">原方案：阅读精读作为与写作并列的核心板块，含真题仓库、逐句注释、长难句拆解</span><br>
+      修订后：阅读降级为写作的"输入附属"，只做轻量级的真题句子引用，不做独立的阅读仓库系统。
+    </div>
+    <p><strong>修订理由：</strong></p>
+    <ul>
+      <li>"逐句注释"需要处理段落锚点、层级定位、并发编辑冲突，技术复杂度是写作模块的 2-3 倍</li>
+      <li>扇贝阅读、每日英语阅读已占据阅读赛道，单人开发很难打出差异</li>
+      <li>用户的核心痛点在写作反馈，不在阅读理解（后者有标准答案，刷题软件已解决）</li>
+    </ul>
+    <p><strong>保留的轻量功能：</strong></p>
+    <ul>
+      <li><strong>真题句子库</strong>（Phase 2）：从历年真题中提取的句子列表，可搜索，可按年份/难度筛选。开发量极小（本质就是一个搜索页 + 数据库表）</li>
+      <li><strong>写作引用</strong>（Phase 2）：写作时可以搜索并引用真题原句，系统自动标注出处。让阅读成为写作的"素材输入"</li>
+      <li><strong>完整的阅读精读板块</strong>（Phase 3+ 远期）：如果写作协作模块跑顺了，有团队和资源了，再回来做完整的阅读仓库系统</li>
+      <li><strong>客观题练习板块</strong>（远期规划）：专门练习阅读理解、完形填空等客观题的独立板块。与写作工坊的协作模式不同——交流性互动要求低，侧重个人刷题+即时对答案+错题归集。可作为写作模块成熟后的横向扩展，但优先级低于写作协作核心</li>
+    </ul>
+
+    <h3>4.5 学习打卡与贡献图</h3>
+    <p>借鉴 GitHub Contribution Graph，展示学习活跃度：</p>
+    <ul>
+      <li><strong>热力图</strong>：每天写作/翻译/批改的活动量，颜色深浅代表活跃度</li>
+      <li><strong>连续天数</strong>：当前连续学习天数 + 历史最长记录</li>
+      <li><strong>成就徽章</strong>：首次发布、首次被Star、批改达人（100次PR）、连续30天打卡等</li>
+    </ul>
+
+    <h3>4.6 AI 辅助功能 — 设立硬性护栏 <span class="rev">v2.0 修订</span></h3>
+    <div class="callout callout-red">
+      <strong>v2.0 核心修订：AI 只准报错和建议，绝不代写</strong>
+      <span class="compare-old">原方案：AI 做智能推荐、润色、深度批改、词汇提取，功能全面</span><br>
+      修订后：AI 设立三层护栏，L1/L2 允许，L3 严禁。一旦允许 AI 代写段落，社区协作的核心价值就崩塌了。
+    </div>
+    <div class="ai-guard">
+      <div class="ai-guard-row" style="background:var(--green-light);">
+        <span class="ai-guard-level" style="color:var(--green);">L1</span>
+        <span class="ai-guard-func">错误检测</span>
+        <span class="ai-guard-status" style="color:var(--green);">允许</span>
+        <span class="ai-guard-reason">标出语法/拼写/时态错误位置，像 Grammarly 基础版 — 只标不改，用户自己思考怎么改</span>
+      </div>
+      <div class="ai-guard-row" style="background:var(--green-light);">
+        <span class="ai-guard-level" style="color:var(--green);">L2</span>
+        <span class="ai-guard-func">词汇升级建议</span>
+        <span class="ai-guard-status" style="color:var(--green);">允许</span>
+        <span class="ai-guard-reason">建议 good → exceptional，但必须给出多个选项让用户自己选，思考过程留在人脑里</span>
+      </div>
+      <div class="ai-guard-row" style="background:var(--red-light);">
+        <span class="ai-guard-level" style="color:var(--red);">L3</span>
+        <span class="ai-guard-func">全文/段落改写</span>
+        <span class="ai-guard-status" style="color:var(--red);">严禁</span>
+        <span class="ai-guard-reason">这条线一旦越过，用户会直接复制 AI 结果，社区协作价值归零。这是产品的生死线。</span>
+      </div>
+    </div>
+    <p><strong>AI 具体功能（在护栏范围内）：</strong></p>
+    <ul>
+      <li><strong>错误检测</strong>（L1）：提交作文后 AI 标出语法/拼写/时态错误，但不给修改方案</li>
+      <li><strong>词汇升级</strong>（L2）：识别可升级的词汇，给出 2-3 个替换选项供用户选择</li>
+      <li><strong>错误分类</strong>（L1+）：将错误归类（时态/冠词/搭配/从句结构），帮用户发现自己的薄弱点</li>
+      <li><strong>难度画像</strong>（L2）：评估作文的词汇丰富度、句式复杂度，给出能力雷达图（不改写，只分析）</li>
+    </ul>
+    <div class="callout callout-blue">
+      <strong>为什么这条线必须守住？</strong>
+      EngForge 的核心壁垒是"社区协作" — 人帮人改作文。如果 AI 能直接改好，没人会去社区提 PR。AI 的角色是"体检医生"（告诉你哪里有问题），不是"代写枪手"（帮你写好）。社区负责"治疗"（教你怎么改、为什么这样改）。
+    </div>
+  </section>
+
+  <!-- ========== 5. USER FLOW ========== -->
+  <section id="flow">
+    <h2><span class="num">5</span> 典型用户流程 <span class="rev">v2.0 修订</span></h2>
+
+    <h3>场景一：小王写了一篇考研大作文（私密工坊模式）</h3>
+    <div class="flow">
+      <span class="flow-step">创建仓库，粘贴作文</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">设为"仅邀请可见"</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">邀请2位同学批改</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">收到2条PR批改</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">审阅讨论</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">接受1条，生成v2</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">对比v1→v2差异</span>
+    </div>
+
+    <h3>场景二：小李想学图画作文怎么写（广场开放后）</h3>
+    <div class="flow">
+      <span class="flow-step">浏览公开广场</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">发现高Star作文</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">查看版本历史</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">看初稿如何被改进</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">Fork到自己空间</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">改写个人版本</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">Star收藏原文</span>
+    </div>
+
+    <h3>场景三：小张写作文时想引用真题原句</h3>
+    <div class="flow">
+      <span class="flow-step">正在写作文</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">搜索真题句子库</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">找到2019年Text3原句</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">一键引用到作文中</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">自动标注出处</span>
+    </div>
+  </section>
+
+  <!-- ========== 6. ARCHITECTURE ========== -->
+  <section id="architecture">
+    <h2><span class="num">6</span> 产品架构 <span class="rev">v2.0 修订</span></h2>
+    <table>
+      <tr><th>层级</th><th>模块</th><th>核心功能</th><th>阶段</th></tr>
+      <tr>
+        <td rowspan="3"><strong>工坊层</strong><br><span style="font-size:11px;color:var(--gray-500);">（原"社区层"）</span></td>
+        <td>我的工坊</td>
+        <td>个人仓库列表、私密/邀请/公开可见性控制</td>
+        <td><span class="tag tag-green">P1</span></td>
+      </tr>
+      <tr><td>邀请协作</td><td>邀请指定用户查看/批改，邀请码机制</td><td><span class="tag tag-green">P1</span></td></tr>
+      <tr><td>公开广场</td><td>Feed流、热榜、分类浏览（延后开放）</td><td><span class="tag tag-teal">P2.5</span></td></tr>
+      <tr>
+        <td rowspan="4"><strong>协作层</strong></td>
+        <td>仓库管理</td>
+        <td>创建/编辑/删除作文仓库，版本管理</td>
+        <td><span class="tag tag-green">P1</span></td>
+      </tr>
+      <tr><td>Fork 系统</td><td>一键 Fork、保留溯源关系、对照查看</td>
+      <td><span class="tag tag-blue">P2</span></td></tr>
+      <tr><td>PR 系统</td><td>提交批改建议、逐句diff对比、审阅讨论</td>
+      <td><span class="tag tag-blue">P2</span></td></tr>
+      <tr><td>评论 / 讨论</td><td>仓库讨论区、行内批注、@通知</td>
+      <td><span class="tag tag-green">P1</span></td></tr>
+      <tr>
+        <td rowspan="3"><strong>学习层</strong></td>
+        <td>真题句子库</td>
+        <td>可搜索的真题句子列表（轻量级，非完整阅读系统）</td>
+      <td><span class="tag tag-blue">P2</span></td></tr>
+      <tr><td>个人语料库</td><td>Star收藏分类、好词好句本</td>
+      <td><span class="tag tag-blue">P2</span></td></tr>
+      <tr><td>学习追踪</td><td>贡献热力图、成就系统</td>
+      <td><span class="tag tag-blue">P2</span></td></tr>
+      <tr>
+        <td rowspan="2"><strong>AI层</strong><br><span style="font-size:11px;color:var(--red);">受护栏约束</span></td>
+        <td>错误检测（L1）</td>
+        <td>语法/拼写/时态错误标出，不给修改方案</td>
+        <td><span class="tag tag-purple">P3</span></td>
+      </tr>
+      <tr><td>词汇升级（L2）</td><td>词汇替换建议、难度画像分析</td>
+      <td><span class="tag tag-purple">P3</span></td></tr>
+      <tr>
+        <td rowspan="2"><strong>基础层</strong></td>
+        <td>账号系统</td>
+        <td>注册登录、邮箱验证、密码找回</td>
+        <td><span class="tag tag-green">P1</span></td>
+      </tr>
+      <tr><td>用户体系</td><td>个人资料、邀请关系、消息通知</td>
+        <td><span class="tag tag-green">P1</span></td></tr>
+    </table>
+  </section>
+
+  <!-- ========== 7. UI MOCK ========== -->
+  <section id="ui">
+    <h2><span class="num">7</span> 界面原型示意 <span class="rev">v2.0 修订</span></h2>
+
+    <h3>7.1 首页 / 我的工坊（Phase 1 私密模式）</h3>
+    <div class="mock-ui">
+      <div class="mock-nav">
+        <span class="logo">EngForge</span>
+        <span class="nav-item active">我的工坊</span>
+        <span class="nav-item">语料库</span>
+        <span class="nav-item" style="margin-left:auto;">邀请码</span>
+        <span class="nav-item">写一篇 +</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <span class="tag tag-blue">全部</span>
+        <span class="tag">考研大作文</span>
+        <span class="tag">考研翻译</span>
+        <span class="tag">上海高考作文</span>
+        <span class="tag">概要写作</span>
+      </div>
+      <div class="mock-repo">
+        <div class="mock-repo-header">
+          <div>
+            <span class="mock-repo-title">2024考研英语一：传统文化传承</span>
+            <span class="badge-private" style="margin-left:8px;">仅邀请</span>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <span class="mock-stat">v3 (3轮PR)</span>
+            <span class="mock-stat">2位协作者</span>
+          </div>
+        </div>
+        <div class="mock-repo-desc">图画作文：图中展示了一个外国人在学书法... 经过2轮PR修改，词汇从CET4升级到考研水平。</div>
+        <div class="mock-repo-tags">
+          <span class="tag tag-purple">考研英语</span>
+          <span class="tag tag-teal">图画作文</span>
+          <span class="tag tag-amber">文化类</span>
+        </div>
+      </div>
+      <div class="mock-repo">
+        <div class="mock-repo-header">
+          <div>
+            <span class="mock-repo-title">上海高考 Summary: Climate Change</span>
+            <span class="badge-private" style="margin-left:8px;">私密</span>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <span class="mock-stat">v1 (初稿)</span>
+            <span class="mock-stat">待邀请</span>
+          </div>
+        </div>
+        <div class="mock-repo-desc">概要写作练习，60字精炼总结。尚未邀请批改人。</div>
+        <div class="mock-repo-tags">
+          <span class="tag tag-purple">上海高考</span>
+          <span class="tag tag-teal">概要写作</span>
+          <span class="tag tag-green">环境类</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>7.2 首页 / 公开广场（Phase 2.5 开放后）</h3>
+    <div class="mock-ui">
+      <div class="mock-nav">
+        <span class="logo">EngForge</span>
+        <span class="nav-item">我的工坊</span>
+        <span class="nav-item active">广场</span>
+        <span class="nav-item">语料库</span>
+        <span class="nav-item" style="margin-left:auto;">🔍 搜索</span>
+        <span class="nav-item">写一篇 +</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <span class="tag tag-blue">热榜</span>
+        <span class="tag">最新</span>
+        <span class="tag">考研大作文</span>
+        <span class="tag">概要写作</span>
+      </div>
+      <div class="mock-repo">
+        <div class="mock-repo-header">
+          <div>
+            <span class="mock-repo-title">2024考研英语一：传统文化传承</span>
+            <span class="badge-new" style="margin-left:8px;">热榜 #1</span>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <span class="mock-stat">⭐ 256</span>
+            <span class="mock-stat">🔀 42</span>
+            <span class="mock-stat">💬 38</span>
+          </div>
+        </div>
+        <div class="mock-repo-desc">初稿到终稿经过5轮PR修改，词汇从CET4升级到考研水平。作者已公开。</div>
+        <div class="mock-repo-tags">
+          <span class="tag tag-purple">考研英语</span>
+          <span class="tag tag-teal">图画作文</span>
+          <span class="tag tag-amber">文化类</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>7.3 作文仓库详情页（含 PR 批改标注）</h3>
+    <div class="mock-ui">
+      <div style="margin-bottom:16px;">
+        <span style="font-size:18px;font-weight:700;color:var(--primary);">英语一2024大作文：传统文化传承</span>
+        <span class="badge-private" style="margin-left:8px;">仅邀请</span>
+        <span style="margin-left:12px;font-size:13px;color:var(--gray-500);">by @考研上岸王 · 3天前</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <span class="tag tag-purple">考研英语</span>
+        <span class="tag tag-teal">图画作文</span>
+        <span class="tag tag-amber">文化类</span>
+        <span class="tag tag-green">已采纳2条PR</span>
+      </div>
+      <div style="display:flex;gap:16px;border-bottom:1px solid var(--gray-200);padding-bottom:8px;margin-bottom:16px;">
+        <span class="nav-item active" style="font-weight:600;color:var(--gray-900);">作文正文</span>
+        <span class="nav-item">版本历史 (3)</span>
+        <span class="nav-item">PR请求 (1)</span>
+        <span class="nav-item">讨论 (5)</span>
+      </div>
+      <div style="background:#fff;border:1px solid var(--gray-200);border-radius:8px;padding:16px;margin-bottom:12px;">
+        <p style="font-size:14px;line-height:2;color:var(--gray-700);">
+          As is vividly depicted in the picture, a foreign student is<span style="background:var(--green-light);padding:2px 4px;border-radius:3px;"> enthusiastically learning</span> Chinese calligraphy under the guidance of a master. <span style="background:var(--amber-light);padding:2px 4px;border-radius:3px;">This scene symbolizes</span> the growing popularity of traditional Chinese culture worldwide...
+        </p>
+        <p style="font-size:12px;color:var(--gray-500);margin-top:8px;">
+          绿色 = 已采纳的PR修改 &nbsp;|&nbsp; 黄色 = 待审阅的PR建议
+        </p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <span class="flow-step">邀请批改人</span>
+        <span class="flow-step">📝 提交PR</span>
+        <span class="flow-step">💬 讨论</span>
+        <span class="flow-step" style="background:var(--amber);color:#fff;border:none;">发布到广场</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 8. ROADMAP ========== -->
+  <section id="roadmap">
+    <h2><span class="num">8</span> 开发路线图（四阶段） <span class="rev">v2.0 修订</span></h2>
+
+    <div class="phase phase-1">
+      <div class="phase-header">
+        <span class="phase-title">Phase 1 — 私密写作工坊 MVP</span>
+        <span class="phase-badge">目标：验证工具价值</span>
+      </div>
+      <p><strong>目标：</strong>跑通"写作文 → 邀请批改 → 看到改进"的核心闭环。<strong>不做公开广场，不做社交。</strong></p>
+      <table>
+        <tr><th>功能</th><th>说明</th><th>优先级</th></tr>
+        <tr><td>账号注册/登录</td><td>邮箱注册 + 密码登录 + 邀请码注册</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>创建作文仓库</td><td>富文本编辑器，支持中英混排</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>可见性控制</td><td><strong>私密 / 仅邀请 / 公开</strong>（默认私密）</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>邀请协作</td><td>生成邀请链接，指定人可查看/批改</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>标签分类</td><td>考研/高考 × 题型 × 话题</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>评论功能</td><td>仓库下方讨论区</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>我的工坊页</td><td>展示个人仓库列表</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>Star 收藏</td><td>收藏到个人语料库（仅自己可见）</td><td><span class="tag tag-amber">P1</span></td></tr>
+      </table>
+      <div class="callout callout-green" style="margin-top:12px;">
+        <strong>MVP 验证标准</strong>
+        20 个种子用户（邀请制）使用 2 周后，至少产生 50 篇作文仓库 + 80 条评论。<strong>核心验证点：用户是否觉得"邀请别人改作文"比"自己对着范文看"更有用。</strong>
+      </div>
+    </div>
+
+    <div class="phase phase-2">
+      <div class="phase-header">
+        <span class="phase-title">Phase 2 — 协作核心 + 真题句子库</span>
+        <span class="phase-badge">目标：建立协作闭环</span>
+      </div>
+      <p><strong>目标：</strong>跑通 Fork/PR/版本历史的核心协作飞轮。加入轻量真题句子库作为写作辅助。<strong>仍不开放公开广场。</strong></p>
+      <table>
+        <tr><th>功能</th><th>说明</th><th>优先级</th></tr>
+        <tr><td>Fork 系统</td><td>一键 Fork + 溯源关系 + 对照查看</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>PR 批改系统</td><td>逐句 diff 对比 + 审阅流程 + 合并</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>版本历史</td><td>Commit 记录 + 版本对比</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>真题句子库</td><td><strong>轻量级</strong>：可搜索的真题句子列表，按年份/难度筛选</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>写作引用</td><td>写作时搜索引用真题原句，自动标注出处</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>贡献热力图</td><td>学习活跃度可视化</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>消息通知</td><td>PR/评论/邀请通知</td><td><span class="tag tag-amber">P1</span></td></tr>
+      </table>
+    </div>
+
+    <div class="phase phase-25">
+      <div class="phase-header">
+        <span class="phase-title">Phase 2.5 — 开放公开广场 <span class="rev">新增</span></span>
+        <span class="phase-badge">目标：从工具到社区</span>
+      </div>
+      <div class="callout callout-amber">
+        <strong>开放条件（必须同时满足）</strong>
+        <ul style="margin-top:8px;">
+          <li>平台上高质量公开作文 ≥ 100 篇（作者主动发布）</li>
+          <li>活跃用户 ≥ 200 人</li>
+          <li>连续 4 周周留存率 > 40%</li>
+        </ul>
+      </div>
+      <table>
+        <tr><th>功能</th><th>说明</th><th>优先级</th></tr>
+        <tr><td>公开广场</td><td>Feed流 + 分类浏览 + 全文搜索</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>发布到广场</td><td>作者可将私密仓库一键发布为公开</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>Follow 关注</td><td>关注用户 + 动态 Feed</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>排行榜</td><td>热榜/活跃榜/打卡榜</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>用户主页（公开）</td><td>展示公开仓库和收藏</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>内容审核</td><td>举报机制 + 基础过滤</td><td><span class="tag tag-amber">P1</span></td></tr>
+      </table>
+    </div>
+
+    <div class="phase phase-3">
+      <div class="phase-header">
+        <span class="phase-title">Phase 3 — AI 护栏内增强</span>
+        <span class="phase-badge">目标：差异化壁垒</span>
+      </div>
+      <div class="callout callout-red">
+        <strong>AI 护栏不变</strong>
+        L1 错误检测 + L2 词汇升级 = 允许。L3 全文改写 = 严禁。所有 AI 功能在护栏范围内设计。
+      </div>
+      <table>
+        <tr><th>功能</th><th>说明</th><th>优先级</th></tr>
+        <tr><td>AI 错误检测（L1）</td><td>语法/拼写/时态标出，不给修改方案</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>AI 词汇升级（L2）</td><td>给出 2-3 个替换选项，用户自选</td><td><span class="tag tag-red">P0</span></td></tr>
+        <tr><td>错误分类报告</td><td>将错误归类，帮用户发现薄弱点</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>难度画像</td><td>词汇丰富度/句式复杂度雷达图（只分析不改写）</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>成就系统</td><td>徽章 + 等级 + 年度报告</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>移动端适配</td><td>响应式优化</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><td>完整阅读精读</td><td>真题仓库 + 逐句注释（远期，需团队）</td><td><span class="tag tag-gray">P2 远期</span></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========== 9. TECH ========== -->
+  <section id="tech">
+    <h2><span class="num">9</span> 技术选型建议</h2>
+    <div class="callout callout-blue">
+      <strong>选型原则</strong>
+      考虑到你"只学过一点编程"，技术栈以"低门槛 + AI辅助开发 + 社区生态成熟"为原则。推荐使用 AI 编程助手辅助开发。
+    </div>
+    <h3>推荐方案（平衡型）</h3>
+    <div class="tech-item">
+      <span class="tech-role">前端框架</span>
+      <div>
+        <span class="tech-name">Next.js (React)</span>
+        <span class="tech-desc"> — 最流行的全栈React框架，SSR/SEO友好，社区资源极多，AI助手对它的代码生成能力最强</span>
+      </div>
+    </div>
+    <div class="tech-item">
+      <span class="tech-role">UI 组件库</span>
+      <div>
+        <span class="tech-name">shadcn/ui + Tailwind CSS</span>
+        <span class="tech-desc"> — 复制粘贴式组件库，无需安装依赖，样式自由度高</span>
+      </div>
+    </div>
+    <div class="tech-item">
+      <span class="tech-role">后端 + 数据库</span>
+      <div>
+        <span class="tech-name">Supabase</span>
+        <span class="tech-desc"> — 自带 PostgreSQL + 用户认证 + 文件存储 + 实时订阅，自带 Row Level Security 可实现"私密/邀请/公开"可见性控制</span>
+      </div>
+    </div>
+    <div class="tech-item">
+      <span class="tech-role">富文本编辑</span>
+      <div>
+        <span class="tech-name">TipTap</span>
+        <span class="tech-desc"> — 基于 ProseMirror 的编辑器，支持中英混排、行内批注</span>
+      </div>
+    </div>
+    <div class="tech-item">
+      <span class="tech-role">Diff 对比</span>
+      <div>
+        <span class="tech-name">diff-match-patch + react-diff-viewer</span>
+        <span class="tech-desc"> — Google 的文本对比算法，实现作文版本 diff 和 PR 逐句对比</span>
+      </div>
+    </div>
+    <div class="tech-item">
+      <span class="tech-role">AI 服务</span>
+      <div>
+        <span class="tech-name">OpenAI API / Claude API</span>
+        <span class="tech-desc"> — Phase 3 的 AI 错误检测和词汇升级功能使用，按量付费</span>
+      </div>
+    </div>
+    <div class="tech-item">
+      <span class="tech-role">部署</span>
+      <div>
+        <span class="tech-name">Vercel</span>
+        <span class="tech-desc"> — Next.js 官方部署平台，git push 即部署，免费额度足够 MVP</span>
+      </div>
+    </div>
+    <h3>开发方式建议</h3>
+    <table>
+      <tr><th>阶段</th><th>开发方式</th><th>预估工作量</th></tr>
+      <tr><td>Phase 1 MVP</td><td>AI辅助编程 + 自学Next.js基础</td><td>3-5周</td></tr>
+      <tr><td>Phase 2 协作</td><td>AI辅助 + 可能需要1名前端伙伴</td><td>5-7周</td></tr>
+      <tr><td>Phase 2.5 广场</td><td>AI辅助</td><td>2-3周</td></tr>
+      <tr><td>Phase 3 AI</td><td>组建小团队</td><td>6-10周</td></tr>
+    </table>
+  </section>
+
+  <!-- ========== 10. COMPETITORS ========== -->
+  <section id="competitors">
+    <h2><span class="num">10</span> 竞品分析与差异化</h2>
+    <table>
+      <tr><th>竞品</th><th>定位</th><th>优势</th><th>不足</th></tr>
+      <tr><td>扇贝/墨墨背单词</td><td>词汇记忆</td><td>用户量大、算法成熟</td><td>不涉及写作/主观题协作</td></tr>
+      <tr><td>批改网</td><td>AI作文批改</td><td>学校采购、机改速度快</td><td>纯机器批改，无社区协作，反馈机械</td></tr>
+      <tr><td>考研帮/小木虫</td><td>考研论坛</td><td>资料多、用户基数大</td><td>论坛形态松散，无结构化协作工具</td></tr>
+      <tr><td>GitHub</td><td>代码托管</td><td>Fork/PR机制成熟</td><td>面向开发者，非英语学习场景</td></tr>
+      <tr><td>Notion / 语雀</td><td>文档协作</td><td>编辑体验好</td><td>通用工具，无学习激励和版本diff</td></tr>
+    </table>
+    <div class="callout callout-green">
+      <strong>EngForge 的差异化壁垒</strong>
+      <ul style="margin-top:8px;">
+        <li><strong>唯一的"写作+协作"结合</strong>：批改网只做AI机改，考研帮只做论坛，没人做"社区协作批改"</li>
+        <li><strong>版本历史是独家价值</strong>：只有 EngForge 能让你看到一篇作文从初稿到终稿的完整改进过程</li>
+        <li><strong>考试场景垂直</strong>：不是泛英语学习，而是精准切入考研+上海高考主观题痛点</li>
+        <li><strong>AI 护栏是护城河</strong>：AI 只报错不代写，逼用户去社区协作 — 这反而成了区别于批改网的独特定位</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ========== 11. MONETIZATION ========== -->
+  <section id="monetization">
+    <h2><span class="num">11</span> 商业模式 <span class="rev">v2.0 修订</span></h2>
+    <div class="callout callout-red">
+      <strong>v2.0 核心修订：收费门槛大幅提高</strong>
+      <span class="compare-old">原方案：Phase 2 后期引入 Pro 会员</span><br>
+      修订后：至少 500 活跃用户 + 连续两周留存 > 40% 之前，提都不要提"收费"两个字。
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <h4>现在（Phase 1-2）</h4>
+        <p>完全免费。所有功能免费使用。目标只有一个：做大用户基数和内容量。收费是这个阶段最大的敌人。</p>
+      </div>
+      <div class="card">
+        <h4>收费触发条件</h4>
+        <p>500 活跃用户 + 连续两周留存 > 40%。这个信号说明产品真的有粘性，用户愿意为增值功能付费。</p>
+      </div>
+      <div class="card">
+        <h4>Pro 会员（触发后）</h4>
+        <p>AI 错误检测不限次数、高级难度画像、专属标识。月费 19-29 元。基础协作功能永久免费。</p>
+      </div>
+      <div class="card">
+        <h4>机构版（远期）</h4>
+        <p>面向培训机构/学校：班级管理、老师批改后台。按人头收费。Phase 3 之后探索。</p>
+      </div>
+    </div>
+    <div class="callout callout-amber">
+      <strong>提前准备但不激活</strong>
+      收费的"基础设施"（支付接口、订阅逻辑的代码）可以在 Phase 2 就搭好，但不激活。这样数据达标时可以快速上线，不用临时开发。
+    </div>
+  </section>
+
+  <!-- ========== 12. RISKS ========== -->
+  <section id="risks">
+    <h2><span class="num">12</span> 风险与对策 <span class="rev">v2.0 修订</span></h2>
+    <table>
+      <tr><th>风险</th><th>影响</th><th>对策</th></tr>
+      <tr>
+        <td>冷启动困难</td>
+        <td>没有内容就没有用户</td>
+        <td><strong>邀请制绕开冷启动悖论</strong>：不需要"广场热闹"，只需要"工坊好用"。自己先创建30篇高质量范文仓库，邀请20个种子用户</td>
+      </tr>
+      <tr>
+        <td>批改质量参差</td>
+        <td>用户互改可能不专业</td>
+        <td>引入"批改信誉分"系统；高信誉用户批改结果排序靠前；Phase 3 用AI辅助质量把控</td>
+      </tr>
+      <tr>
+        <td>AI 护栏被突破</td>
+        <td>用户绕过限制让AI代写</td>
+        <td><strong>产品层面硬编码限制</strong>：AI 接口只返回错误位置和词汇选项，不返回完整改写文本。这不是策略问题，是架构问题</td>
+      </tr>
+      <tr>
+        <td>用户用完即走</td>
+        <td>考试结束就流失</td>
+        <td>拓展考试覆盖（四六级→考研→雅思托福）；年度报告分享</td>
+      </tr>
+      <tr>
+        <td>技术门槛</td>
+        <td>个人开发能力有限</td>
+        <td>AI辅助编程 + MVP保持极简；Phase 2 考虑找合伙人</td>
+      </tr>
+      <tr>
+        <td>广场开放后灌水</td>
+        <td>公开后内容质量下降</td>
+        <td><strong>渐进式开放</strong>：先让高质量用户发布，再逐步放开。举报机制 + 信誉分门槛</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ========== 13. NEXT STEPS ========== -->
+  <section id="next">
+    <h2><span class="num">13</span> 下一步行动建议 <span class="rev">v2.0 修订</span></h2>
+    <div class="callout callout-blue">
+      <strong>不需要一步到位，先动起来</strong>
+    </div>
+    <ol>
+      <li><strong>第1步（本周）：</strong>找 5-10 个目标用户做访谈。核心问题：你写完作文后怎么获得反馈？你愿意把作文发给同学改吗？你觉得"邀请制"还是"公开广场"更吸引你？</li>
+      <li><strong>第2步（1-2周）：</strong>画出核心页面原型（我的工坊 → 仓库详情 → PR对比 → 邀请页）。重点设计"邀请协作"流程 — 这是 Phase 1 的核心</li>
+      <li><strong>第3步（2-4周）：</strong>用 AI 编程助手搭建 MVP。从最简单的功能开始：注册（邀请码）→ 发作文 → 邀请人查看 → 评论。<strong>不需要 Fork/PR，不需要广场</strong></li>
+      <li><strong>第4步（4-5周）：</strong>MVP 上线，邀请 20 个种子用户。自己先填充 20-30 篇范文内容</li>
+      <li><strong>第5步（5-6周）：</strong>观察用户行为：他们是否真的在"邀请别人改作文"？如果没有，是工具问题还是需求问题？</li>
+      <li><strong>第6步（6-8周）：</strong>根据反馈迭代，逐步加入 Fork、PR、版本历史</li>
+    </ol>
+    <div class="callout callout-green">
+      <strong>记住</strong>
+      产品不是"设计"出来的，是"迭代"出来的。先做一个粗糙但能用的东西，让真实用户告诉你该往哪走。v2.0 的核心变化就是：不要一上来就想做"社区"，先做一个"好用的工具"。工具用顺了，社区自然会长出来。
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  EngForge 产品规划书 v2.0（修订版） · 2026-08-02<br>
+  用 GitHub 的方式学英语 — 私密工坊优先，广场水到渠成
+</div>
+
+</body>
+</html>
