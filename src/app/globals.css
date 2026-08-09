@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
+/* ============================================
+   EngForge 设计系统 — 品牌色 + 语义色
+   原型 :root 变量迁移到 Tailwind v4 @theme
+   用法：--color-primary → bg-primary / text-primary / border-primary
+   ============================================ */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
 @theme inline {
+  /* 基础 */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* 品牌色 — 蓝紫青三色渐变体系 */
+  --color-primary: #2563EB;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-light: #DBEAFE;
+  --color-purple: #7C3AED;
+  --color-purple-light: #EDE9FE;
+  --color-teal: #0891B2;
+  --color-teal-light: #CFFAFE;
+
+  /* 语义色 — 状态反馈 */
+  --color-green: #059669;
+  --color-green-light: #D1FAE5;
+  --color-amber: #D97706;
+  --color-amber-light: #FEF3C7;
+  --color-red: #DC2626;
+  --color-red-light: #FEE2E2;
+
+  /* 圆角 */
+  --radius-card: 10px;
+
+  /* 阴影 */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }

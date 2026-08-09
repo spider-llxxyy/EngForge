@@ -16,22 +16,22 @@ export default function Home() {
       icon: "F",
       title: "Fork 借鉴",
       desc: "复制范文到自己的工坊，在原文基础上改写练习",
-      bg: "bg-blue-100",
-      color: "text-blue-600",
+      bg: "bg-primary-light",
+      color: "text-primary",
     },
     {
       icon: "P",
       title: "PR 互改",
       desc: "邀请伙伴批改你的作文，逐句修改像代码 Review",
-      bg: "bg-purple-100",
-      color: "text-purple-600",
+      bg: "bg-purple-light",
+      color: "text-purple",
     },
     {
       icon: "S",
       title: "Star 收藏",
       desc: "收藏优质语料和范文，构建你的个人语料库",
-      bg: "bg-cyan-100",
-      color: "text-cyan-600",
+      bg: "bg-teal-light",
+      color: "text-teal",
     },
   ];
 
@@ -40,20 +40,20 @@ export default function Home() {
     // min-h-screen = 最小高度 100vh（撑满视口）
     // bg-gradient-to-br = 渐变方向"到右下"（= CSS 的 135deg）
     // from-blue-600 via-purple-600 to-cyan-600 = 蓝→紫→青
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-600 p-10">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary via-purple to-teal p-10">
 
       {/* 白色卡片容器 */}
       {/* max-w-[560px] = 最大宽度 560px；rounded-2xl = 圆角；shadow-2xl = 大阴影 */}
       <div className="w-full max-w-[560px] rounded-2xl bg-white px-12 py-14 text-center shadow-2xl">
 
         {/* 邀请制内测中 — 琥珀色小标签 */}
-        <span className="mb-5 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-600">
+        <span className="mb-5 inline-block rounded-full bg-amber-light px-3 py-1 text-xs font-semibold text-amber">
           邀请制内测中
         </span>
 
         {/* Logo — 渐变文字效果 */}
         {/* bg-clip-text + text-transparent = 把渐变背景裁剪到文字上 */}
-        <h1 className="mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent">
+        <h1 className="mb-2 bg-gradient-to-r from-primary to-purple bg-clip-text text-4xl font-extrabold tracking-tight text-transparent">
           EngForge
         </h1>
 
@@ -89,7 +89,7 @@ export default function Home() {
         <div className="flex justify-center">
           <Link
             href="/dashboard"
-            className="rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+            className="rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
           >
             进入我的工坊
           </Link>
