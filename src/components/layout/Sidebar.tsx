@@ -25,8 +25,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { navGroups, dashboardUser } from "@/lib/dashboard-data";
+import { navGroups } from "@/lib/dashboard-data";
 import type { NavItem } from "@/lib/dashboard-data";
+import type { SessionUser } from "@/lib/auth";
 
 /* ============================================================
  * 子组件：单个导航项
@@ -105,36 +106,23 @@ function NavItemLink({ item, isActive }: NavItemLinkProps) {
  * 主组件：Sidebar
  * ============================================================ */
 
-export function Sidebar() {
-  /**
-   * usePathname() 返回当前 URL 的路径部分。
-   * 比如你在 /dashboard 页面，它返回 "/dashboard"。
-   * 比如你在 /editor 页面，它返回 "/editor"。
-   *
-   * 然后我们拿它和每个导航项的 href 比较——
-   * 匹配的就是当前页，高亮显示。
-   */
+export function Sidebar({ user }: { user: SessionUser }) {
   const pathname = usePathname();
 
   return (
     <aside className="flex w-60 flex-shrink-0 flex-col bg-gray-900 text-gray-300">
       {/* ── Logo 区域 ── */}
-      {/* 原型：padding 20px 24px, font-size 20px, font-weight 800 */}
       <div className="border-b border-white/[0.08] px-6 py-5 text-xl font-extrabold text-white">
         Eng<span className="text-primary">Forge</span>
       </div>
 
       {/* ── 导航区域 ── */}
-      {/* flex-1 让导航区占满中间空间，overflow-y-auto 内容超出时滚动 */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {navGroups.map((group) => (
           <div key={group.title}>
-            {/* 分组标题 — 大写字母 + 灰色小字 */}
             <div className="px-3 pb-2 pt-4 text-[11px] uppercase tracking-wide text-gray-500">
               {group.title}
             </div>
-
-            {/* 分组下的导航项 */}
             {group.items.map((item) => (
               <NavItemLink
                 key={item.label}
@@ -148,16 +136,15 @@ export function Sidebar() {
 
       {/* ── 底部用户信息 ── */}
       <div className="flex items-center gap-2.5 border-t border-white/[0.08] px-5 py-4">
-        {/* 头像 — 蓝紫渐变圆形 */}
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple text-[13px] font-semibold text-white">
-          {dashboardUser.avatar}
+          {user.avatarInitials}
         </div>
         <div className="text-[13px]">
           <strong className="block font-medium text-white">
-            {dashboardUser.name}
+            {user.username}
           </strong>
           <span className="text-xs text-gray-500">
-            {dashboardUser.subtitle}
+            {user.email}
           </span>
         </div>
       </div>
