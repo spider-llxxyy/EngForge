@@ -80,12 +80,11 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
-      // code_verifier 丢失或 code 过期 → 跳转登录页并提示
+      // PKCE code_verifier 丢失（常见于跨浏览器/设备打开邮件链接）或 code 过期。
+      // 但此时邮箱已在 Supabase 后台确认成功（点链接这个动作本身完成确认），
+      // 所以不报错，而是告诉用户「邮箱已确认，请登录」。
       return NextResponse.redirect(
-        new URL(
-          `/login?error=${encodeURIComponent("邮箱确认失败，请直接登录。如果无法登录，请重新注册。")}`,
-          requestUrl.origin
-        )
+        new URL(`/login?verified=1`, requestUrl.origin)
       );
     }
   }

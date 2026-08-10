@@ -32,6 +32,9 @@ export default function LoginPage() {
   const [error, setError] = useState(
     searchParams.get("error") || ""
   );
+  const [verifiedMsg, setVerifiedMsg] = useState(
+    searchParams.get("verified") ? "邮箱已确认，请直接登录。" : ""
+  );
 
   // 冷却倒计时（秒），> 0 时按钮禁用
   const [cooldown, setCooldown] = useState(0);
@@ -67,6 +70,7 @@ export default function LoginPage() {
 
     setLoading(true);
     setError("");
+    setVerifiedMsg("");
 
     const supabase = createClient();
     const { error } = await withAuthTimeout(
@@ -146,6 +150,12 @@ export default function LoginPage() {
         {error && (
           <p className="rounded-lg bg-red/10 px-3 py-2 text-sm text-red">
             {error}
+          </p>
+        )}
+
+        {verifiedMsg && !error && (
+          <p className="rounded-lg bg-green/10 px-3 py-2 text-sm text-green">
+            {verifiedMsg}
           </p>
         )}
 

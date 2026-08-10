@@ -21,6 +21,9 @@ import { formatAuthError, isRateLimited, withAuthTimeout } from "@/lib/auth-erro
 /** 冷却时长（秒）— 注册失败后按钮锁定的时间 */
 const COOLDOWN_SECONDS = 60;
 
+/** 注册成功后自动跳转登录页的倒计时（秒） */
+const REDIRECT_SECONDS = 5;
+
 export default function RegisterPage() {
   const router = useRouter();
 
@@ -35,10 +38,15 @@ export default function RegisterPage() {
   const [cooldown, setCooldown] = useState(0);
   const cooldownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // 组件卸载时清理定时器
+  // 注册成功后的跳转倒计时（秒），> 0 时显示浮窗
+  const [redirectCountdown, setRedirectCountdown] = useState(0);
+  const redirectTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 组件卸载时清理所有定时器
   useEffect(() => {
     return () => {
       if (cooldownTimer.current) clearInterval(cooldownTimer.current);
+      if (redirectTimer.current) clearInterval(redirectTimer.current);
     };
   }, []);
 
@@ -50,6 +58,22 @@ export default function RegisterPage() {
       setCooldown((prev) => {
         if (prev <= 1) {
           if (cooldownTimer.current) clearInterval(cooldownTimer.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+  /** 启动注册成功后的跳转倒计时 */
+  function startRedirectCountdown() {
+    setRedirectCountdown(REDIRECT_SECONDS);
+    if (redirectTimer.current) clearInterval(redirectTimer.current);
+    redirectTimer.current = setInterval(() => {
+      setRedirectCountdown((prev) => {
+        if (prev <= 1) {
+          if (redirectTimer.current) clearInterval(redirectTimer.current);
+          router.push("/login");
           return 0;
         }
         return prev - 1;
@@ -102,7 +126,8 @@ export default function RegisterPage() {
     if (!data.session) {
       setSuccess("注册成功！请查收确认邮件后登录。");
       setLoading(false);
-      // 停留在此页，用户确认后点登录
+      // 5 秒后自动跳转登录页
+      startRedirectCountdown();
       return;
     }
 
@@ -200,6 +225,27 @@ export default function RegisterPage() {
           {buttonText()}
         </button>
       </form>
+
+      {/* 注册成功后的跳转浮窗 */}
+      {redirectCountdown > 0 && (
+        <div className="mt-4 flex items-center justify-between rounded-lg border border-green/30 bg-green/10 px-4 py-3">
+          <div className="text-sm text-green">
+            <span className="font-semibold">{redirectCountdown}s</span> 后自动跳转登录页
+            <br />
+            <span className="text-xs opacity-80">未跳转请手动登录</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (redirectTimer.current) clearInterval(redirectTimer.current);
+              router.push("/login");
+            }}
+            className="rounded-md bg-green px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-green-dark"
+          >
+            立即登录
+          </button>
+        </div>
+      )}
 
       <p className="mt-6 text-center text-sm text-gray-500">
         已有账号？{" "}
