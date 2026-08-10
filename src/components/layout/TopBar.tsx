@@ -25,7 +25,8 @@ const PAGE_TITLES: Record<string, string> = {
 
 export function TopBar({ user }: TopBarProps) {
   const pathname = usePathname();
-  const title = PAGE_TITLES[pathname] ?? "EngForge";
+  const title = PAGE_TITLES[pathname]
+    ?? (pathname.startsWith("/editor") ? "作文编辑器" : "EngForge");
   const showNewEssay = pathname === "/dashboard";
 
   return (

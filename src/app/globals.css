@@ -47,3 +47,95 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* ============================================
+   TipTap 编辑器排版
+   EditorContent 渲染一个 .tiptap-content 元素，
+   需要手动设置排版样式（未安装 @tailwindcss/typography）
+   ============================================ */
+
+.tiptap-content {
+  min-height: 400px;
+  outline: none;
+}
+
+.tiptap-content > * + * {
+  margin-top: 1em;
+}
+
+.tiptap-content p {
+  line-height: 1.8;
+  color: #1f2937;
+  font-size: 16px;
+}
+
+.tiptap-content h1 {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-top: 1.5em;
+  color: #111827;
+}
+
+.tiptap-content h2 {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin-top: 1.2em;
+  color: #111827;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+  padding-left: 1.5em;
+}
+
+.tiptap-content ul {
+  list-style: disc;
+}
+
+.tiptap-content ol {
+  list-style: decimal;
+}
+
+.tiptap-content li {
+  margin: 0.25em 0;
+  line-height: 1.8;
+}
+
+.tiptap-content li > p {
+  line-height: 1.8;
+}
+
+.tiptap-content blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 1em;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.tiptap-content code {
+  background: #f3f4f6;
+  border-radius: 3px;
+  padding: 0.1em 0.3em;
+  font-size: 0.875em;
+  font-family: var(--font-mono), monospace;
+}
+
+.tiptap-content pre {
+  background: #1f2937;
+  color: #f9fafb;
+  border-radius: 6px;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+.tiptap-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.tiptap-content hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2em 0;
+}

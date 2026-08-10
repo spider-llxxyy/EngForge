@@ -12,9 +12,16 @@
 
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
-export async function createClient() {
+/**
+ * 显式标注返回类型为 SupabaseClient<Database>。
+ *
+ * @supabase/ssr 的 createServerClient 泛型推断在 insert() / rpc() 链上
+ * 会退化为 never，导致编译报错。显式标注返回类型可解决此问题。
+ */
+export async function createClient(): Promise<SupabaseClient<Database>> {
   const cookieStore = await cookies()
 
   return createServerClient<Database>(
