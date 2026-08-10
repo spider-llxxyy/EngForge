@@ -16,7 +16,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { formatAuthError, isRateLimited } from "@/lib/auth-errors";
+import { formatAuthError, isRateLimited, withAuthTimeout } from "@/lib/auth-errors";
 
 /** 冷却时长（秒）— 注册失败后按钮锁定的时间 */
 const COOLDOWN_SECONDS = 60;
@@ -68,14 +68,16 @@ export default function RegisterPage() {
     setSuccess("");
 
     const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { username },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    const { data, error } = await withAuthTimeout(
+      supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+    );
 
     if (error) {
       setError(formatAuthError(error));
@@ -85,6 +87,14 @@ export default function RegisterPage() {
       if (isRateLimited(error)) {
         startCooldown();
       }
+      return;
+    }
+
+    // Supabase 安全策略：用已注册邮箱再注册时返回 200 但 user.identities 为空数组
+    // 这是判断"邮箱已存在"的唯一可靠方式
+    if (data.user && data.user.identities && data.user.identities.length === 0) {
+      setError("该邮箱已注册，请直接登录。");
+      setLoading(false);
       return;
     }
 

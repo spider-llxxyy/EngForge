@@ -16,7 +16,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { formatAuthError, isRateLimited } from "@/lib/auth-errors";
+import { formatAuthError, isRateLimited, withAuthTimeout } from "@/lib/auth-errors";
 
 /** 冷却时长（秒）— 登录失败后按钮锁定的时间 */
 const COOLDOWN_SECONDS = 60;
@@ -69,10 +69,12 @@ export default function LoginPage() {
     setError("");
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await withAuthTimeout(
+      supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+    );
 
     if (error) {
       setError(formatAuthError(error));
