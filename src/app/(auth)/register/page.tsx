@@ -6,12 +6,20 @@
  * 邮箱 + 密码 + 用户名注册，调用 supabase.auth.signUp。
  * 用户名通过 options.data 传入，触发器 handle_new_user 从 raw_user_meta_data 提取。
  * 注册成功后自动登录并跳转 /dashboard（需关闭 Supabase 邮箱确认）。
+ *
+ * 错误处理：
+ * - 429 速率限制：显示中文提示 + 按钮冷却 60 秒
+ * - 其他错误：通过 formatAuthError 映射为友好中文提示
  */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { formatAuthError, isRateLimited } from "@/lib/auth-errors";
+
+/** 冷却时长（秒）— 注册失败后按钮锁定的时间 */
+const COOLDOWN_SECONDS = 60;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,8 +31,38 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // 冷却倒计时（秒），> 0 时按钮禁用
+  const [cooldown, setCooldown] = useState(0);
+  const cooldownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 组件卸载时清理定时器
+  useEffect(() => {
+    return () => {
+      if (cooldownTimer.current) clearInterval(cooldownTimer.current);
+    };
+  }, []);
+
+  /** 启动冷却倒计时 */
+  function startCooldown() {
+    setCooldown(COOLDOWN_SECONDS);
+    if (cooldownTimer.current) clearInterval(cooldownTimer.current);
+    cooldownTimer.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          if (cooldownTimer.current) clearInterval(cooldownTimer.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // 冷却中或加载中：拒绝提交
+    if (cooldown > 0 || loading) return;
+
     setLoading(true);
     setError("");
     setSuccess("");
@@ -40,8 +78,13 @@ export default function RegisterPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError(formatAuthError(error));
       setLoading(false);
+
+      // 429 速率限制：启动冷却倒计时
+      if (isRateLimited(error)) {
+        startCooldown();
+      }
       return;
     }
 
@@ -57,6 +100,16 @@ export default function RegisterPage() {
     router.push("/dashboard");
     router.refresh();
   }
+
+  // 按钮文案
+  const buttonText = () => {
+    if (loading) return "注册中...";
+    if (cooldown > 0) return `请等待 ${cooldown}s`;
+    return "注册";
+  };
+
+  // 按钮是否禁用
+  const buttonDisabled = loading || cooldown > 0;
 
   return (
     <div>
@@ -79,7 +132,8 @@ export default function RegisterPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="你的昵称"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+            disabled={cooldown > 0}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
           />
         </div>
 
@@ -94,7 +148,8 @@ export default function RegisterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+            disabled={cooldown > 0}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
           />
         </div>
 
@@ -110,7 +165,8 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="至少 6 位"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+            disabled={cooldown > 0}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
           />
         </div>
 
@@ -128,10 +184,10 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:opacity-50"
+          disabled={buttonDisabled}
+          className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "注册中..." : "注册"}
+          {buttonText()}
         </button>
       </form>
 
