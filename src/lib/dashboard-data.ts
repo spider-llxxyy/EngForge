@@ -117,8 +117,8 @@ export const navGroups: NavGroup[] = [
   {
     title: '协作',
     items: [
-      { label: '作品详情', icon: 'D', href: '#', disabled: true, disabledLabel: 'Phase 2' },
-      { label: '批改请求', icon: 'R', href: '#', disabled: true, disabledLabel: 'Phase 2' },
+      { label: '作品详情', icon: 'D', href: '/dashboard' },
+      { label: '批改请求', icon: 'R', href: '#', disabled: true, disabledLabel: 'Step 8' },
     ],
   },
   {

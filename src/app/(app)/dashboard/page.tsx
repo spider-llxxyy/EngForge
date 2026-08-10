@@ -61,7 +61,7 @@ export default async function DashboardPage() {
     tag: mapTag(e.tags?.[0] ?? "other"),
     wordCount: e.word_count ?? 0,
     updatedAt: e.updated_at,
-    href: `/editor/${e.id}`,
+    href: `/essays/${e.id}`,
   }));
 
   // 4. 计算统计数据
