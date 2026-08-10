@@ -119,11 +119,15 @@ export async function publishNewEssay(params: {
  *
  * 流程：
  * 1. 验证登录
- * 2. RPC create_essay_version 创建新版本（RPC 内部验证权限）
- * 3. 返回 versionId
+ * 2. UPDATE essays 表的 title / tags / visibility / word_count
+ * 3. RPC create_essay_version 创建新版本（RPC 内部验证权限）
+ * 4. 返回 versionId
  */
 export async function publishNewVersion(params: {
   essayId: string;
+  title: string;
+  tags: string[];
+  visibility: EssayVisibility;
   content: Json;
   plainText: string;
   wordCount: number;
@@ -137,7 +141,26 @@ export async function publishNewVersion(params: {
 
   const supabase = await createClient();
 
-  // 2. 创建新版本
+  // 2. 更新 essay 元数据（标题、标签、可见性、词数）
+  const updateResult = await supabase
+    .from("essays")
+    .update({
+      title: params.title.trim(),
+      tags: params.tags,
+      visibility: params.visibility,
+      word_count: params.wordCount,
+    } as never)
+    .eq("id", params.essayId);
+
+  const updateError = updateResult.error as { message?: string } | null;
+  if (updateError) {
+    return {
+      success: false,
+      error: "更新作文信息失败：" + updateError.message,
+    };
+  }
+
+  // 3. 创建新版本
   const rpcResult = await supabase.rpc("create_essay_version", {
     p_essay_id: params.essayId,
     p_content: params.content,

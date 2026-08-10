@@ -20,8 +20,17 @@
 /** 作文状态 — 只有这 3 种合法值 */
 export type EssayStatus = 'draft' | 'review' | 'published';
 
-/** 作文标签 — 只有这 4 种合法值 */
-export type EssayTag = '考研大作文' | '高考作文' | '翻译练习' | '自由写作';
+/** 作文标签 key — 和数据库存储的英文 key 一致 */
+export type EssayTag = 'kaoyan' | 'gaokao' | 'cet4' | 'cet6' | 'other';
+
+/** 标签 key → 中文显示名 */
+export const tagLabels: Record<EssayTag, string> = {
+  kaoyan: '考研大作文',
+  gaokao: '高考作文',
+  cet4: 'CET-4',
+  cet6: 'CET-6',
+  other: '自由写作',
+};
 
 /** 热力图等级 — 空字符串表示无活动，l1~l4 表示 4 个活动强度 */
 export type HeatmapLevel = '' | 'l1' | 'l2' | 'l3' | 'l4';
@@ -64,9 +73,9 @@ export interface DashboardEssay {
   title: string;
   status: EssayStatus;
   tag: EssayTag;
-  wordCount: number | string;  // 数字（如 248）或字符串（如 "中译英"）
-  dateText: string;            // 已格式化的日期文本，如 "3 天前"
-  href: string;                // 点击后跳转的路由
+  wordCount: number;
+  updatedAt: string;            // ISO 时间戳，由调用方格式化
+  href: string;                 // 点击后跳转的路由
 }
 
 /** 活动记录的一个片段（用于控制加粗） */
@@ -90,9 +99,10 @@ export interface LearningGoal {
 
 
 /* ============================================================
- * 第二部分：静态数据
- * 以下数据全部从原型 EngForge_原型.html 1:1 搬运。
- * 以后接 Supabase 后，这些数组会被替换成数据库查询结果。
+ * 第二部分：展示配置数据
+ * navGroups 保留为静态数据（导航结构固定）。
+ * 统计数据、作文列表、活动记录由 Dashboard 页面从 Supabase
+ * 查询后通过 props 传入子组件。
  * ============================================================ */
 
 /** 侧边栏导航 — 三组：工坊 / 协作 / 发现 */
@@ -107,8 +117,8 @@ export const navGroups: NavGroup[] = [
   {
     title: '协作',
     items: [
-      { label: '作品详情', icon: 'D', href: '/detail' },
-      { label: '批改请求', icon: 'R', href: '/review', badge: 2 },
+      { label: '作品详情', icon: 'D', href: '#', disabled: true, disabledLabel: 'Phase 2' },
+      { label: '批改请求', icon: 'R', href: '#', disabled: true, disabledLabel: 'Phase 2' },
     ],
   },
   {
@@ -120,132 +130,13 @@ export const navGroups: NavGroup[] = [
   },
 ];
 
-/** 侧边栏底部用户信息 */
-export const dashboardUser: DashboardUser = {
-  name: '李同学',
-  avatar: 'LY',
-  subtitle: '考研英语 · Day 47',
-};
-
-/** 4 个统计卡片 — 数值和副标题来自原型 */
-export const statCards: StatCardData[] = [
-  { label: '我的作文', value: 12, sub: '3 篇草稿', colorClass: '' },
-  { label: '收到批改', value: 28, sub: '2 条待处理', colorClass: 'text-purple' },
-  { label: '被 Star', value: 15, sub: '来自 4 位同学', colorClass: 'text-teal' },
-  { label: '连续天数', value: 47, sub: '历史最长 47', colorClass: 'text-green' },
+/** 4 个统计卡片配置（label + colorClass 固定，value/sub 动态） */
+export const statCardConfig: { label: string; colorClass: string }[] = [
+  { label: '我的作文', colorClass: '' },
+  { label: '收到批改', colorClass: 'text-purple' },
+  { label: '被 Star', colorClass: 'text-teal' },
+  { label: '连续天数', colorClass: 'text-green' },
 ];
-
-/** 作品列表 — 5 篇作文，数据来自原型 essayList 变量 */
-export const dashboardEssays: DashboardEssay[] = [
-  {
-    id: 'essay-1',
-    title: 'The Impact of Social Media on Interpersonal Communication',
-    status: 'published',
-    tag: '考研大作文',
-    wordCount: 248,
-    dateText: '3 天前',
-    href: '/detail',
-  },
-  {
-    id: 'essay-2',
-    title: 'On the Importance of Lifelong Learning in Modern Society',
-    status: 'review',
-    tag: '考研大作文',
-    wordCount: 215,
-    dateText: '2 条 PR 待审',
-    href: '/review',
-  },
-  {
-    id: 'essay-3',
-    title: 'Environmental Protection: Individual Responsibility vs Government Action',
-    status: 'published',
-    tag: '高考作文',
-    wordCount: 180,
-    dateText: '1 周前',
-    href: '/detail',
-  },
-  {
-    id: 'essay-4',
-    title: 'The Role of Artificial Intelligence in Education (草稿)',
-    status: 'draft',
-    tag: '考研大作文',
-    wordCount: 87,
-    dateText: '昨天编辑',
-    href: '/detail',
-  },
-  {
-    id: 'essay-5',
-    title: '翻译练习：中国文化走出去 (Translation Practice)',
-    status: 'published',
-    tag: '翻译练习',
-    wordCount: '中译英',
-    dateText: '2 周前',
-    href: '/detail',
-  },
-];
-
-/** 最近活动 — 5 条记录，segments 控制哪些部分加粗 */
-export const activities: Activity[] = [
-  {
-    segments: [
-      { text: '王同学', bold: true },
-      { text: ' 向你的作文发起了 PR 批改', bold: false },
-    ],
-    time: '2 小时前',
-  },
-  {
-    segments: [
-      { text: '张同学', bold: true },
-      { text: ' Star 了你的 "Environmental Protection"', bold: false },
-    ],
-    time: '5 小时前',
-  },
-  {
-    segments: [
-      { text: '你完成了 ', bold: false },
-      { text: '第 3 版', bold: true },
-      { text: ' 修改 "Social Media Impact"', bold: false },
-    ],
-    time: '昨天',
-  },
-  {
-    segments: [
-      { text: '赵同学', bold: true },
-      { text: ' 评论了你的翻译练习', bold: false },
-    ],
-    time: '2 天前',
-  },
-  {
-    segments: [
-      { text: '你 Fork 了 ', bold: false },
-      { text: '范文仓库', bold: true },
-      { text: ' 的 "Climate Change Essay"', bold: false },
-    ],
-    time: '3 天前',
-  },
-];
-
-/**
- * 贡献热力图 — 26 周 × 7 天 = 182 格
- * 数据直接从原型 JS 的 levels 数组 1:1 搬运
- * '' = 无活动，l1~l4 = 4 个活动强度等级
- */
-export const heatmapLevels: HeatmapLevel[] = [
-  '', '', 'l1', '', 'l2', '', 'l1', '', '', 'l3', 'l2', '', 'l1', '', 'l4', 'l3', 'l2', '', 'l1', '', 'l2', 'l3', '', 'l1', '', 'l4',
-  '', '', 'l1', 'l2', '', 'l3', '', '', 'l1', '', 'l2', 'l3', 'l4', '', 'l2', '', 'l1', '', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4',
-  'l2', '', 'l1', '', '', 'l2', 'l3', '', 'l1', '', 'l4', 'l3', '', 'l2', 'l1', '', '', 'l3', '', 'l2', 'l1', '', 'l4', '', 'l3', 'l2',
-  '', '', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l1', 'l2', '', 'l3', '', '', 'l2', 'l1', 'l3', '', 'l4', 'l2', '', 'l1', '', 'l3', '',
-  'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', '', 'l1', 'l2', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4', '', 'l2', '', 'l1', '',
-  'l3', '', 'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l2', 'l1', '', 'l3', '', 'l4', 'l2',
-  '', 'l1', 'l3', '', '', 'l2', 'l4', 'l1', '', 'l3', '', 'l2', '', 'l1', 'l4', 'l3', '', 'l2', '', 'l1', '', 'l3', 'l4', 'l2', '', '',
-];
-
-/** 学习目标 */
-export const learningGoal: LearningGoal = {
-  description: '本周写 3 篇大作文',
-  current: 2,
-  total: 3,
-};
 
 
 /* ============================================================
@@ -261,12 +152,13 @@ export const statusConfig: Record<EssayStatus, { dotClass: string; label: string
   published: { dotClass: 'bg-green',    label: '已发布' },
 };
 
-/** 作文标签 → 背景色 + 文字色 */
+/** 作文标签 → 背景色 + 文字色（key 和数据库存储一致） */
 export const tagConfig: Record<EssayTag, { bgClass: string; textClass: string }> = {
-  '考研大作文': { bgClass: 'bg-primary-light', textClass: 'text-primary' },
-  '高考作文':   { bgClass: 'bg-purple-light',  textClass: 'text-purple' },
-  '翻译练习':   { bgClass: 'bg-teal-light',   textClass: 'text-teal' },
-  '自由写作':   { bgClass: 'bg-amber-light',  textClass: 'text-amber' },
+  kaoyan: { bgClass: 'bg-primary-light', textClass: 'text-primary' },
+  gaokao: { bgClass: 'bg-purple-light',  textClass: 'text-purple' },
+  cet4:   { bgClass: 'bg-teal-light',   textClass: 'text-teal' },
+  cet6:   { bgClass: 'bg-amber-light',  textClass: 'text-amber' },
+  other:   { bgClass: 'bg-gray-100',     textClass: 'text-gray-600' },
 };
 
 /** 热力图等级 → 背景色（来自原型 CSS：空=#F3F4F6，l1~l4=蓝色渐变） */
@@ -277,3 +169,17 @@ export const heatmapLevelConfig: Record<HeatmapLevel, string> = {
   l3:  'bg-[#378ADD]',
   l4:  'bg-[#185FA5]',
 };
+
+/**
+ * 贡献热力图 — 26 周 × 7 天 = 182 格
+ * TODO: Phase 2 接入真实活动数据后替换此静态数组
+ */
+export const heatmapLevels: HeatmapLevel[] = [
+  '', '', 'l1', '', 'l2', '', 'l1', '', '', 'l3', 'l2', '', 'l1', '', 'l4', 'l3', 'l2', '', 'l1', '', 'l2', 'l3', '', 'l1', '', 'l4',
+  '', '', 'l1', 'l2', '', 'l3', '', '', 'l1', '', 'l2', 'l3', 'l4', '', 'l2', '', 'l1', '', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4',
+  'l2', '', 'l1', '', '', 'l2', 'l3', '', 'l1', '', 'l4', 'l3', '', 'l2', 'l1', '', '', 'l3', '', 'l2', 'l1', '', 'l4', '', 'l3', 'l2',
+  '', '', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l1', 'l2', '', 'l3', '', '', 'l2', 'l1', 'l3', '', 'l4', 'l2', '', 'l1', '', 'l3', '',
+  'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', '', 'l1', 'l2', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4', '', 'l2', '', 'l1', '',
+  'l3', '', 'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l2', 'l1', '', 'l3', '', 'l4', 'l2',
+  '', 'l1', 'l3', '', '', 'l2', 'l4', 'l1', '', 'l3', '', 'l2', '', 'l1', 'l4', 'l3', '', 'l2', '', 'l1', '', 'l3', 'l4', 'l2', '', '',
+];

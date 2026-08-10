@@ -229,6 +229,9 @@ export function EditorClient({
       } else {
         result = await publishNewVersion({
           essayId: essayId!,
+          title,
+          tags,
+          visibility,
           content,
           plainText: text,
           wordCount: wc,

@@ -21,11 +21,13 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({
@@ -45,7 +47,7 @@ export default function RegisterPage() {
 
     // 如果邮箱确认开启，data.session 为 null，需要提示用户查邮件
     if (!data.session) {
-      setError("注册成功！请查收确认邮件后登录。");
+      setSuccess("注册成功！请查收确认邮件后登录。");
       setLoading(false);
       // 停留在此页，用户确认后点登录
       return;
@@ -115,6 +117,12 @@ export default function RegisterPage() {
         {error && (
           <p className="rounded-lg bg-red/10 px-3 py-2 text-sm text-red">
             {error}
+          </p>
+        )}
+
+        {success && (
+          <p className="rounded-lg bg-green/10 px-3 py-2 text-sm text-green">
+            {success}
           </p>
         )}
 
