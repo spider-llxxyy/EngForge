@@ -64,8 +64,8 @@ export default async function EditEssayPage({
     return (
       <div className="flex h-[calc(100vh-49px)] flex-col items-center justify-center text-center">
         <span className="mb-3 text-4xl">🔒</span>
-        <p className="text-lg font-medium text-gray-700">无编辑权限</p>
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="text-lg font-medium text-zinc-700">无编辑权限</p>
+        <p className="mt-1 text-sm text-zinc-400">
           只有作文的协作者才能编辑内容
         </p>
       </div>

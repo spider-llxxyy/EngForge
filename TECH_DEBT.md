@@ -23,7 +23,13 @@
 | 2026-08-09 | 通知写入 | notifications INSERT 由 SECURITY DEFINER 触发器完成，用户无法直接 INSERT；如需新增通知类型需新增触发器 | 低 | Phase 2 | 未偿还 |
 | 2026-08-09 | 邀请码通用性 | 当前 use_invitation 仅支持 essay 级邀请，不支持全局邀请（注册邀请） | 低 | Phase 2 | 未偿还 |
 | 2026-08-09 | PR diff | base/head 版本必须先存在才能创建 PR，无法从草稿直接提交 | 中 | Phase 2 | 未偿还 |
-| — | — | — 待填写 — | — | — | — |
+| 2026-08-10 | 草稿存储 | 草稿仅存 localStorage，不支持跨设备恢复 | 中 | Phase 2 | 未偿还 |
+| 2026-08-10 | 类型推断 | @supabase/ssr 在 insert()/rpc() 链退化为 never，用 as never 绕过 | 中 | Phase 2 | 未偿还 |
+| 2026-08-14 | 性能 | Detail 页 6 个串行查询，应改 Promise.all 并行 | 中 | P3 | 未偿还 |
+| 2026-08-14 | 数据 | 热力图/活动面板/连续天数全是假数据 | 高 | P2 | 未偿还 |
+| 2026-08-14 | 安全 | Server Actions 不在应用层验 ownership | 中 | P2 | 未偿还 |
+| 2026-08-14 | 响应式 | 全站无响应式适配 | 中 | P3 | 未偿还 |
+| 2026-08-15 | 框架迁移 | Next.js 16.3 提示 middleware 文件约定已弃用，应迁移到 proxy（`npx @next/codemod@canary middleware-to-proxy .`） | 低 | P3 | 未偿还 |
 
 ## 偿还记录
 
@@ -31,7 +37,10 @@
 
 | 偿还日期 | 原债务 | 偿还方式 | 实际耗时 |
 |----------|--------|----------|----------|
-| — | — 待填写 — | — | — |
+| 2026-08-14 | XSS: dangerouslySetInnerHTML 无 sanitize | render-content.ts 加 isomorphic-dompurify，白名单仅允许 TipTap 结构标签 | 20min |
+| 2026-08-14 | 全站无图标系统，用单字符代替 | 引入 lucide-react，替换 Sidebar/Landing/Toolbar/EssayActions/TopBar/UserMenu/DetailSidebar/AiSuggestions 共 9 个文件 | 1h |
+| 2026-08-14 | 无 Toast/通知反馈系统 | 引入 sonner，root layout 挂载 Toaster，Fork/Star/发布/恢复版本加 toast 反馈 | 40min |
+| 2026-08-14 | 无 error.tsx / loading.tsx / not-found.tsx | 创建 root error.tsx + app error.tsx + not-found.tsx + dashboard loading.tsx + detail loading.tsx | 40min |
 
 ## 使用示例
 

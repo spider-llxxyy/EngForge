@@ -6,6 +6,7 @@
  */
 
 import Link from "next/link";
+import { Plus } from "lucide-react";
 
 import {
   statusConfig,
@@ -38,7 +39,7 @@ function EssayListItem({ essay }: EssayListItemProps) {
   return (
     <Link
       href={essay.href}
-      className="flex items-center gap-3 border-b border-gray-100 px-5 py-3.5 transition-colors last:border-b-0 hover:bg-gray-50"
+      className="flex items-center gap-3 border-b border-zinc-100 px-5 py-3.5 transition-colors last:border-b-0 hover:bg-zinc-50"
     >
       {/* 状态圆点 */}
       <span
@@ -48,10 +49,10 @@ function EssayListItem({ essay }: EssayListItemProps) {
 
       {/* 作文信息 */}
       <div className="min-w-0 flex-1">
-        <p className="mb-0.5 truncate text-sm font-medium text-gray-700">
+        <p className="mb-0.5 truncate text-sm font-medium text-zinc-700">
           {essay.title}
         </p>
-        <div className="flex gap-3 text-xs text-gray-500">
+        <div className="flex gap-3 text-xs text-zinc-500">
           <span
             className={`inline-block rounded px-2 py-0.5 text-[11px] font-medium ${tag.bgClass} ${tag.textClass}`}
           >
@@ -71,15 +72,16 @@ interface EssayListProps {
 
 export function EssayList({ essays }: EssayListProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-card bg-white shadow-card">
       {/* 面板头部 */}
-      <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-        <h3 className="text-[15px] font-semibold text-gray-800">我的作品</h3>
+      <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+        <h3 className="text-[15px] font-semibold text-zinc-950">我的作品</h3>
         <Link
           href="/editor"
-          className="rounded border border-gray-300 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          className="flex items-center gap-1 rounded border border-zinc-200 bg-white px-3.5 py-1.5 text-[13px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
         >
-          + 新建
+          <Plus className="h-3.5 w-3.5" />
+          新建
         </Link>
       </div>
 
@@ -92,8 +94,8 @@ export function EssayList({ essays }: EssayListProps) {
         ) : (
           /* 空状态 */
           <div className="flex flex-col items-center justify-center px-5 py-12 text-center">
-            <p className="mb-1 text-sm text-gray-500">还没有作文</p>
-            <p className="mb-4 text-xs text-gray-400">
+            <p className="mb-1 text-sm text-zinc-500">还没有作文</p>
+            <p className="mb-4 text-xs text-zinc-400">
               写第一篇作文，开始你的英语写作之旅
             </p>
             <Link

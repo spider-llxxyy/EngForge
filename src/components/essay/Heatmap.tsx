@@ -30,7 +30,7 @@ function HeatmapLegend() {
   const legendLevels = ["", "l1", "l2", "l3", "l4"] as const;
 
   return (
-    <div className="mt-2 flex items-center justify-end gap-1 text-[11px] text-gray-500">
+    <div className="mt-2 flex items-center justify-end gap-1 text-[11px] text-zinc-500">
       <span>少</span>
       {legendLevels.map((level) => (
         <span
@@ -51,11 +51,11 @@ function HeatmapLegend() {
 
 export function Heatmap() {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-card bg-white shadow-card">
       {/* 面板头部 — 标题在左，副标题在右 */}
-      <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-        <h3 className="text-[15px] font-semibold text-gray-800">贡献热力图</h3>
-        <span className="text-xs text-gray-500">过去 26 周</span>
+      <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+        <h3 className="text-[15px] font-semibold text-zinc-950">贡献热力图</h3>
+        <span className="text-xs text-zinc-500">过去 26 周</span>
       </div>
 
       {/*

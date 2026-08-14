@@ -28,6 +28,7 @@ import {
   useMemo,
 } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { EditorToolbar } from "./EditorToolbar";
 import { AiSuggestions } from "./AiSuggestions";
 import { publishNewEssay, publishNewVersion } from "@/lib/essay-actions";
@@ -93,7 +94,6 @@ export function EditorClient({
 
   // ── 编辑器文本状态 ──
   const [plainText, setPlainText] = useState("");
-  const [publishError, setPublishError] = useState<string | null>(null);
 
   const draftKey = DRAFT_KEY_PREFIX + (essayId ?? "new");
 
@@ -199,10 +199,9 @@ export function EditorClient({
   // ── 发布 ──
   const handlePublish = () => {
     if (!editor) return;
-    setPublishError(null);
 
     if (!title.trim()) {
-      setPublishError("请输入作文标题");
+      toast.error("请输入作文标题");
       return;
     }
 
@@ -211,7 +210,7 @@ export function EditorClient({
     const wc = countWords(text);
 
     if (wc === 0) {
-      setPublishError("作文内容不能为空");
+      toast.error("作文内容不能为空");
       return;
     }
 
@@ -241,9 +240,12 @@ export function EditorClient({
       if (result.success) {
         // 清除草稿
         localStorage.removeItem(draftKey);
+        toast.success(mode === "new" ? "作文发布成功" : "新版本发布成功");
         router.push("/dashboard");
       } else {
-        setPublishError(result.error ?? "发布失败，请重试");
+        toast.error("发布失败", {
+          description: result.error ?? "请稍后重试",
+        });
       }
     });
   };
@@ -315,14 +317,14 @@ export function EditorClient({
       )}
 
       {/* ── 元数据栏 ── */}
-      <div className="border-b border-gray-200 bg-white px-8 py-4">
+      <div className="border-b border-zinc-200 bg-white px-8 py-4">
         {/* 标题输入 */}
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="作文标题..."
-          className="w-full text-xl font-bold text-gray-900 outline-none placeholder:text-gray-300"
+          className="w-full text-xl font-bold text-zinc-950 outline-none placeholder:text-zinc-300"
         />
 
         {/* 元数据操作行 */}
@@ -331,7 +333,7 @@ export function EditorClient({
           <select
             value={tags[0] ?? "kaoyan"}
             onChange={(e) => setTags([e.target.value])}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 outline-none focus:border-primary"
+            className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 outline-none focus:border-primary"
           >
             {TAG_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -344,7 +346,7 @@ export function EditorClient({
           <select
             value={visibility}
             onChange={(e) => setVisibility(e.target.value as EssayVisibility)}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 outline-none focus:border-primary"
+            className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 outline-none focus:border-primary"
           >
             {VISIBILITY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -354,13 +356,13 @@ export function EditorClient({
           </select>
 
           {/* 字数统计 */}
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-zinc-400">
             {wordCount} 词
           </span>
 
           {/* 草稿状态 */}
           {draftTime && !showDraftNotice && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-zinc-400">
               已自动保存 {draftTimeText}
             </span>
           )}
@@ -393,23 +395,10 @@ export function EditorClient({
         </div>
 
         {/* 右：AI 标注面板 */}
-        <div className="w-80 flex-shrink-0 border-l border-gray-200 bg-white">
+        <div className="w-80 flex-shrink-0 border-l border-zinc-200 bg-white">
           <AiSuggestions text={plainText} onReplace={handleAiReplace} />
         </div>
       </div>
-
-      {/* ── 发布错误提示 ── */}
-      {publishError && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-lg bg-red px-4 py-2.5 text-sm text-white shadow-lg">
-          {publishError}
-          <button
-            onClick={() => setPublishError(null)}
-            className="ml-3 text-white/70 hover:text-white"
-          >
-            ✕
-          </button>
-        </div>
-      )}
     </div>
   );
 }

@@ -10,6 +10,18 @@
  */
 
 import type { Editor } from "@tiptap/react";
+import {
+  Bold,
+  Italic,
+  Heading1,
+  Heading2,
+  List,
+  ListOrdered,
+  Quote,
+  Undo2,
+  Redo2,
+  type LucideIcon,
+} from "lucide-react";
 
 interface EditorToolbarProps {
   editor: Editor | null;
@@ -18,9 +30,8 @@ interface EditorToolbarProps {
 /** 工具按钮定义 */
 interface ToolButton {
   action: string;
-  label: string;
+  icon: LucideIcon;
   title: string;
-  className?: string;
 }
 
 interface ToolDivider {
@@ -28,23 +39,23 @@ interface ToolDivider {
 }
 
 const TOOLBAR_ITEMS: (ToolButton | ToolDivider)[] = [
-  { action: "bold", label: "B", title: "加粗 (Ctrl+B)", className: "font-bold" },
-  { action: "italic", label: "I", title: "斜体 (Ctrl+I)", className: "italic" },
+  { action: "bold", icon: Bold, title: "加粗 (Ctrl+B)" },
+  { action: "italic", icon: Italic, title: "斜体 (Ctrl+I)" },
   { divider: true },
-  { action: "heading1", label: "H1", title: "一级标题" },
-  { action: "heading2", label: "H2", title: "二级标题" },
+  { action: "heading1", icon: Heading1, title: "一级标题" },
+  { action: "heading2", icon: Heading2, title: "二级标题" },
   { divider: true },
-  { action: "bulletList", label: "•", title: "无序列表" },
-  { action: "orderedList", label: "1.", title: "有序列表" },
-  { action: "blockquote", label: "❝", title: "引用" },
+  { action: "bulletList", icon: List, title: "无序列表" },
+  { action: "orderedList", icon: ListOrdered, title: "有序列表" },
+  { action: "blockquote", icon: Quote, title: "引用" },
   { divider: true },
-  { action: "undo", label: "↶", title: "撤销 (Ctrl+Z)" },
-  { action: "redo", label: "↷", title: "重做 (Ctrl+Y)" },
+  { action: "undo", icon: Undo2, title: "撤销 (Ctrl+Z)" },
+  { action: "redo", icon: Redo2, title: "重做 (Ctrl+Y)" },
 ];
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
   if (!editor) {
-    return <div className="h-[42px] border-b border-gray-200" />;
+    return <div className="h-[42px] border-b border-zinc-200" />;
   }
 
   /** 执行编辑器命令 */
@@ -104,15 +115,16 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   };
 
   return (
-    <div className="flex items-center gap-0.5 border-b border-gray-200 bg-gray-50 px-3 py-1.5">
+    <div className="flex items-center gap-0.5 border-b border-zinc-200 bg-zinc-50 px-3 py-1.5">
       {TOOLBAR_ITEMS.map((item, idx) => {
         if ("divider" in item) {
           return (
-            <div key={idx} className="mx-1.5 h-5 w-px bg-gray-200" />
+            <div key={idx} className="mx-1.5 h-5 w-px bg-zinc-200" />
           );
         }
 
         const active = isButtonActive(item.action);
+        const Icon = item.icon;
 
         return (
           <button
@@ -120,13 +132,13 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
             type="button"
             onClick={() => runCommand(item.action)}
             title={item.title}
-            className={`flex h-8 min-w-8 items-center justify-center rounded px-2 text-sm transition-colors ${
+            className={`flex h-8 min-w-8 items-center justify-center rounded px-2 transition-colors ${
               active
                 ? "bg-primary-light text-primary"
-                : "text-gray-600 hover:bg-gray-200"
-            } ${item.className ?? ""}`}
+                : "text-zinc-600 hover:bg-zinc-200"
+            }`}
           >
-            {item.label}
+            <Icon className="h-[18px] w-[18px]" />
           </button>
         );
       })}

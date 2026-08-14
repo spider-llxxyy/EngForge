@@ -17,6 +17,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { EssayActions } from "./EssayActions";
 import { VersionSwitcher } from "./VersionSwitcher";
 import { VersionHistory } from "./VersionHistory";
@@ -74,7 +75,6 @@ export function DetailClient(props: DetailClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>("content");
   const [activeVersion, setActiveVersion] = useState(essay.current_version);
   const [restoring, setRestoring] = useState(false);
-  const [restoreMsg, setRestoreMsg] = useState("");
 
   // 当前版本数据
   const versionData = versions.find((v) => v.version_number === activeVersion);
@@ -84,15 +84,18 @@ export function DetailClient(props: DetailClientProps) {
   async function handleRestore() {
     if (restoring || !canEdit) return;
     setRestoring(true);
-    setRestoreMsg("");
 
     const result = await restoreVersion(essay.id, activeVersion);
 
     if (result.success) {
-      setRestoreMsg("已恢复，正在刷新...");
+      toast.success("已恢复到 v" + activeVersion, {
+        description: "正在刷新页面...",
+      });
       router.refresh();
     } else {
-      setRestoreMsg("恢复失败：" + (result.error ?? "未知错误"));
+      toast.error("恢复失败", {
+        description: result.error ?? "未知错误",
+      });
       setRestoring(false);
     }
   }
@@ -107,22 +110,22 @@ export function DetailClient(props: DetailClientProps) {
   return (
     <div className="px-8 py-6">
       {/* 面包屑 */}
-      <nav className="mb-4 flex items-center gap-2 text-sm text-gray-500">
+      <nav className="mb-4 flex items-center gap-2 text-sm text-zinc-500">
         <Link href="/dashboard" className="hover:text-primary">
           我的工坊
         </Link>
         <span>/</span>
-        <span className="text-gray-900">{essay.title}</span>
+        <span className="text-zinc-950">{essay.title}</span>
       </nav>
 
       {/* 头部：标题 + 标签 + 元信息 + 操作按钮 */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-bold text-gray-900">{essay.title}</h1>
+          <h1 className="text-xl font-bold text-zinc-950">{essay.title}</h1>
 
           {/* Fork 来源 */}
           {essay.forked_from && essay.forked_from_title && (
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-zinc-500">
               Fork 自{" "}
               <Link
                 href={`/essays/${essay.forked_from}`}
@@ -138,18 +141,18 @@ export function DetailClient(props: DetailClientProps) {
             {essay.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                className="rounded bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600"
               >
                 {tagLabels[tag as keyof typeof tagLabels] ?? tag}
               </span>
             ))}
-            <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+            <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
               {essay.visibilityLabel}
             </span>
           </div>
 
           {/* 元信息 */}
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-zinc-500">
             <span className="flex items-center gap-1">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-white">
                 {author.avatar_initials}
@@ -177,7 +180,7 @@ export function DetailClient(props: DetailClientProps) {
         {/* 左栏：内容区 */}
         <div className="min-w-0 flex-1">
           {/* Tabs */}
-          <div className="mb-4 flex gap-1 border-b border-gray-200">
+          <div className="mb-4 flex gap-1 border-b border-zinc-200">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -185,7 +188,7 @@ export function DetailClient(props: DetailClientProps) {
                 className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                   activeTab === tab.key
                     ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
+                    : "border-transparent text-zinc-500 hover:text-zinc-700"
                 }`}
               >
                 {tab.label}
@@ -215,15 +218,6 @@ export function DetailClient(props: DetailClientProps) {
                       >
                         {restoring ? "恢复中..." : `恢复到 v${activeVersion}`}
                       </button>
-                      {restoreMsg && (
-                        <span
-                          className={`text-xs ${
-                            restoreMsg.includes("失败") ? "text-red" : "text-green"
-                          }`}
-                        >
-                          {restoreMsg}
-                        </span>
-                      )}
                     </div>
                   )}
                 </div>
@@ -231,7 +225,7 @@ export function DetailClient(props: DetailClientProps) {
 
               {/* 作文内容 */}
               <div
-                className="prose prose-sm max-w-none rounded-lg border border-gray-200 bg-white p-6"
+                className="prose prose-sm max-w-none rounded-lg border border-zinc-200 bg-white p-6"
                 dangerouslySetInnerHTML={{
                   __html: versionData?.html ?? "<p>版本内容不存在</p>",
                 }}
@@ -247,7 +241,7 @@ export function DetailClient(props: DetailClientProps) {
           )}
 
           {activeTab === "reviews" && (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">
+            <div className="rounded-lg border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
               批改记录将在 Step 8 PR 系统中实现
             </div>
           )}

@@ -12,7 +12,7 @@
  * - URL 中的 error 参数（来自回调路由）：直接显示
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -21,7 +21,19 @@ import { formatAuthError, isRateLimited, withAuthTimeout } from "@/lib/auth-erro
 /** 冷却时长（秒）— 登录失败后按钮锁定的时间 */
 const COOLDOWN_SECONDS = 60;
 
+/**
+ * 页面外壳：useSearchParams() 必须包在 Suspense 内，
+ * 否则静态预渲染（next build）会报错。
+ */
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="py-8 text-center text-sm text-zinc-400">加载中...</div>}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/dashboard";
@@ -108,14 +120,14 @@ export default function LoginPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-bold text-gray-900">欢迎回来</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-bold text-zinc-950">欢迎回来</h1>
+      <p className="mb-6 text-sm text-zinc-500">
         登录你的 EngForge 工坊
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="mb-1 block text-sm font-medium text-zinc-700">
             邮箱
           </label>
           <input
@@ -126,12 +138,12 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             disabled={cooldown > 0}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
+            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-primary focus:ring-2 focus:ring-primary-light disabled:opacity-50"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="mb-1 block text-sm font-medium text-zinc-700">
             密码
           </label>
           <input
@@ -143,7 +155,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="至少 6 位"
             disabled={cooldown > 0}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
+            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-primary focus:ring-2 focus:ring-primary-light disabled:opacity-50"
           />
         </div>
 
@@ -168,7 +180,7 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-sm text-zinc-500">
         还没有账号？{" "}
         <Link href="/register" className="font-medium text-primary hover:underline">
           注册

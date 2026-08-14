@@ -27,7 +27,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="flex min-h-screen">
       <Sidebar user={user} />
-      <main className="flex-1 overflow-y-auto bg-gray-50">
+      <main className="flex-1 overflow-y-auto bg-zinc-50">
         <TopBar user={user} />
         {children}
       </main>

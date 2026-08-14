@@ -12,6 +12,7 @@
  */
 
 import { useMemo } from "react";
+import { Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
 import { scanText } from "@/lib/ai-dictionary";
 import type { AiLevel } from "@/lib/ai-dictionary";
 
@@ -25,7 +26,7 @@ interface AiSuggestionsProps {
 /** 等级标签配置 */
 const LEVEL_CONFIG: Record<AiLevel, { label: string; bgClass: string; textClass: string }> = {
   l1: { label: "建议改进", bgClass: "bg-amber-light", textClass: "text-amber" },
-  l2: { label: "可选优化", bgClass: "bg-teal-light", textClass: "text-teal" },
+  l2: { label: "可选优化", bgClass: "bg-green-light", textClass: "text-green" },
 };
 
 export function AiSuggestions({ text, onReplace }: AiSuggestionsProps) {
@@ -42,23 +43,24 @@ export function AiSuggestions({ text, onReplace }: AiSuggestionsProps) {
   return (
     <div className="flex h-full flex-col">
       {/* 标题栏 */}
-      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+      <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-gray-900">AI 标注</span>
+          <Sparkles className="h-4 w-4 text-primary" />
+          <span className="text-sm font-semibold text-zinc-950">AI 标注</span>
           {uniqueWords > 0 && (
             <span className="rounded-full bg-primary-light px-2 py-0.5 text-[11px] font-medium text-primary">
               {uniqueWords} 个词
             </span>
           )}
         </div>
-        <span className="text-[11px] text-gray-400">客户端词库</span>
+        <span className="text-[11px] text-zinc-400">客户端词库</span>
       </div>
 
       {/* 标注列表 */}
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {annotations.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-center text-sm text-gray-400">
-            <span className="mb-2 text-3xl">✓</span>
+          <div className="flex h-full flex-col items-center justify-center text-center text-sm text-zinc-400">
+            <CheckCircle2 className="mb-2 h-8 w-8 text-green" />
             <span>暂无标注建议</span>
             <span className="mt-1 text-xs">写得不错！继续加油。</span>
           </div>
@@ -69,11 +71,11 @@ export function AiSuggestions({ text, onReplace }: AiSuggestionsProps) {
               return (
                 <div
                   key={`${ann.key}-${ann.offset}-${idx}`}
-                  className="rounded-lg border border-gray-200 p-3"
+                  className="rounded-lg border border-zinc-200 p-3"
                 >
                   {/* 原词 + 等级标签 */}
                   <div className="mb-2 flex items-center gap-2">
-                    <span className="font-mono text-sm font-semibold text-gray-900">
+                    <span className="font-mono text-sm font-semibold text-zinc-950">
                       {ann.word}
                     </span>
                     <span
@@ -84,7 +86,7 @@ export function AiSuggestions({ text, onReplace }: AiSuggestionsProps) {
                   </div>
 
                   {/* 原因 */}
-                  <p className="mb-2 text-xs text-gray-500">{ann.entry.reason}</p>
+                  <p className="mb-2 text-xs text-zinc-500">{ann.entry.reason}</p>
 
                   {/* 建议 chips */}
                   <div className="flex flex-wrap gap-1.5">
@@ -92,9 +94,9 @@ export function AiSuggestions({ text, onReplace }: AiSuggestionsProps) {
                       <button
                         key={suggestion}
                         onClick={() => onReplace(ann.word, suggestion)}
-                        className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700 transition-colors hover:border-primary hover:bg-primary-light hover:text-primary"
+                        className="flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-700 transition-colors hover:border-primary hover:bg-primary-light hover:text-primary"
                       >
-                        <span className="text-gray-400">→</span>
+                        <ArrowRight className="h-3 w-3 text-zinc-400" />
                         {suggestion}
                       </button>
                     ))}
@@ -107,7 +109,7 @@ export function AiSuggestions({ text, onReplace }: AiSuggestionsProps) {
       </div>
 
       {/* 底部说明 */}
-      <div className="border-t border-gray-200 px-4 py-2.5 text-[11px] text-gray-400">
+      <div className="border-t border-zinc-200 px-4 py-2.5 text-[11px] text-zinc-400">
         Phase 1 客户端词库 · Phase 3 将接入 LLM 实时标注
       </div>
     </div>

@@ -38,7 +38,7 @@ export type HeatmapLevel = '' | 'l1' | 'l2' | 'l3' | 'l4';
 /** 导航菜单项 */
 export interface NavItem {
   label: string;           // 显示文字，如 "我的工坊"
-  icon: string;            // 单字符图标，如 "H"、"+"
+  icon: string;            // lucide-react 图标名称（在 Sidebar 中映射为组件）
   href: string;            // 点击后跳转的路由路径
   active?: boolean;        // 是否当前页（高亮显示）
   badge?: number;          // 红色徽章数字（如批改请求 2 条）
@@ -64,7 +64,7 @@ export interface StatCardData {
   label: string;           // 卡片标题，如 "我的作文"
   value: number;           // 大数字
   sub: string;             // 副标题，如 "3 篇草稿"
-  colorClass: string;      // 大数字的 Tailwind 颜色类名，如 "" 或 "text-purple"
+  colorClass: string;      // 大数字的 Tailwind 颜色类名，如 "" 或 "text-primary"
 }
 
 /** 仪表盘作文列表项（比全局 Essay 类型精简，只含展示所需字段） */
@@ -110,22 +110,22 @@ export const navGroups: NavGroup[] = [
   {
     title: '工坊',
     items: [
-      { label: '我的工坊', icon: 'H', href: '/dashboard', active: true },
-      { label: '新建作文', icon: '+', href: '/editor' },
+      { label: '我的工坊', icon: 'layout-dashboard', href: '/dashboard', active: true },
+      { label: '新建作文', icon: 'file-plus', href: '/editor' },
     ],
   },
   {
     title: '协作',
     items: [
-      { label: '作品详情', icon: 'D', href: '/dashboard' },
-      { label: '批改请求', icon: 'R', href: '#', disabled: true, disabledLabel: 'Step 8' },
+      { label: '作品详情', icon: 'file-text', href: '/dashboard' },
+      { label: '批改请求', icon: 'git-pull-request', href: '#', disabled: true, disabledLabel: 'Step 8' },
     ],
   },
   {
     title: '发现',
     items: [
-      { label: '广场', icon: 'G', href: '#', disabled: true, disabledLabel: 'Phase 2.5' },
-      { label: '真题句子库', icon: 'B', href: '#', disabled: true, disabledLabel: 'Phase 2' },
+      { label: '广场', icon: 'globe', href: '#', disabled: true, disabledLabel: 'Phase 2.5' },
+      { label: '真题句子库', icon: 'book-open', href: '#', disabled: true, disabledLabel: 'Phase 2' },
     ],
   },
 ];
@@ -133,9 +133,9 @@ export const navGroups: NavGroup[] = [
 /** 4 个统计卡片配置（label + colorClass 固定，value/sub 动态） */
 export const statCardConfig: { label: string; colorClass: string }[] = [
   { label: '我的作文', colorClass: '' },
-  { label: '收到批改', colorClass: 'text-purple' },
-  { label: '被 Star', colorClass: 'text-teal' },
-  { label: '连续天数', colorClass: 'text-green' },
+  { label: '收到批改', colorClass: 'text-primary' },
+  { label: '被 Star', colorClass: 'text-green' },
+  { label: '连续天数', colorClass: 'text-amber' },
 ];
 
 
@@ -152,22 +152,22 @@ export const statusConfig: Record<EssayStatus, { dotClass: string; label: string
   published: { dotClass: 'bg-green',    label: '已发布' },
 };
 
-/** 作文标签 → 背景色 + 文字色（key 和数据库存储一致） */
+/** 作文标签 → 背景色 + 文字色（key 和数据库存储一致，Bento Neutral 三强调色） */
 export const tagConfig: Record<EssayTag, { bgClass: string; textClass: string }> = {
   kaoyan: { bgClass: 'bg-primary-light', textClass: 'text-primary' },
-  gaokao: { bgClass: 'bg-purple-light',  textClass: 'text-purple' },
-  cet4:   { bgClass: 'bg-teal-light',   textClass: 'text-teal' },
-  cet6:   { bgClass: 'bg-amber-light',  textClass: 'text-amber' },
-  other:   { bgClass: 'bg-gray-100',     textClass: 'text-gray-600' },
+  gaokao: { bgClass: 'bg-amber-light',  textClass: 'text-amber' },
+  cet4:   { bgClass: 'bg-green-light',  textClass: 'text-green' },
+  cet6:   { bgClass: 'bg-primary-subtle', textClass: 'text-primary-dark' },
+  other:   { bgClass: 'bg-zinc-100',     textClass: 'text-zinc-600' },
 };
 
-/** 热力图等级 → 背景色（来自原型 CSS：空=#F3F4F6，l1~l4=蓝色渐变） */
+/** 热力图等级 → 背景色（Bento Neutral 蓝色渐变：空=zinc-100，l1~l4=primary 色阶） */
 export const heatmapLevelConfig: Record<HeatmapLevel, string> = {
-  '':  'bg-[#F3F4F6]',
-  l1:  'bg-[#BBE0F8]',
-  l2:  'bg-[#7BBEF0]',
-  l3:  'bg-[#378ADD]',
-  l4:  'bg-[#185FA5]',
+  '':  'bg-zinc-100',
+  l1:  'bg-[#DBEAFE]',
+  l2:  'bg-[#93C5FD]',
+  l3:  'bg-[#60A5FA]',
+  l4:  'bg-[#3B82F6]',
 };
 
 /**

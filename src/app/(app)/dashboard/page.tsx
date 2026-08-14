@@ -6,6 +6,7 @@
  */
 
 import { redirect } from "next/navigation";
+import { ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 import { StatsCards } from "@/components/essay/StatsCards";
@@ -92,11 +93,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-[1200px] px-8 py-7">
-      {/* 邀请制工坊模式 Banner */}
-      <div className="mb-6 flex items-center gap-3 rounded-xl bg-gradient-to-br from-primary-light to-purple-light px-5 py-4">
-        <span className="text-2xl">I</span>
-        <div className="flex-1 text-[13px] text-gray-700">
-          <span className="mb-0.5 block font-semibold">邀请制工坊模式</span>
+      {/* 邀请制工坊模式 Banner — Bento 卡片 + primary-subtle 底 */}
+      <div className="mb-6 flex items-center gap-3 rounded-card bg-primary-subtle px-5 py-4 shadow-card">
+        <ShieldCheck className="h-6 w-6 shrink-0 text-primary" />
+        <div className="flex-1 text-[13px] text-zinc-600">
+          <span className="mb-0.5 block font-semibold text-zinc-950">邀请制工坊模式</span>
           你的作文默认私密，除非你手动设为公开，否则任何人（包括广场）都看不到。
         </div>
       </div>
@@ -104,10 +105,10 @@ export default async function DashboardPage() {
       {/* 问候语 + 统计卡片 */}
       <div className="mb-7 flex items-start justify-between">
         <div>
-          <h2 className="mb-1 text-2xl font-bold text-gray-900">
+          <h2 className="mb-1 text-2xl font-bold text-zinc-950">
             {greeting}，{user.username}
           </h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-zinc-500">
             {essayCount > 0
               ? `你有 ${essayCount} 篇作文，继续加油`
               : "欢迎来到 EngForge，开始写第一篇作文吧"}

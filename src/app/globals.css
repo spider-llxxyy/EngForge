@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 /* ============================================
-   EngForge 设计系统 — 品牌色 + 语义色
-   原型 :root 变量迁移到 Tailwind v4 @theme
-   用法：--color-primary → bg-primary / text-primary / border-primary
+   EngForge 设计系统 v2 — Bento Neutral
+   来源：Ardot 视觉重设计（bento-modular + bento-neutral）
+   中性色直接使用 Tailwind zinc 灰阶：
+   zinc-50 #FAFAFA 背景 / zinc-200 #E4E4E7 边框
+   zinc-600 #52525B 次文字 / zinc-950 #0A0A0B 主文字
    ============================================ */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAFAFA;
+  --foreground: #0A0A0B;
 }
 
 @theme inline {
@@ -18,29 +20,31 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* 品牌色 — 蓝紫青三色渐变体系 */
-  --color-primary: #2563EB;
-  --color-primary-dark: #1D4ED8;
+  /* 主色 — Accent Primary 蓝 */
+  --color-primary: #3B82F6;
+  --color-primary-dark: #2563EB;
   --color-primary-light: #DBEAFE;
-  --color-purple: #7C3AED;
-  --color-purple-light: #EDE9FE;
-  --color-teal: #0891B2;
-  --color-teal-light: #CFFAFE;
+  --color-primary-subtle: #EFF6FF;
 
-  /* 语义色 — 状态反馈 */
-  --color-green: #059669;
-  --color-green-dark: #047857;
+  /* Accent Secondary 绿（成功/增长） */
+  --color-green: #10B981;
+  --color-green-dark: #059669;
   --color-green-light: #D1FAE5;
-  --color-amber: #D97706;
+
+  /* Accent Tertiary 琥珀（提示/待办） */
+  --color-amber: #F59E0B;
+  --color-amber-dark: #D97706;
   --color-amber-light: #FEF3C7;
-  --color-red: #DC2626;
+
+  /* 危险 */
+  --color-red: #EF4444;
   --color-red-light: #FEE2E2;
 
-  /* 圆角 */
-  --radius-card: 10px;
+  /* 圆角 — Bento 卡片 12px */
+  --radius-card: 12px;
 
-  /* 阴影 */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  /* 阴影 — 超轻 Bento 阴影 */
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
 }
 
 body {
@@ -66,7 +70,7 @@ body {
 
 .tiptap-content p {
   line-height: 1.8;
-  color: #1f2937;
+  color: #3f3f46;
   font-size: 16px;
 }
 
@@ -74,14 +78,14 @@ body {
   font-size: 1.5em;
   font-weight: 700;
   margin-top: 1.5em;
-  color: #111827;
+  color: #18181b;
 }
 
 .tiptap-content h2 {
   font-size: 1.25em;
   font-weight: 600;
   margin-top: 1.2em;
-  color: #111827;
+  color: #18181b;
 }
 
 .tiptap-content ul,
@@ -109,12 +113,12 @@ body {
 .tiptap-content blockquote {
   border-left: 3px solid var(--color-primary);
   padding-left: 1em;
-  color: #6b7280;
+  color: #52525b;
   font-style: italic;
 }
 
 .tiptap-content code {
-  background: #f3f4f6;
+  background: #f4f4f5;
   border-radius: 3px;
   padding: 0.1em 0.3em;
   font-size: 0.875em;
@@ -137,6 +141,6 @@ body {
 
 .tiptap-content hr {
   border: none;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #e4e4e7;
   margin: 2em 0;
 }

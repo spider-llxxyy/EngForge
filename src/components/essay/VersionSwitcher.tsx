@@ -24,7 +24,7 @@ export function VersionSwitcher({
 }: VersionSwitcherProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-sm text-gray-500">版本：</span>
+      <span className="text-sm text-zinc-500">版本：</span>
       {versions.map((v) => {
         const isActive = v.version_number === activeVersion;
         const isLatest = v.version_number === latestVersion;
@@ -36,7 +36,7 @@ export function VersionSwitcher({
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               isActive
                 ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
             }`}
           >
             v{v.version_number}
@@ -50,7 +50,7 @@ export function VersionSwitcher({
           </button>
         );
       })}
-      <span className="text-xs text-gray-400">* 最新</span>
+      <span className="text-xs text-zinc-400">* 最新</span>
     </div>
   );
 }

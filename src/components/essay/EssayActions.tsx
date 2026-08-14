@@ -11,6 +11,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
+import { Pencil, GitFork, Star } from "lucide-react";
 import { forkEssay, toggleStar } from "@/lib/essay-actions";
 
 interface EssayActionsProps {
@@ -43,9 +45,15 @@ export function EssayActions({
     const result = await forkEssay(essayId);
 
     if (result.success && result.newEssayId) {
+      toast.success("Fork 成功", {
+        description: "已创建到你的工坊，正在跳转...",
+      });
       router.push(`/essays/${result.newEssayId}`);
     } else {
       setForkError(result.error ?? "Fork 失败");
+      toast.error("Fork 失败", {
+        description: result.error ?? "请稍后重试",
+      });
       setForking(false);
     }
   }
@@ -59,6 +67,9 @@ export function EssayActions({
     if (result.success) {
       setStarred(result.starred ?? false);
       setCurrentStarCount((prev) => (result.starred ? prev + 1 : prev - 1));
+      toast.success(result.starred ? "已收藏" : "已取消收藏");
+    } else {
+      toast.error("操作失败，请重试");
     }
     setStarring(false);
   }
@@ -70,8 +81,9 @@ export function EssayActions({
         {canEdit && (
           <Link
             href={`/editor/${essayId}`}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
           >
+            <Pencil className="h-3.5 w-3.5" />
             编辑
           </Link>
         )}
@@ -81,8 +93,9 @@ export function EssayActions({
           <button
             onClick={handleFork}
             disabled={forking}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
           >
+            <GitFork className="h-3.5 w-3.5" />
             {forking ? "Fork 中..." : "Fork"}
           </button>
         )}
@@ -94,10 +107,10 @@ export function EssayActions({
           className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
             starred
               ? "border-amber/40 bg-amber/10 text-amber"
-              : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
           }`}
         >
-          <span>{starred ? "\u2605" : "\u2606"}</span>
+          <Star className={`h-3.5 w-3.5 ${starred ? "fill-current" : ""}`} />
           {currentStarCount}
         </button>
       </div>

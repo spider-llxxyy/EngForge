@@ -148,14 +148,14 @@ export default function RegisterPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-bold text-gray-900">创建账号</h1>
-      <p className="mb-6 text-sm text-gray-500">
+      <h1 className="mb-1 text-xl font-bold text-zinc-950">创建账号</h1>
+      <p className="mb-6 text-sm text-zinc-500">
         加入 EngForge，用 GitHub 的方式学英语
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="username" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="username" className="mb-1 block text-sm font-medium text-zinc-700">
             用户名
           </label>
           <input
@@ -168,12 +168,12 @@ export default function RegisterPage() {
             onChange={(e) => setUsername(e.target.value)}
             placeholder="你的昵称"
             disabled={cooldown > 0}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
+            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-primary focus:ring-2 focus:ring-primary-light disabled:opacity-50"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="mb-1 block text-sm font-medium text-zinc-700">
             邮箱
           </label>
           <input
@@ -184,12 +184,12 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             disabled={cooldown > 0}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
+            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-primary focus:ring-2 focus:ring-primary-light disabled:opacity-50"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="mb-1 block text-sm font-medium text-zinc-700">
             密码
           </label>
           <input
@@ -201,7 +201,7 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="至少 6 位"
             disabled={cooldown > 0}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50"
+            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-primary focus:ring-2 focus:ring-primary-light disabled:opacity-50"
           />
         </div>
 
@@ -247,7 +247,7 @@ export default function RegisterPage() {
         </div>
       )}
 
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-sm text-zinc-500">
         已有账号？{" "}
         <Link href="/login" className="font-medium text-primary hover:underline">
           登录

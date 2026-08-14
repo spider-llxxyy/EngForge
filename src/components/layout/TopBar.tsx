@@ -11,6 +11,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Plus } from "lucide-react";
 import { UserMenu } from "@/components/layout/UserMenu";
 import type { SessionUser } from "@/lib/auth";
 
@@ -32,9 +33,9 @@ export function TopBar({ user }: TopBarProps) {
   const showNewEssay = pathname === "/dashboard";
 
   return (
-    <div className="flex items-center justify-between border-b border-gray-200 bg-white px-8 py-3">
+    <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-8 py-3">
       {/* 左：页面标题 */}
-      <span className="text-sm font-semibold text-gray-900">
+      <span className="text-base font-semibold text-zinc-950">
         {title}
       </span>
 
@@ -43,9 +44,10 @@ export function TopBar({ user }: TopBarProps) {
         {showNewEssay && (
           <Link
             href="/editor"
-            className="rounded border border-gray-300 bg-white px-3.5 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-primary-dark"
           >
-            + 新建作文
+            <Plus className="h-3.5 w-3.5" />
+            新建作文
           </Link>
         )}
         <UserMenu user={user} />

@@ -2,8 +2,12 @@
 
 /**
  * ============================================
- * Sidebar — 左侧深色导航栏
+ * Sidebar — 左侧导航栏（Bento Neutral 浅色版）
  * ============================================
+ *
+ * 按 Ardot 设计稿（Dashboard Frame 2:3）实现：
+ * 白底 + zinc-200 右边框，Pill 风格导航项
+ * （active = primary-subtle 底 + primary 字），底部用户卡片。
  *
  * 这是所有"应用内页面"（Dashboard / Editor / Detail / Review）
  * 共享的侧边栏组件。放在 (app)/layout.tsx 里，所有应用内页面
@@ -16,30 +20,36 @@
  *
  * 但这个组件需要用 usePathname() 这个 Hook——它返回当前 URL 路径，
  * 让侧边栏知道"你现在在哪个页面"，从而高亮对应的菜单项。
- * 用了 Hook 就必须声明 "use client"，告诉 Next.js：
- * "这个组件需要在浏览器里运行，不要只在服务端渲染。"
- *
- * 类比：服务端组件像"餐厅后厨提前做好的菜"，客户端组件像"当面现做的铁板烧"。
  */
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  FilePlus,
+  FileText,
+  GitPullRequest,
+  Globe,
+  BookOpen,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navGroups } from "@/lib/dashboard-data";
 import type { NavItem } from "@/lib/dashboard-data";
 import type { SessionUser } from "@/lib/auth";
 
+/** 图标名称 → lucide-react 组件的映射 */
+const ICON_MAP: Record<string, LucideIcon> = {
+  "layout-dashboard": LayoutDashboard,
+  "file-plus": FilePlus,
+  "file-text": FileText,
+  "git-pull-request": GitPullRequest,
+  "globe": Globe,
+  "book-open": BookOpen,
+};
+
 /* ============================================================
  * 子组件：单个导航项
- * ------------------------------------------------------------
- * 为什么要把单个导航项抽成子组件？
- * - 逻辑隔离：active/disabled/badge 三种状态各有不同的渲染逻辑
- * - 复用性：每个导航项都走同一段代码，改一处全改
- * - 可读性：父组件只管"遍历分组"，子组件只管"渲染一项"
- *
- * Props 的类型定义：
- * - item: NavItem — 从数据层定义的类型，保证字段名拼不错
- * - isActive: boolean — 由父组件通过 usePathname 计算后传入
  * ============================================================ */
 
 interface NavItemLinkProps {
@@ -50,16 +60,16 @@ interface NavItemLinkProps {
 function NavItemLink({ item, isActive }: NavItemLinkProps) {
   /**
    * 分支 1：disabled 的项目
-   * 原型用 style="opacity:0.5;cursor:not-allowed"
    * 渲染成 <div> 而不是 <Link>，因为不能跳转
    */
   if (item.disabled) {
+    const Icon = ICON_MAP[item.icon] ?? FileText;
     return (
-      <div className="flex cursor-not-allowed items-center gap-2.5 px-3 py-2 text-sm text-gray-300 opacity-50">
-        <span className="w-[18px] text-center text-base">{item.icon}</span>
+      <div className="flex cursor-not-allowed items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-zinc-400 opacity-60">
+        <Icon className="h-[18px] w-[18px] shrink-0" />
         <span>{item.label}</span>
         {item.disabledLabel && (
-          <span className="ml-auto text-[10px] text-gray-500">
+          <span className="ml-auto text-[10px] text-zinc-400">
             {item.disabledLabel}
           </span>
         )}
@@ -68,31 +78,27 @@ function NavItemLink({ item, isActive }: NavItemLinkProps) {
   }
 
   /**
-   * 分支 2：可点击的导航项
-   * 用 Next.js 的 <Link> 组件做跳转（不是 <a> 标签）
-   * Link 做了"预取"优化——鼠标悬停时就预加载目标页面，点击后秒开
-   *
-   * className 用 cn() 动态拼接：
-   * - 基础样式（所有状态共用）：flex 布局 + 间距 + 圆角 + 过渡动画
-   * - active 状态：蓝色背景 + 白字
-   * - 非 active 状态：灰色字 + hover 变亮
+   * 分支 2：可点击的导航项（Pill 风格）
+   * - active：primary-subtle 底 + primary 字
+   * - 非 active：zinc-600 字 + hover 浅灰底
    */
   return (
     <Link
       href={item.href}
       className={cn(
-        "flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors",
+        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
         isActive
-          ? "bg-primary text-white"
-          : "text-gray-300 hover:bg-white/[0.06] hover:text-white"
+          ? "bg-primary-subtle font-semibold text-primary"
+          : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
       )}
     >
-      {/* 图标 — 固定宽度，保证所有图标的文字左对齐 */}
-      <span className="w-[18px] text-center text-base">{item.icon}</span>
+      {(() => {
+        const Icon = ICON_MAP[item.icon] ?? FileText;
+        return <Icon className="h-[18px] w-[18px] shrink-0" />;
+      })()}
       <span>{item.label}</span>
 
       {/* 红色徽章 — 只有 badge 有值时才渲染 */}
-      {/* ml-auto 把徽章推到最右边，和原型 margin-left:auto 一致 */}
       {item.badge !== undefined && (
         <span className="ml-auto rounded-full bg-red px-1.5 py-px text-[10px] font-medium text-white">
           {item.badge}
@@ -110,17 +116,20 @@ export function Sidebar({ user }: { user: SessionUser }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-60 flex-shrink-0 flex-col bg-gray-900 text-gray-300">
+    <aside className="flex w-60 shrink-0 flex-col border-r border-zinc-200 bg-white">
       {/* ── Logo 区域 ── */}
-      <div className="border-b border-white/[0.08] px-6 py-5 text-xl font-extrabold text-white">
-        Eng<span className="text-primary">Forge</span>
+      <div className="flex items-center gap-2.5 px-5 py-5">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-base font-bold text-white">
+          E
+        </span>
+        <span className="text-lg font-semibold text-zinc-950">EngForge</span>
       </div>
 
       {/* ── 导航区域 ── */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-auto px-3 pb-4">
         {navGroups.map((group) => (
           <div key={group.title}>
-            <div className="px-3 pb-2 pt-4 text-[11px] uppercase tracking-wide text-gray-500">
+            <div className="px-3 pb-2 pt-4 text-[11px] font-medium tracking-wide text-zinc-400">
               {group.title}
             </div>
             {group.items.map((item) => (
@@ -134,18 +143,18 @@ export function Sidebar({ user }: { user: SessionUser }) {
         ))}
       </nav>
 
-      {/* ── 底部用户信息 ── */}
-      <div className="flex items-center gap-2.5 border-t border-white/[0.08] px-5 py-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple text-[13px] font-semibold text-white">
-          {user.avatarInitials}
-        </div>
-        <div className="text-[13px]">
-          <strong className="block font-medium text-white">
-            {user.username}
-          </strong>
-          <span className="text-xs text-gray-500">
-            {user.email}
-          </span>
+      {/* ── 底部用户卡片 ── */}
+      <div className="px-3 pb-4">
+        <div className="flex items-center gap-2.5 rounded-lg bg-zinc-100 p-3">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+            {user.avatarInitials}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-xs font-semibold text-zinc-950">
+              {user.username}
+            </p>
+            <p className="truncate text-[10px] text-zinc-500">{user.email}</p>
+          </div>
         </div>
       </div>
     </aside>
