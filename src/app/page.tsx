@@ -34,7 +34,7 @@ const FEATURES = [
   {
     icon: Star,
     title: "Star 收藏",
-    desc: "收藏优秀范文，追踪自己的写作进步曲线。",
+    desc: "收藏值得反复读的范文，随时回看拆解学习。",
     iconBg: "bg-green-light",
     iconColor: "text-green",
   },
@@ -52,7 +52,7 @@ function ProductPreview() {
         <p className="text-sm font-semibold text-zinc-950">
           The Impact of AI on Education
         </p>
-        <p className="text-xs text-zinc-500">32 词 · 2 小时前 · 3 forks</p>
+        <p className="text-xs text-zinc-500">32 词 · 2 小时前 · 3 次复刻</p>
       </div>
 
       {/* 预览 2：协作动态 */}
@@ -60,7 +60,7 @@ function ProductPreview() {
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green text-[11px] font-semibold text-white">
           C
         </span>
-        <p className="text-[13px] text-zinc-600">陈同学 fork 了你的作文</p>
+        <p className="text-[13px] text-zinc-600">陈同学 复刻了你的作文</p>
       </div>
 
       {/* 预览 3：写作统计 */}
@@ -97,9 +97,6 @@ export default function Home() {
             产品
           </a>
           <a href="#cta" className="transition-colors hover:text-zinc-950">
-            学习路径
-          </a>
-          <a href="#features" className="transition-colors hover:text-zinc-950">
             关于
           </a>
         </nav>
@@ -138,9 +135,9 @@ export default function Home() {
           </h1>
 
           <p className="text-base leading-relaxed text-zinc-600">
-            Fork 借鉴高分范文，PR 互改提升，Star 收藏你的进步。
+            版本可追溯，改动可对比，批改可沉淀——
             <br />
-            让协作成为学习英语的最佳方式。
+            把开源协作的精髓写进每一次练习。
           </p>
 
           <div className="mt-2 flex gap-3">
@@ -154,8 +151,8 @@ export default function Home() {
               href="/login"
               className="rounded-lg border border-zinc-200 bg-white px-9 py-3 text-base font-semibold text-zinc-950 transition-colors hover:bg-zinc-50"
             >
-              查看示例
-            </Link>
+登录
+          </Link>
           </div>
         </div>
 
@@ -200,7 +197,7 @@ export default function Home() {
         className="flex flex-col items-center gap-6 bg-white px-16 py-16"
       >
         <h2 className="text-[28px] font-semibold text-zinc-950">
-          准备好开始你的英语写作之旅了吗？
+          从第一篇开始，让每次写作都有迹可循。
         </h2>
         <Link
           href="/register"
