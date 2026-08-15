@@ -30,6 +30,26 @@
 - Toast：`sonner`
 - 富文本：TipTap（`.tiptap-content` 手写排版样式）
 
+## 组件库页（DC-001，2026-08-15）
+
+画布内新增 **Design System · 组件库** 画板，包含以下可复用资产：
+
+| 类别 | 内容 |
+|---|---|
+| 色彩 | Primary / Green / Amber / Zinc 全梯度 swatch |
+| 排版 | H1(24/Bold) · H2(20/SemiBold) · H3(16/SemiBold) · Body(14) · Caption(12) |
+| 形状 | 卡片（r12 + shadow-card）、输入框(r8)、小元素(r6) |
+| Button | Primary / Secondary / Ghost / Disabled 四态 |
+| Status Pill | 草稿(amber) / 已发布(green) / 待审阅(blue) / 已合并(green solid) |
+| Tag chip | zinc-100 底 + zinc-600 字 |
+| Input | Label + 输入框 + Hint |
+| Sidebar Nav | Active(primary-subtle 底) vs Default(透明) |
+| Stat Card | 数值 + 标签 + 涨跌 |
+| Toast | 成功(green) / 失败(amber) |
+| EmptyState | 图标 + 主文案 + 次文案 + Primary Button |
+
+**使用方式**：新页面/新组件直接从该画板复制对应元素，禁止凭记忆重画。
+
 ## 使用规则（摘自开发提示词 v3）
 
 1. 新 UI 一律 Tailwind 工具类 + 上述 token，禁止内联 style 和新硬编码色值
