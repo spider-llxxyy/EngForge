@@ -65,6 +65,8 @@ const DRAFT_KEY_PREFIX = "engforge-draft-";
 
 interface EditorClientProps {
   mode: "new" | "edit";
+  /** 当前用户 ID — 用于隔离 localStorage 草稿，避免多用户同浏览器互踩 */
+  userId: string;
   essayId?: string;
   initialTitle?: string;
   initialTags?: string[];
@@ -78,6 +80,7 @@ interface EditorClientProps {
 
 export function EditorClient({
   mode,
+  userId,
   essayId,
   initialTitle = "",
   initialTags = ["kaoyan"],
@@ -95,7 +98,8 @@ export function EditorClient({
   // ── 编辑器文本状态 ──
   const [plainText, setPlainText] = useState("");
 
-  const draftKey = DRAFT_KEY_PREFIX + (essayId ?? "new");
+  // 草稿 key 拼入 userId：同一浏览器切换账号时草稿互不干扰
+  const draftKey = DRAFT_KEY_PREFIX + userId + "-" + (essayId ?? "new");
 
   // ── 草稿检测（lazy initializer，避免在 effect 中调用 setState）──
   // 在组件首次渲染时检查 localStorage，如果有草稿则直接设为初始状态

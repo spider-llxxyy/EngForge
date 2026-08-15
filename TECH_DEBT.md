@@ -26,11 +26,12 @@
 | 2026-08-10 | 草稿存储 | 草稿仅存 localStorage，不支持跨设备恢复 | 中 | Phase 2 | 未偿还 |
 | 2026-08-10 | 类型推断 | @supabase/ssr 在 insert()/rpc() 链退化为 never，用 as never 绕过 | 中 | Phase 2 | 未偿还 |
 | 2026-08-14 | 性能 | Detail 页 6 个串行查询，应改 Promise.all 并行 | 中 | ~~P3~~ | ✅ 已偿还 |
-| 2026-08-14 | 数据 | 热力图/活动面板已接入真实数据；**连续天数仍为假数据** | 高 | P2 | 部分偿还 |
+| 2026-08-14 | 数据 | 热力图/活动面板已接入真实数据；**连续天数仍为假数据** | 高 | ~~P2~~ | ✅ 已偿还（Step 11 computeStreak 按东八区口径计算，今天无活动从昨天起算） |
 | 2026-08-14 | 安全 | Server Actions 不在应用层验 ownership | 中 | ~~P2~~ | ✅ 已偿还 |
 | 2026-08-14 | 响应式 | 全站无响应式适配 | 中 | P3 | 未偿还 |
-| 2026-08-15 | 框架迁移 | Next.js 16.3 提示 middleware 文件约定已弃用，应迁移到 proxy（`npx @next/codemod@canary middleware-to-proxy .`） | 低 | P3 | 未偿还 |
+| 2026-08-15 | 框架迁移 | Next.js 16.3 提示 middleware 文件约定已弃用，应迁移到 proxy（`npx @next/codemod@canary middleware-to-proxy .`） | 低 | ~~P3~~ | ✅ 已偿还（Step 11 手动迁移 src/middleware.ts → src/proxy.ts，函数名 middleware → proxy，逻辑不变） |
 | 2026-08-15 | 通知 Realtime | 客户端断线期间漏掉的 INSERT 靠下次整页刷新补齐（supabase-js 自带重连，但离线窗口内的推送不补发） | 低 | P3 | 未偿还 |
+| 2026-08-15 | 协作权限 | essays 表 RLS 只允许作者 UPDATE，editor 成员发布新版本时标题/标签/词数更新被静默跳过（版本内容由 RPC 正常创建） | 中 | Phase 2 | 未偿还 |
 
 ## 偿还记录
 
@@ -49,6 +50,9 @@
 | 2026-08-15 | PR 系统缺失（Step 8） | 新增 8 文件：diff.ts(LCS行级diff) / prs/new 页+PrEditorClient / prs/[prId] 页+loading / PrDiffView / PrActions / PrList；改 5 文件：essay-actions(+createPullRequest/mergePr/closePr) / DetailClient(reviews tab 接 PrList) / Detail 页(批次A加 PRs 查询) / Sidebar 标签 / TopBar 标题 | 3h |
 | 2026-08-15 | 通知系统缺失（Step 9） | 新增 notification-config.ts(类型映射+相对时间，去重) + NotificationBell.tsx(铃铛+徽章+下拉面板+Realtime 订阅+已读+toast)；改 TopBar(插入铃铛) / layout(服务端未读计数) / ActivityPanel(import 共享配置) | 1h |
 | 2026-08-15 | 邀请协作缺失（Step 10） | 新增 InviteManager.tsx(邀请码管理弹窗) + JoinByCode.tsx(TopBar 凭码加入入口)；改 essay-actions(+generateInviteCode/joinByInviteCode/revokeInviteCode/removeMember) / DetailSidebar(接 InviteManager + 移除成员) / DetailClient(MemberData+user_id) / page.tsx(members+user_id) / TopBar(插 JoinByCode) | 1h |
+| 2026-08-15 | 数据: 连续天数假数据 | dashboard/page.tsx 新增 computeStreak()：复用热力图 countsByDate，东八区口径从今天（或昨天）往回数连续活跃天数，替换硬编码 0 | 20min |
+| 2026-08-15 | 草稿 key 多用户碰撞 | EditorClient 新增 userId prop，draftKey = `engforge-draft-{userId}-{essayId|new}`；两个 editor page 传入 user.id | 15min |
+| 2026-08-15 | middleware → proxy | 手动迁移（等同官方 codemod）：src/middleware.ts → src/proxy.ts，导出函数改名 proxy，matcher 与逻辑不变 | 15min |
 
 ## 使用示例
 

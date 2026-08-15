@@ -85,6 +85,7 @@ export default async function EditEssayPage({
   return (
     <EditorClient
       mode="edit"
+      userId={user!.id}
       essayId={essayId}
       initialTitle={essay.title}
       initialTags={essay.tags}

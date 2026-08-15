@@ -76,6 +76,25 @@ function buildHeatmapLevels(countsByDate: Map<string, number>): HeatmapLevel[] {
   return levels;
 }
 
+/**
+ * 当前连续活跃天数（东八区口径）。
+ * 规则：从今天往回数连续有活动的天数；今天还没活动则从昨天起算
+ * （今天"尚未打破"连续记录，与 GitHub Streak 的口径一致）。
+ */
+function computeStreak(countsByDate: Map<string, number>): number {
+  const start = todayStart();
+  // 今天没有活动 → 从昨天开始数；有则从今天开始
+  const hasToday = (countsByDate.get(dateKey(start)) ?? 0) > 0;
+  let cursor = hasToday ? start : new Date(start.getTime() - DAY_MS);
+
+  let streak = 0;
+  while ((countsByDate.get(dateKey(cursor)) ?? 0) > 0) {
+    streak++;
+    cursor = new Date(cursor.getTime() - DAY_MS);
+  }
+  return streak;
+}
+
 // ──────────────────────────────────────────────
 // 页面组件
 // ──────────────────────────────────────────────
@@ -162,6 +181,7 @@ export default async function DashboardPage() {
   const versionDates = (versionsResult.data ?? []) as Array<{ created_at: string }>;
   versionDates.forEach((v) => bump(v.created_at));
   const heatmapLevels = buildHeatmapLevels(countsByDate);
+  const streak = computeStreak(countsByDate);
 
   // 7. 通知 → ActivityItem
   const rawNotifications = (notificationsResult.data ?? []) as Array<{
@@ -191,7 +211,7 @@ export default async function DashboardPage() {
     { value: essayCount, sub: essayCount > 0 ? "已发布" : "去写第一篇" },
     { value: prCount, sub: prCount > 0 ? "待处理" : "暂无" },
     { value: totalStars, sub: totalStars > 0 ? "被收藏" : "暂无" },
-    { value: 0, sub: "即将上线" },
+    { value: streak, sub: streak > 0 ? "天连续活跃" : "今天写一篇" },
   ];
 
   // 9. 问候语（按时间段）

@@ -1,5 +1,5 @@
 /**
- * Supabase Auth 中间件
+ * Supabase Auth 代理（Next.js 16 起 Middleware 更名为 Proxy，功能不变）
  *
  * 两个职责：
  * 1. 每次请求刷新 Supabase 认证 session（写入最新 cookie）
@@ -14,7 +14,7 @@ import type { Database } from "@/types/database";
 const PROTECTED_PREFIXES = ["/dashboard", "/editor", "/essays", "/settings"];
 const AUTH_PREFIXES = ["/login", "/register"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
