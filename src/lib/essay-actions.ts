@@ -144,7 +144,15 @@ export async function publishNewVersion(params: {
 
   const supabase = await createClient();
 
-  // 2. 更新 essay 元数据（标题、标签、可见性、词数）
+  // 2. 校验编辑权限（作者本人或 editor 成员）
+  const access = await checkEssayAccess(supabase, params.essayId, user.id, "edit");
+  if (!access.ok) {
+    return { success: false, error: access.error };
+  }
+
+  // 3. 更新 essay 元数据（标题、标签、可见性、词数）
+  // 注意：essays 表 RLS 只允许作者 UPDATE，editor 成员更新元数据会被
+  // 静默跳过（版本内容仍由 RPC 正常创建）— 已记录在 TECH_DEBT.md。
   const updateResult = await supabase
     .from("essays")
     .update({
@@ -206,6 +214,74 @@ interface StarResult {
   starred?: boolean;
 }
 
+// ──────────────────────────────────────────────
+// 应用层权限校验
+// ──────────────────────────────────────────────
+
+/**
+ * 校验当前用户对某篇作文的访问权限。
+ *
+ * 为什么 RLS 之外还要应用层校验？
+ * 1. stars 表的 RLS 只校验 user_id = auth.uid()，
+ *    不校验目标作文是否可见 — 不加这层校验，
+ *    任何登录用户都能收藏一篇自己看不见的私密作文。
+ * 2. RLS 拒绝时 Supabase 往往静默返回空结果而非报错，
+ *    应用层校验能把失败转成明确的中文错误返回给前端 toast。
+ *
+ * view：作者本人 / essay_members 任意角色 / visibility = public
+ * edit：作者本人 / essay_members 的 owner、editor 角色
+ */
+async function checkEssayAccess(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  essayId: string,
+  userId: string,
+  mode: "view" | "edit"
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  // 查作文基础信息（RLS 闸口：查不到 = 不存在或不可见）
+  const essayResult = await supabase
+    .from("essays")
+    .select("id, author_id, visibility")
+    .eq("id", essayId)
+    .single();
+  const essay = (essayResult.data ?? null) as {
+    id: string;
+    author_id: string;
+    visibility: string;
+  } | null;
+
+  if (!essay) {
+    return { ok: false, error: "作文不存在或无权访问" };
+  }
+
+  // 作者本人拥有全部权限
+  if (essay.author_id === userId) {
+    return { ok: true };
+  }
+
+  // 查成员身份（members_select_participant 策略允许成员查看自己的记录）
+  const memberResult = await supabase
+    .from("essay_members")
+    .select("role")
+    .eq("essay_id", essayId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  const membership = (memberResult.data ?? null) as { role: string } | null;
+
+  if (mode === "view") {
+    // 公开作文任何人可见；协作者任意角色可见
+    if (essay.visibility === "public" || membership) {
+      return { ok: true };
+    }
+    return { ok: false, error: "这篇作文是私密的，你没有访问权限" };
+  }
+
+  // edit 模式：需要 owner 或 editor 角色
+  if (membership && (membership.role === "owner" || membership.role === "editor")) {
+    return { ok: true };
+  }
+  return { ok: false, error: "需要作者本人或 editor 成员权限" };
+}
+
 /**
  * Fork 作文
  *
@@ -225,7 +301,8 @@ export async function forkEssay(essayId: string): Promise<ForkResult> {
 
   const supabase = await createClient();
 
-  // 查询原作文
+  // 查询原作文（essays 表 RLS 已闸口：作者/成员/公开可见才查得到，
+  // 私密作文直接返回 null → 报"不存在或无权访问"，无需重复校验）
   const essayResult = await supabase
     .from("essays")
     .select("id, title, tags, visibility, current_version, author_id")
@@ -333,6 +410,12 @@ export async function restoreVersion(
 
   const supabase = await createClient();
 
+  // 校验编辑权限（作者本人或 editor 成员）
+  const access = await checkEssayAccess(supabase, essayId, user.id, "edit");
+  if (!access.ok) {
+    return { success: false, error: access.error };
+  }
+
   // 查询目标版本内容
   const versionResult = await supabase
     .from("essay_versions")
@@ -392,6 +475,13 @@ export async function toggleStar(essayId: string): Promise<StarResult> {
   }
 
   const supabase = await createClient();
+
+  // 校验查看权限（防止收藏一篇自己看不见的私密作文 —
+  // stars 表 RLS 只校验 user_id，目标作文可见性必须在这里闸口）
+  const access = await checkEssayAccess(supabase, essayId, user.id, "view");
+  if (!access.ok) {
+    return { success: false, error: access.error };
+  }
 
   // 检查是否已收藏
   const checkResult = await supabase

@@ -171,15 +171,14 @@ export const heatmapLevelConfig: Record<HeatmapLevel, string> = {
 };
 
 /**
- * 贡献热力图 — 26 周 × 7 天 = 182 格
- * TODO: Phase 2 接入真实活动数据后替换此静态数组
+ * 最近活动条目 — 由 Dashboard 页面从 notifications 表查询后传入
  */
-export const heatmapLevels: HeatmapLevel[] = [
-  '', '', 'l1', '', 'l2', '', 'l1', '', '', 'l3', 'l2', '', 'l1', '', 'l4', 'l3', 'l2', '', 'l1', '', 'l2', 'l3', '', 'l1', '', 'l4',
-  '', '', 'l1', 'l2', '', 'l3', '', '', 'l1', '', 'l2', 'l3', 'l4', '', 'l2', '', 'l1', '', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4',
-  'l2', '', 'l1', '', '', 'l2', 'l3', '', 'l1', '', 'l4', 'l3', '', 'l2', 'l1', '', '', 'l3', '', 'l2', 'l1', '', 'l4', '', 'l3', 'l2',
-  '', '', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l1', 'l2', '', 'l3', '', '', 'l2', 'l1', 'l3', '', 'l4', 'l2', '', 'l1', '', 'l3', '',
-  'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', '', 'l1', 'l2', 'l3', '', '', 'l2', 'l1', '', 'l3', 'l4', '', 'l2', '', 'l1', '',
-  'l3', '', 'l2', 'l4', '', 'l1', '', 'l3', 'l2', '', '', 'l4', 'l1', '', 'l2', 'l3', '', 'l4', '', 'l2', 'l1', '', 'l3', '', 'l4', 'l2',
-  '', 'l1', 'l3', '', '', 'l2', 'l4', 'l1', '', 'l3', '', 'l2', '', 'l1', 'l4', 'l3', '', 'l2', '', 'l1', '', 'l3', 'l4', 'l2', '', '',
-];
+export interface ActivityItem {
+  id: string;
+  type: string;                 // notification_type 枚举值
+  title: string;
+  content: string;
+  linkUrl: string | null;       // 有值时整条可点击跳转
+  isRead: boolean;
+  createdAt: string;            // ISO 时间戳
+}

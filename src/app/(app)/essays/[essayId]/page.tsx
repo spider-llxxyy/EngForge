@@ -41,14 +41,42 @@ export default async function EssayDetailPage({
   const user = await getSessionUser();
   const supabase = await createClient();
 
-  // ── 1. 查询作文 ──
-  const essayResult = await supabase
-    .from("essays")
-    .select(
-      "id, author_id, title, tags, visibility, forked_from, fork_count, star_count, current_version, latest_version, word_count, created_at"
-    )
-    .eq("id", essayId)
-    .single();
+  // ── 1. 第一批查询（并行）：作文 / 全部版本 / 成员列表 / 我的身份 / 收藏状态 ──
+  const [essayResult, versionsResult, membersResult, memberResult, starResult] =
+    await Promise.all([
+      supabase
+        .from("essays")
+        .select(
+          "id, author_id, title, tags, visibility, forked_from, fork_count, star_count, current_version, latest_version, word_count, created_at"
+        )
+        .eq("id", essayId)
+        .single(),
+      supabase
+        .from("essay_versions")
+        .select(
+          "version_number, content, plain_text, word_count, change_summary, created_at, created_by"
+        )
+        .eq("essay_id", essayId)
+        .order("version_number", { ascending: true }),
+      supabase
+        .from("essay_members")
+        .select("user_id, role, profiles:profiles!essay_members_user_id_fkey(username, avatar_initials)")
+        .eq("essay_id", essayId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("essay_members")
+        .select("role")
+        .eq("essay_id", essayId)
+        .eq("user_id", user!.id)
+        .maybeSingle(),
+      supabase
+        .from("stars")
+        .select("id")
+        .eq("user_id", user!.id)
+        .eq("essay_id", essayId)
+        .maybeSingle(),
+    ]);
+
   const essay = (essayResult.data ?? null) as {
     id: string;
     author_id: string;
@@ -68,25 +96,25 @@ export default async function EssayDetailPage({
     notFound();
   }
 
-  // ── 2. 查询作者 profile ──
-  const authorResult = await supabase
-    .from("profiles")
-    .select("username, avatar_initials")
-    .eq("id", essay.author_id)
-    .single();
+  // ── 2. 第二批查询（并行，依赖 essay 结果）：作者 profile / fork 来源标题 ──
+  const [authorResult, forkResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("username, avatar_initials")
+      .eq("id", essay.author_id)
+      .single(),
+    essay.forked_from
+      ? supabase.from("essays").select("title").eq("id", essay.forked_from).single()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
   const author = (authorResult.data ?? null) as {
     username: string;
     avatar_initials: string;
   } | null;
+  const forkedFromTitle = (
+    (forkResult.data as { title: string } | null)?.title
+  ) ?? null;
 
-  // ── 3. 查询所有版本 ──
-  const versionsResult = await supabase
-    .from("essay_versions")
-    .select(
-      "version_number, content, plain_text, word_count, change_summary, created_at, created_by"
-    )
-    .eq("essay_id", essayId)
-    .order("version_number", { ascending: true });
   const rawVersions = (versionsResult.data ?? []) as Array<{
     version_number: number;
     content: Json;
@@ -106,33 +134,13 @@ export default async function EssayDetailPage({
     word_count: v.word_count,
   }));
 
-  // ── 4. 查询当前用户的成员身份（判断 canEdit）──
-  const memberResult = await supabase
-    .from("essay_members")
-    .select("role")
-    .eq("essay_id", essayId)
-    .eq("user_id", user!.id)
-    .maybeSingle();
   const myMembership = (memberResult.data ?? null) as { role: string } | null;
 
   const isOwner = essay.author_id === user!.id;
   const canEdit = isOwner || myMembership?.role === "editor";
 
-  // ── 5. 查询收藏状态 ──
-  const starResult = await supabase
-    .from("stars")
-    .select("id")
-    .eq("user_id", user!.id)
-    .eq("essay_id", essayId)
-    .maybeSingle();
   const isStarred = !!(starResult.data as { id: string } | null);
 
-  // ── 6. 查询成员列表（RLS: 只有 author 能看到全部）──
-  const membersResult = await supabase
-    .from("essay_members")
-    .select("user_id, role, profiles:profiles!essay_members_user_id_fkey(username, avatar_initials)")
-    .eq("essay_id", essayId)
-    .order("created_at", { ascending: true });
   const rawMembers = (membersResult.data ?? []) as Array<{
     user_id: string;
     role: string;
@@ -145,17 +153,6 @@ export default async function EssayDetailPage({
       avatar_initials: m.profiles!.avatar_initials,
       role: m.role,
     }));
-
-  // ── 7. 查询 fork 来源标题 ──
-  let forkedFromTitle: string | null = null;
-  if (essay.forked_from) {
-    const forkResult = await supabase
-      .from("essays")
-      .select("title")
-      .eq("id", essay.forked_from)
-      .single();
-    forkedFromTitle = ((forkResult.data as { title: string } | null)?.title) ?? null;
-  }
 
   // ── 8. 传递给客户端组件 ──
   return (

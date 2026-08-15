@@ -6,17 +6,26 @@
  * 底部图例："少 → 多"。
  *
  * 设计来源：原型 EngForge_原型.html 的 .heatmap-grid + .heatmap-cell 结构
- * 数据来源：dashboard-data.ts 的 heatmapLevels 数组（182 项）
+ * 数据来源：levels prop（182 项），由 Dashboard 页面在服务端从
+ * essays + essay_versions 表按天聚合后传入。
+ *
+ * 网格布局说明（与数组顺序对应）：
+ * 网格 26 列 × 7 行，数组按行填充 → levels[day * 26 + week]。
+ * 每一列是一个连续的周，每一行是周内的第几天，
+ * 最后一个格子（day=6, week=25）是今天。
  *
  * 为什么是服务端组件？
- * — 数据是静态的硬编码数组，不需要交互或状态更新。
- *   整个热力图在服务器上渲染成 HTML 发给浏览器，不需要客户端 JS。
+ * — 无交互无状态，整个热力图在服务器上渲染成 HTML，
+ *   不需要客户端 JS。
  */
 
-import {
-  heatmapLevels,
-  heatmapLevelConfig,
-} from "@/lib/dashboard-data";
+import { heatmapLevelConfig } from "@/lib/dashboard-data";
+import type { HeatmapLevel } from "@/lib/dashboard-data";
+
+interface HeatmapProps {
+  /** 182 项热力图等级，levels[day * 26 + week] */
+  levels: HeatmapLevel[];
+}
 
 /* ============================================================
  * 子组件：HeatmapLegend — 底部图例
@@ -49,7 +58,7 @@ function HeatmapLegend() {
  * 面板头（"贡献热力图" + "过去 26 周"）+ 网格 + 图例
  */
 
-export function Heatmap() {
+export function Heatmap({ levels }: HeatmapProps) {
   return (
     <div className="overflow-hidden rounded-card bg-white shadow-card">
       {/* 面板头部 — 标题在左，副标题在右 */}
@@ -75,7 +84,7 @@ export function Heatmap() {
            * rounded-sm — 小圆角，对应原型 border-radius: 2px
            * 颜色由 heatmapLevelConfig[level] 映射决定
            */}
-          {heatmapLevels.map((level, index) => (
+          {levels.map((level, index) => (
             <span
               key={index}
               className={`aspect-square rounded-sm ${heatmapLevelConfig[level]}`}

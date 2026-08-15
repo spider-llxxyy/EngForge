@@ -69,7 +69,10 @@ export function EssayActions({
       setCurrentStarCount((prev) => (result.starred ? prev + 1 : prev - 1));
       toast.success(result.starred ? "已收藏" : "已取消收藏");
     } else {
-      toast.error("操作失败，请重试");
+      // 透传服务端返回的错误（如权限不足），不再吞掉
+      toast.error("操作失败", {
+        description: result.error ?? "请稍后重试",
+      });
     }
     setStarring(false);
   }
