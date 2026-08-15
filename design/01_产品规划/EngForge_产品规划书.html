@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EngForge — 英语学习协作工坊 产品规划书 v2.0</title>
+<title>EngForge — 英语学习协作工坊 产品规划书 v2.1</title>
 <style>
   :root {
     --primary: #2563EB;
@@ -276,11 +276,14 @@
   <h1>EngForge</h1>
   <p class="tagline">用 GitHub 的方式学英语 — 私密工坊 · 邀请协作 · 范文迭代</p>
   <div class="meta">
-    <span>产品规划书 v2.0（修订版）</span>
+    <span>产品规划书 v2.1（修订版）</span>
     <span>目标用户：考研 & 上海高考英语</span>
-    <span>日期：2026-08-02</span>
+    <span>日期：2026-08-15（v2.0 定稿于 2026-08-02）</span>
   </div>
   <div class="changelog">
+    v2.1 修订要点：① 修复墓碑身份锚与第 12 章「拓展四六级→雅思托福」的内部矛盾（以墓碑为准，跨考试拓展改标为需墓碑复审）② Phase 1 路线图同步实现现状（Fork/PR/版本已提前至 Phase 1 完成，评论移至 Phase 2）③ MVP 验证标准暂缓待定（原标准引用已移出的评论功能）④ 新增术语双层结构说明（界面层降皮，git 术语保留系统内部）⑤ 决策日志独立为「决策日志.md」持续维护 ⑥ 双人群维持不变（MVP 验证不聚焦记录为已接受风险）
+  </div>
+  <div class="changelog" style="background:rgba(59,130,246,.06);">
     v2.0 修订要点：① 工坊优先，广场延后（Phase 2.5） ② 阅读精读降级为附属功能 ③ AI 设立硬性护栏 ④ 收费门槛提高至 500 活跃用户 + 留存 > 40% ⑤ 1.5 章新增板块四：四层纠偏执行体系
   </div>
 </div>
@@ -331,6 +334,14 @@
       <li><strong>工坊即语料库</strong> — Star 收藏的优质范文组成你的个人语料库，比任何词汇书都实用</li>
       <li><strong>公开发布是可选的</strong> — 作文默认私密，作者可主动选择"发布到广场"，内容自然积累</li>
     </ul>
+    <div class="callout callout-blue" style="margin-top:16px;">
+      <strong>术语双层结构（v2.1 新增，源自 DC-002 决策 2026-08-15）</strong>
+      <ul style="margin-top:8px;">
+        <li><strong>界面层（用户看到的）</strong>：全降皮，用学习场景词汇 — <strong>借鉴</strong> = Fork · <strong>批改 / 提交批改</strong> = PR · <strong>采纳</strong> = Merge · <strong>收藏</strong> = Star。界面不出现"仓库"字样</li>
+        <li><strong>系统层（代码 / 数据库 / 本规划书内部描述）</strong>：保留 git 语义 — essays / forked_from / pull_requests / stars 等命名不变</li>
+      </ul>
+      <p style="margin-top:8px;">理由：视觉系统无法自解释 Fork/PR（原型时代只能用 F/P/S 字母当图标），学习场景词汇让隐喻可被目标用户直觉理解；git 语义留在系统内部保证开发者心智模型不变。</p>
+    </div>
   </section>
 
   <!-- ========== 1.5 GOVERNANCE ========== -->
@@ -400,25 +411,34 @@
             <td>未违背。将墓碑第 2 条从理念变为硬编码限制</td>
           </tr>
           <tr>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td>2026-08-05</td>
+            <td>Phase 1 MVP 边界调整：Fork/PR/版本管理提前至 Phase 1，评论与个人主页移至 Phase 2</td>
+            <td>Phase 1 核心假设是"协作批改有用"，评论只是弱反馈，先把强协作链路做通再验证</td>
+            <td>未违背。强化身份锚（协作批改是核心）</td>
           </tr>
           <tr>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td>2026-08-15</td>
+            <td>设计系统迁移为 Bento Neutral（zinc 中性色 + 三强调色），建立 Ardot 组件库页（DC-001）</td>
+            <td>多轮设计会话风格漂移，需固化 token 事实源；设计变更走 DC 审批流程（engforge-design skill）</td>
+            <td>未违背</td>
           </tr>
           <tr>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
-            <td style="color:var(--gray-300);">— 待填写 —</td>
+            <td>2026-08-15</td>
+            <td>界面隐喻全降皮：借鉴/批改/采纳/收藏（DC-002），git 术语只留系统内部</td>
+            <td>设计评审发现视觉系统无法自解释 Fork/PR，目标用户（考研/高考生）多数不熟悉 git</td>
+            <td>未违背。只改界面词汇，协作机制本身不变</td>
+          </tr>
+          <tr>
+            <td>2026-08-15</td>
+            <td>规划书 v2.1 修订：修复墓碑与第 12 章矛盾；维持双人群；验证标准暂缓待定</td>
+            <td>v2.0 与实现现状多处漂移；跨考试拓展与身份锚冲突需裁决（裁决结果：以墓碑为准）</td>
+            <td>未违背。本次修订本身就是墓碑复审流程的执行</td>
           </tr>
         </tbody>
       </table>
+      <div class="decision-log-note" style="margin-bottom:12px;">
+        <strong>📌 v2.1 载体迁移：</strong>决策日志自 2026-08-15 起在 <strong>「决策日志.md」</strong>（与本规划书同目录）持续维护，本表为快照不再逐条更新。触发条件规则不变。
+      </div>
       <div class="decision-log-note">
         <strong>⚠ 触发条件：</strong>连续三次为同一理由违背墓碑，须强制暂停产品方向，重新评估产品定位是否仍然成立。这不是建议，是硬性规则。
       </div>
@@ -563,7 +583,10 @@
 
   <!-- ========== 3. USERS ========== -->
   <section id="users">
-    <h2><span class="num">3</span> 目标用户画像</h2>
+    <h2><span class="num">3</span> 目标用户画像 <span class="rev" style="background:var(--primary-light);color:var(--primary);">v2.1 决策</span></h2>
+    <div class="callout callout-amber">
+      <strong>v2.1 决策记录（2026-08-15）：维持双人群。</strong>两群用户在备考节奏（6-12 月 vs 1-2 年）、题型体系（图画作文 vs 概要写作）、批改标准上差异显著，邀请制下 20 个种子用户难以同时验证两个人群。<strong>已知并接受的风险：MVP 期验证不聚焦</strong>——缓解方式：内测期观察两群用户各自的核心链路完成率，若某群显著低活跃，Phase 2 收敛主攻人群。此决策不违背墓碑（墓碑本身覆盖双人群）。
+    </div>
     <div class="persona">
       <div class="persona-card">
         <h4>考研英语备考者</h4>
@@ -793,6 +816,9 @@
   <!-- ========== 6. ARCHITECTURE ========== -->
   <section id="architecture">
     <h2><span class="num">6</span> 产品架构 <span class="rev">v2.0 修订</span></h2>
+    <div class="callout callout-amber" style="margin-bottom:16px;">
+      <strong>v2.1 同步说明：</strong>下表"阶段"列为 v2.0 规划值。实际执行中 Fork 系统、PR 批改系统、版本历史已提前至 Phase 1 完成实现（开发 Step 7-8），评论/讨论移至 Phase 2。表格保留原规划值作对照，以第 8 章路线图 v2.1 版为准。
+    </div>
     <table>
       <tr><th>层级</th><th>模块</th><th>核心功能</th><th>阶段</th></tr>
       <tr>
@@ -846,6 +872,9 @@
   <!-- ========== 7. UI MOCK ========== -->
   <section id="ui">
     <h2><span class="num">7</span> 界面原型示意 <span class="rev">v2.0 修订</span></h2>
+    <div class="callout callout-amber" style="margin-bottom:16px;">
+      <strong>v2.1 说明：</strong>本章为 v2.0 时代的静态示意稿。当前界面事实源为 <strong>Ardot 画布（v2 重构，DC-002）+ 已实现代码</strong>，本章保留作历史参考，不再作为设计依据。三份事实源优先级：代码 &gt; Ardot 画布 &gt; 本章 HTML 原型。
+    </div>
 
     <h3>7.1 首页 / 我的工坊（Phase 1 私密模式）</h3>
     <div class="mock-ui">
@@ -984,20 +1013,27 @@
         <span class="phase-badge">目标：验证工具价值</span>
       </div>
       <p><strong>目标：</strong>跑通"写作文 → 邀请批改 → 看到改进"的核心闭环。<strong>不做公开广场，不做社交。</strong></p>
+      <div class="callout callout-blue" style="margin-bottom:12px;">
+        <strong>v2.1 边界同步（2026-08-05 确认，2026-08-15 更新进度）：</strong>实际 Phase 1 边界与 v2.0 不同 — Fork 系统、PR 批改系统、版本管理<strong>提前至 Phase 1</strong>（开发 Step 7-8 已完成实现）；<strong>评论功能与个人主页移至 Phase 2</strong>；通知系统（站内铃铛 + Realtime）已在 Phase 1 完成（Step 9）。下表以删除线标注 v2.0 原规划，以实际边界为准。
+      </div>
       <table>
-        <tr><th>功能</th><th>说明</th><th>优先级</th></tr>
-        <tr><td>账号注册/登录</td><td>邮箱注册 + 密码登录 + 邀请码注册</td><td><span class="tag tag-red">P0</span></td></tr>
-        <tr><td>创建作文仓库</td><td>富文本编辑器，支持中英混排</td><td><span class="tag tag-red">P0</span></td></tr>
-        <tr><td>可见性控制</td><td><strong>私密 / 仅邀请 / 公开</strong>（默认私密）</td><td><span class="tag tag-red">P0</span></td></tr>
-        <tr><td>邀请协作</td><td>生成邀请链接，指定人可查看/批改</td><td><span class="tag tag-red">P0</span></td></tr>
-        <tr><td>标签分类</td><td>考研/高考 × 题型 × 话题</td><td><span class="tag tag-red">P0</span></td></tr>
-        <tr><td>评论功能</td><td>仓库下方讨论区</td><td><span class="tag tag-red">P0</span></td></tr>
-        <tr><td>我的工坊页</td><td>展示个人仓库列表</td><td><span class="tag tag-amber">P1</span></td></tr>
-        <tr><td>Star 收藏</td><td>收藏到个人语料库（仅自己可见）</td><td><span class="tag tag-amber">P1</span></td></tr>
+        <tr><th>功能</th><th>说明</th><th>优先级</th><th>v2.1 状态</th></tr>
+        <tr><td>账号注册/登录</td><td>邮箱注册 + 密码登录 + 邮箱验证</td><td><span class="tag tag-red">P0</span></td><td>✅ 已实现（Step 5，含速率限制/超时处理）</td></tr>
+        <tr><td>创建作文仓库</td><td>富文本编辑器（TipTap），支持中英混排 + 草稿自动保存</td><td><span class="tag tag-red">P0</span></td><td>✅ 已实现（Step 6）</td></tr>
+        <tr><td>可见性控制</td><td><strong>私密 / 仅邀请 / 公开</strong>（默认私密）</td><td><span class="tag tag-red">P0</span></td><td>✅ 已实现（RLS 全表 + 可见性字段）</td></tr>
+        <tr><td>邀请协作</td><td>生成邀请码，指定人可查看/批改</td><td><span class="tag tag-red">P0</span></td><td>🔄 开发中（Step 10）</td></tr>
+        <tr><td>标签分类</td><td>考研/高考 × 题型 × 话题</td><td><span class="tag tag-red">P0</span></td><td>✅ 已实现（元数据表单）</td></tr>
+        <tr><td style="text-decoration:line-through;color:var(--gray-400);">评论功能</td><td>仓库下方讨论区</td><td><span class="tag tag-red">P0</span></td><td>⏭ 移至 Phase 2（弱反馈不参与核心验证）</td></tr>
+        <tr><td>我的工坊页</td><td>展示个人仓库列表</td><td><span class="tag tag-amber">P1</span></td><td>✅ 已实现（Dashboard，Step 3）</td></tr>
+        <tr><td>Star 收藏</td><td>收藏到个人语料库（仅自己可见）</td><td><span class="tag tag-amber">P1</span></td><td>✅ 已实现（Step 7）</td></tr>
+        <tr><td><strong>Fork 系统（v2.1 提前）</strong></td><td>一键借鉴 + 溯源关系 + 对照查看</td><td><span class="tag tag-red">P0</span></td><td>✅ 已实现（Step 7）</td></tr>
+        <tr><td><strong>PR 批改系统（v2.1 提前）</strong></td><td>纯文本 diff 对比 + 审阅流程 + 采纳合并</td><td><span class="tag tag-red">P0</span></td><td>✅ 已实现（Step 8）</td></tr>
+        <tr><td><strong>版本历史（v2.1 提前）</strong></td><td>版本记录 + 切换 + 恢复</td><td><span class="tag tag-red">P0</span></td><td>✅ 已实现（Step 7）</td></tr>
+        <tr><td><strong>消息通知（v2.1 新增）</strong></td><td>站内铃铛 + 实时未读徽章</td><td><span class="tag tag-amber">P1</span></td><td>✅ 已实现（Step 9）</td></tr>
       </table>
       <div class="callout callout-green" style="margin-top:12px;">
-        <strong>MVP 验证标准</strong>
-        20 个种子用户（邀请制）使用 2 周后，至少产生 50 篇作文仓库 + 80 条评论。<strong>核心验证点：用户是否觉得"邀请别人改作文"比"自己对着范文看"更有用。</strong>
+        <strong>MVP 验证标准 <span style="color:var(--amber);">（v2.1：暂缓待定）</span></strong>
+        v2.0 原标准"50 篇作文 + 80 条评论"已失效——评论功能移出 Phase 1，且产出量指标无法验证核心假设（人情面评论也能达标）。<strong>新标准于 MVP 上线前重定</strong>，方向已定：价值型指标优先于产出量指标，候选包括「批改采纳率 ≥ 30%」「≥ 10 个用户主动二次邀请批改人」。<strong>核心验证点不变：用户是否觉得"邀请别人改作文"比"自己对着范文看"更有用。</strong>
       </div>
     </div>
 
@@ -1104,8 +1140,8 @@
     <div class="tech-item">
       <span class="tech-role">Diff 对比</span>
       <div>
-        <span class="tech-name">diff-match-patch + react-diff-viewer</span>
-        <span class="tech-desc"> — Google 的文本对比算法，实现作文版本 diff 和 PR 逐句对比</span>
+        <span class="tech-name">自研 LCS 行级 diff（src/lib/diff.ts）<span style="font-size:11px;color:var(--gray-400);">v2.1 更新</span></span>
+        <span class="tech-desc"> — 实际选型替代了 v2.0 规划的 diff-match-patch + react-diff-viewer：作文场景行级对比即可，自研 LCS 零依赖、体量小，Step 8 已验证</span>
       </div>
     </div>
     <div class="tech-item">
@@ -1209,7 +1245,7 @@
       <tr>
         <td>用户用完即走</td>
         <td>考试结束就流失</td>
-        <td>拓展考试覆盖（四六级→考研→雅思托福）；年度报告分享</td>
+        <td><strong>同人群纵向延伸（v2.1 修订，以墓碑为准）</strong>：二战考生、下一届备考人群滚动接入；年度学习报告分享带动传播。<br><span style="font-size:12px;color:var(--gray-500);">v2.0 原对策"拓展考试覆盖（四六级→考研→雅思托福）"与墓碑身份锚（非泛英语平台）冲突，按 1.5 章裁决以墓碑为准——<strong>跨考试拓展若要做，必须先走墓碑复审并记决策日志</strong>。</span></td>
       </tr>
       <tr>
         <td>技术门槛</td>
@@ -1226,17 +1262,25 @@
 
   <!-- ========== 13. NEXT STEPS ========== -->
   <section id="next">
-    <h2><span class="num">13</span> 下一步行动建议 <span class="rev">v2.0 修订</span></h2>
+    <h2><span class="num">13</span> 下一步行动建议 <span class="rev">v2.1 重写</span></h2>
     <div class="callout callout-blue">
-      <strong>不需要一步到位，先动起来</strong>
+      <strong>v2.1 说明：</strong>v2.0 的六步行动（访谈 → 原型 → 搭建 → 上线 → 观察 → 迭代）已全部发生或进行中，本章重写为<strong>当前进度与真实下一步</strong>。
+    </div>
+    <div class="callout callout-green">
+      <strong>已完成（截至 2026-08-15）</strong>
+      <ul style="margin-top:8px;">
+        <li>开发 Step 1-9：账号系统 / 编辑器 / Fork + 版本管理 / PR 系统 / 通知系统全部完成，11 个路由</li>
+        <li>设计系统 Bento Neutral 迁移完成，Ardot 组件库页（DC-001）与 v2 原型重构（DC-002）立项推进</li>
+        <li>四层纠偏体系运转中：TECH_DEBT.md / PROGRESS_LOG.md / 对话同步协议 / .workbuddy memory</li>
+      </ul>
     </div>
     <ol>
-      <li><strong>第1步（本周）：</strong>找 5-10 个目标用户做访谈。核心问题：你写完作文后怎么获得反馈？你愿意把作文发给同学改吗？你觉得"邀请制"还是"公开广场"更吸引你？</li>
-      <li><strong>第2步（1-2周）：</strong>画出核心页面原型（我的工坊 → 仓库详情 → PR对比 → 邀请页）。重点设计"邀请协作"流程 — 这是 Phase 1 的核心</li>
-      <li><strong>第3步（2-4周）：</strong>用 AI 编程助手搭建 MVP。从最简单的功能开始：注册（邀请码）→ 发作文 → 邀请人查看 → 评论。<strong>不需要 Fork/PR，不需要广场</strong></li>
-      <li><strong>第4步（4-5周）：</strong>MVP 上线，邀请 20 个种子用户。自己先填充 20-30 篇范文内容</li>
-      <li><strong>第5步（5-6周）：</strong>观察用户行为：他们是否真的在"邀请别人改作文"？如果没有，是工具问题还是需求问题？</li>
-      <li><strong>第6步（6-8周）：</strong>根据反馈迭代，逐步加入 Fork、PR、版本历史</li>
+      <li><strong>第1步（本周）：</strong>完成 Phase 1 收尾——Step 10 邀请协作（邀请码生成 + 凭码加入 + 成员管理）、Step 11 整体收尾与验收</li>
+      <li><strong>第2步（收尾同期）：</strong>完成 DC-002 原型 v2 重构（7 屏 + 三态规范板，隐喻全降皮），与实现代码互校</li>
+      <li><strong>第3步（上线前）：</strong>重定 MVP 验证标准（方向：价值型指标，见第 8 章）；部署 Vercel + 配置生产环境</li>
+      <li><strong>第4步（上线）：</strong>招募 20 个种子用户（双人群并行招募，观察各自完成率）；自己先填充 20-30 篇高质量范文仓库</li>
+      <li><strong>第5步（2 周观察）：</strong>验证核心假设——用户是否真的在"邀请别人改作文"；记录两人群活跃差异，为人群收敛决策积累数据</li>
+      <li><strong>第6步（观察后）：</strong>Layer 4 里程碑复盘（对照墓碑 + 重读技术债务 + 更新记忆 + 写周记），据此排 Phase 2</li>
     </ol>
     <div class="callout callout-green">
       <strong>记住</strong>
@@ -1247,7 +1291,7 @@
 </div>
 
 <div class="footer">
-  EngForge 产品规划书 v2.0（修订版） · 2026-08-02<br>
+  EngForge 产品规划书 v2.1（修订版） · 2026-08-15 · 决策日志见同目录「决策日志.md」<br>
   用 GitHub 的方式学英语 — 私密工坊优先，广场水到渠成
 </div>
 
