@@ -30,6 +30,7 @@
 | 2026-08-14 | 安全 | Server Actions 不在应用层验 ownership | 中 | ~~P2~~ | ✅ 已偿还 |
 | 2026-08-14 | 响应式 | 全站无响应式适配 | 中 | P3 | 未偿还 |
 | 2026-08-15 | 框架迁移 | Next.js 16.3 提示 middleware 文件约定已弃用，应迁移到 proxy（`npx @next/codemod@canary middleware-to-proxy .`） | 低 | P3 | 未偿还 |
+| 2026-08-15 | 通知 Realtime | 客户端断线期间漏掉的 INSERT 靠下次整页刷新补齐（supabase-js 自带重连，但离线窗口内的推送不补发） | 低 | P3 | 未偿还 |
 
 ## 偿还记录
 
@@ -46,6 +47,7 @@
 | 2026-08-15 | 数据: 热力图假数据 | dashboard/page.tsx 查 essays+essay_versions created_at 聚合为 182 天 levels 传 prop；Heatmap 改 props 驱动删假数组；ActivityPanel 查 notifications 最近 20 条渲染真实列表 | 50min |
 | 2026-08-15 | PR: base/head 需预先存在 | createPullRequest SA 内部调 create_essay_version 自动生成 head 版本（更新 latest_version 不动 current_version），提交 PR 即建版本 | Step 8 内完成 |
 | 2026-08-15 | PR 系统缺失（Step 8） | 新增 8 文件：diff.ts(LCS行级diff) / prs/new 页+PrEditorClient / prs/[prId] 页+loading / PrDiffView / PrActions / PrList；改 5 文件：essay-actions(+createPullRequest/mergePr/closePr) / DetailClient(reviews tab 接 PrList) / Detail 页(批次A加 PRs 查询) / Sidebar 标签 / TopBar 标题 | 3h |
+| 2026-08-15 | 通知系统缺失（Step 9） | 新增 notification-config.ts(类型映射+相对时间，去重) + NotificationBell.tsx(铃铛+徽章+下拉面板+Realtime 订阅+已读+toast)；改 TopBar(插入铃铛) / layout(服务端未读计数) / ActivityPanel(import 共享配置) | 1h |
 
 ## 使用示例
 

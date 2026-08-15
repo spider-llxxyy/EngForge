@@ -13,10 +13,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Plus } from "lucide-react";
 import { UserMenu } from "@/components/layout/UserMenu";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import type { SessionUser } from "@/lib/auth";
 
 interface TopBarProps {
   user: SessionUser;
+  /** 服务端查询的未读通知数（避免铃铛徽章首帧闪烁） */
+  unreadCount: number;
 }
 
 const PAGE_TITLES: Record<string, string> = {
@@ -24,7 +27,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/editor": "作文编辑器",
 };
 
-export function TopBar({ user }: TopBarProps) {
+export function TopBar({ user, unreadCount }: TopBarProps) {
   const pathname = usePathname();
   const title = PAGE_TITLES[pathname]
     ?? (pathname.startsWith("/editor") ? "作文编辑器"
@@ -51,6 +54,7 @@ export function TopBar({ user }: TopBarProps) {
             新建作文
           </Link>
         )}
+        <NotificationBell userId={user.id} initialUnread={unreadCount} />
         <UserMenu user={user} />
       </div>
     </div>
