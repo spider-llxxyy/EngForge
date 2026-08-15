@@ -156,6 +156,7 @@ export default async function EssayDetailPage({
   const members = rawMembers
     .filter((m) => m.profiles)
     .map((m) => ({
+      user_id: m.user_id,
       username: m.profiles!.username,
       avatar_initials: m.profiles!.avatar_initials,
       role: m.role,

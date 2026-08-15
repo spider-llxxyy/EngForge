@@ -784,3 +784,206 @@ export async function closePr(prId: string): Promise<PrActionResult> {
 
   return { success: true };
 }
+
+// ──────────────────────────────────────────────
+// Invitations & Member Management
+// ──────────────────────────────────────────────
+
+/** 邀请码操作的结果 */
+interface InviteResult {
+  success: boolean;
+  error?: string;
+  code?: string;
+}
+
+/** 凭码加入的结果 */
+interface JoinResult {
+  success: boolean;
+  error?: string;
+  essayId?: string;
+}
+
+/** 简单操作的结果 */
+interface SimpleResult {
+  success: boolean;
+  error?: string;
+}
+
+/**
+ * 生成邀请码
+ *
+ * generate_invite_code RPC（SECURITY DEFINER）内部校验 essay ownership：
+ * 检查 essays.author_id = auth.uid()，非 owner 会 RAISE EXCEPTION。
+ * 默认 7 天有效期，不限使用次数。
+ */
+export async function generateInviteCode(essayId: string): Promise<InviteResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "请先登录" };
+  }
+
+  const supabase = await createClient();
+
+  const rpcResult = await supabase.rpc("generate_invite_code", {
+    p_essay_id: essayId,
+    p_max_uses: null,
+    p_expires_days: 7,
+  } as never);
+  const code = (rpcResult.data ?? null) as string | null;
+  const rpcError = rpcResult.error as { message?: string } | null;
+
+  if (rpcError || !code) {
+    return {
+      success: false,
+      error: "生成邀请码失败：" + (rpcError?.message ?? "未知错误"),
+    };
+  }
+
+  return { success: true, code };
+}
+
+/**
+ * 凭邀请码加入协作
+ *
+ * use_invitation RPC（SECURITY DEFINER）校验码有效性（存在/过期/上限），
+ * 将调用者添加为 editor 成员（幂等 ON CONFLICT DO NOTHING），自增 used_count。
+ * SA 额外查询 essay 信息，给 owner 发一条 member_joined 通知。
+ */
+export async function joinByInviteCode(code: string): Promise<JoinResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "请先登录" };
+  }
+
+  const supabase = await createClient();
+
+  const rpcResult = await supabase.rpc("use_invitation", {
+    p_code: code,
+  } as never);
+  const rpcData = (rpcResult.data ?? null) as {
+    success: boolean;
+    error?: string;
+    essay_id?: string;
+  } | null;
+  const rpcError = rpcResult.error as { message?: string } | null;
+
+  if (rpcError) {
+    return { success: false, error: "加入失败：" + rpcError.message };
+  }
+
+  if (!rpcData || !rpcData.success) {
+    return { success: false, error: rpcData?.error ?? "加入失败" };
+  }
+
+  const essayId = rpcData.essay_id!;
+
+  // 通知 essay owner 有新成员加入（不阻塞主流程）
+  const essayResult = await supabase
+    .from("essays")
+    .select("author_id, title")
+    .eq("id", essayId)
+    .single();
+  const essay = (essayResult.data ?? null) as {
+    author_id: string;
+    title: string;
+  } | null;
+
+  if (essay && essay.author_id !== user.id) {
+    await supabase.from("notifications").insert({
+      user_id: essay.author_id,
+      type: "member_joined",
+      title: "有新成员加入了你的作文",
+      content: `${user.username} 加入了你的作文「${essay.title}」`,
+      link_url: `/essays/${essayId}`,
+    } as never).then(() => {});
+  }
+
+  return { success: true, essayId };
+}
+
+/**
+ * 撤销邀请码
+ *
+ * RLS on invitations DELETE 检查 created_by = auth.uid()，
+ * 只有创建者（essay owner）可以撤销自己的邀请码。
+ */
+export async function revokeInviteCode(code: string): Promise<SimpleResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "请先登录" };
+  }
+
+  const supabase = await createClient();
+
+  const deleteResult = await supabase
+    .from("invitations")
+    .delete()
+    .eq("code", code);
+  const deleteError = deleteResult.error as { message?: string } | null;
+
+  if (deleteError) {
+    return { success: false, error: "撤销失败：" + deleteError.message };
+  }
+
+  return { success: true };
+}
+
+/**
+ * 移除协作成员
+ *
+ * RLS on essay_members DELETE 检查 essay.author_id = auth.uid()。
+ * 应用层额外校验目标不是 owner（owner 由触发器自动添加，不可移除）。
+ */
+export async function removeMember(
+  essayId: string,
+  userId: string
+): Promise<SimpleResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "请先登录" };
+  }
+
+  const supabase = await createClient();
+
+  // 校验 essay ownership
+  const essayResult = await supabase
+    .from("essays")
+    .select("author_id")
+    .eq("id", essayId)
+    .single();
+  const essay = (essayResult.data ?? null) as { author_id: string } | null;
+
+  if (!essay || essay.author_id !== user.id) {
+    return { success: false, error: "只有作者可以移除成员" };
+  }
+
+  // 校验目标成员存在且不是 owner
+  const memberResult = await supabase
+    .from("essay_members")
+    .select("role")
+    .eq("essay_id", essayId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  const member = (memberResult.data ?? null) as { role: string } | null;
+
+  if (!member) {
+    return { success: false, error: "该成员不存在" };
+  }
+  if (member.role === "owner") {
+    return { success: false, error: "不能移除作者" };
+  }
+
+  // DELETE（RLS: essay owner can delete members）
+  const deleteResult = await supabase
+    .from("essay_members")
+    .delete()
+    .eq("essay_id", essayId)
+    .eq("user_id", userId);
+  const deleteError = deleteResult.error as { message?: string } | null;
+
+  if (deleteError) {
+    return { success: false, error: "移除失败：" + deleteError.message };
+  }
+
+  return { success: true };
+}

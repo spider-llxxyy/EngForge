@@ -4,12 +4,17 @@
  * DetailSidebar — 详情页右侧栏
  *
  * 两个卡片：
- * 1. 协作者：成员列表 + 邀请按钮（owner 可见，Step 10 接入）
+ * 1. 协作者：成员列表 + 邀请按钮（owner 可见，InviteManager）+ 移除成员（owner 可见）
  * 2. 数据统计：Fork / Star / 版本数
  */
 
-import { Users, BarChart3 } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Users, BarChart3, UserMinus } from "lucide-react";
 import type { MemberData } from "./DetailClient";
+import { InviteManager } from "./InviteManager";
+import { removeMember } from "@/lib/essay-actions";
 
 interface DetailSidebarProps {
   members: MemberData[];
@@ -32,7 +37,25 @@ export function DetailSidebar({
   starCount,
   versionCount,
   isOwner,
+  essayId,
 }: DetailSidebarProps) {
+  const router = useRouter();
+  const [confirmingUserId, setConfirmingUserId] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
+
+  async function handleRemove(userId: string) {
+    setRemoving(true);
+    const result = await removeMember(essayId, userId);
+    if (result.success) {
+      toast.success("成员已移除");
+      setConfirmingUserId(null);
+      router.refresh();
+    } else {
+      toast.error(result.error ?? "移除失败");
+    }
+    setRemoving(false);
+  }
+
   return (
     <div className="space-y-4">
       {/* 协作者卡片 */}
@@ -44,16 +67,48 @@ export function DetailSidebar({
         {members.length > 0 ? (
           <div className="space-y-2">
             {members.map((m) => (
-              <div key={m.username} className="flex items-center justify-between">
+              <div key={m.user_id} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-medium text-white">
                     {m.avatar_initials}
                   </span>
                   <span className="text-sm text-zinc-700">{m.username}</span>
                 </div>
-                <span className="text-xs text-zinc-400">
-                  {roleLabels[m.role] ?? m.role}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-zinc-400">
+                    {roleLabels[m.role] ?? m.role}
+                  </span>
+                  {isOwner && m.role !== "owner" && (
+                    <>
+                      {confirmingUserId === m.user_id ? (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => handleRemove(m.user_id)}
+                            disabled={removing}
+                            className="text-xs text-red hover:opacity-70"
+                          >
+                            {removing ? "移除中..." : "确认移除"}
+                          </button>
+                          <button
+                            onClick={() => setConfirmingUserId(null)}
+                            disabled={removing}
+                            className="text-xs text-zinc-400 hover:text-zinc-600"
+                          >
+                            取消
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmingUserId(m.user_id)}
+                          className="rounded p-1 text-zinc-300 transition-colors hover:text-red"
+                          title="移除成员"
+                        >
+                          <UserMinus className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -61,15 +116,8 @@ export function DetailSidebar({
           <p className="text-sm text-zinc-400">暂无协作者信息</p>
         )}
 
-        {/* 邀请按钮（Step 10 接入） */}
-        {isOwner && (
-          <button
-            disabled
-            className="mt-3 w-full rounded-lg border border-dashed border-zinc-200 px-3 py-2 text-xs text-zinc-400"
-          >
-            邀请批改（Step 10）
-          </button>
-        )}
+        {/* 邀请按钮 */}
+        {isOwner && <InviteManager essayId={essayId} />}
       </div>
 
       {/* 数据统计卡片 */}

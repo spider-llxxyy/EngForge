@@ -36,6 +36,7 @@ export interface VersionData {
 }
 
 export interface MemberData {
+  user_id: string;
   username: string;
   avatar_initials: string;
   role: string;

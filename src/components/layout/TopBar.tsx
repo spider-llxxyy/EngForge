@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { Plus } from "lucide-react";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { JoinByCode } from "@/components/essay/JoinByCode";
 import type { SessionUser } from "@/lib/auth";
 
 interface TopBarProps {
@@ -55,6 +56,7 @@ export function TopBar({ user, unreadCount }: TopBarProps) {
           </Link>
         )}
         <NotificationBell userId={user.id} initialUnread={unreadCount} />
+        <JoinByCode />
         <UserMenu user={user} />
       </div>
     </div>

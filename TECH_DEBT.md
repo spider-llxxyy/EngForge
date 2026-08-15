@@ -48,6 +48,7 @@
 | 2026-08-15 | PR: base/head 需预先存在 | createPullRequest SA 内部调 create_essay_version 自动生成 head 版本（更新 latest_version 不动 current_version），提交 PR 即建版本 | Step 8 内完成 |
 | 2026-08-15 | PR 系统缺失（Step 8） | 新增 8 文件：diff.ts(LCS行级diff) / prs/new 页+PrEditorClient / prs/[prId] 页+loading / PrDiffView / PrActions / PrList；改 5 文件：essay-actions(+createPullRequest/mergePr/closePr) / DetailClient(reviews tab 接 PrList) / Detail 页(批次A加 PRs 查询) / Sidebar 标签 / TopBar 标题 | 3h |
 | 2026-08-15 | 通知系统缺失（Step 9） | 新增 notification-config.ts(类型映射+相对时间，去重) + NotificationBell.tsx(铃铛+徽章+下拉面板+Realtime 订阅+已读+toast)；改 TopBar(插入铃铛) / layout(服务端未读计数) / ActivityPanel(import 共享配置) | 1h |
+| 2026-08-15 | 邀请协作缺失（Step 10） | 新增 InviteManager.tsx(邀请码管理弹窗) + JoinByCode.tsx(TopBar 凭码加入入口)；改 essay-actions(+generateInviteCode/joinByInviteCode/revokeInviteCode/removeMember) / DetailSidebar(接 InviteManager + 移除成员) / DetailClient(MemberData+user_id) / page.tsx(members+user_id) / TopBar(插 JoinByCode) | 1h |
 
 ## 使用示例
 
