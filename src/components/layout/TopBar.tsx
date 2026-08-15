@@ -28,6 +28,7 @@ export function TopBar({ user }: TopBarProps) {
   const pathname = usePathname();
   const title = PAGE_TITLES[pathname]
     ?? (pathname.startsWith("/editor") ? "作文编辑器"
+      : pathname.includes("/prs/") ? "批改请求"
       : pathname.startsWith("/essays") ? "作品详情"
       : "EngForge");
   const showNewEssay = pathname === "/dashboard";

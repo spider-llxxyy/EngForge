@@ -23,6 +23,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 import type { Database } from "@/types/database";
 import type { Json } from "@/types/database";
+import { generateDiffText } from "@/lib/diff";
 
 // ──────────────────────────────────────────────
 // 类型定义
@@ -547,4 +548,239 @@ export async function toggleStar(essayId: string): Promise<StarResult> {
   }
 
   return { success: true, starred: true };
+}
+
+// ──────────────────────────────────────────────
+// Pull Requests
+// ──────────────────────────────────────────────
+
+/** PR 操作的结果 */
+interface PrActionResult {
+  success: boolean;
+  error?: string;
+  prId?: string;
+}
+
+/**
+ * 创建批改请求（Pull Request）
+ *
+ * 流程：
+ * 1. 验证登录 + 编辑权限
+ * 2. 查 essay + 当前版本（base）的 id 和 plain_text
+ * 3. RPC create_essay_version 创建 head 版本（更新 latest_version 但不动 current_version）
+ * 4. 生成行级 diff（base plain_text vs head plain_text）
+ * 5. INSERT pull_requests（触发器自动通知 essay owner）
+ */
+export async function createPullRequest(params: {
+  essayId: string;
+  title: string;
+  description: string;
+  content: Json;
+  plainText: string;
+  wordCount: number;
+}): Promise<PrActionResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "请先登录" };
+  }
+
+  const supabase = await createClient();
+
+  // 校验编辑权限（作者本人或 editor 成员）
+  const access = await checkEssayAccess(
+    supabase,
+    params.essayId,
+    user.id,
+    "edit"
+  );
+  if (!access.ok) {
+    return { success: false, error: access.error };
+  }
+
+  // 查 essay 当前版本号
+  const essayResult = await supabase
+    .from("essays")
+    .select("id, current_version")
+    .eq("id", params.essayId)
+    .single();
+  const essay = (essayResult.data ?? null) as {
+    id: string;
+    current_version: number;
+  } | null;
+
+  if (!essay) {
+    return { success: false, error: "作文不存在" };
+  }
+
+  // 查 base 版本的 id + plain_text
+  const baseVersionResult = await supabase
+    .from("essay_versions")
+    .select("id, plain_text")
+    .eq("essay_id", params.essayId)
+    .eq("version_number", essay.current_version)
+    .single();
+  const baseVersion = (baseVersionResult.data ?? null) as {
+    id: string;
+    plain_text: string;
+  } | null;
+
+  if (!baseVersion) {
+    return { success: false, error: "无法获取当前版本" };
+  }
+
+  // 创建 head 版本（create_essay_version 更新 latest_version 但不动 current_version）
+  const rpcResult = await supabase.rpc("create_essay_version", {
+    p_essay_id: params.essayId,
+    p_content: params.content,
+    p_plain_text: params.plainText,
+    p_word_count: params.wordCount,
+    p_change_summary: "PR: " + params.title,
+  } as never);
+  const headVersionId = (rpcResult.data ?? null) as string | null;
+  const rpcError = rpcResult.error as { message?: string } | null;
+
+  if (rpcError || !headVersionId) {
+    return {
+      success: false,
+      error: "创建版本失败：" + (rpcError?.message ?? "未知错误"),
+    };
+  }
+
+  // 生成行级 diff
+  const diffText = generateDiffText(
+    baseVersion.plain_text,
+    params.plainText
+  );
+
+  // INSERT pull_requests（触发器自动通知 essay owner）
+  const prInsertResult = await supabase
+    .from("pull_requests")
+    .insert({
+      essay_id: params.essayId,
+      base_version_id: baseVersion.id,
+      head_version_id: headVersionId,
+      title: params.title.trim(),
+      description: params.description.trim(),
+      diff_text: diffText,
+      created_by: user.id,
+    } as never)
+    .select("id")
+    .single();
+  const pr = (prInsertResult.data ?? null) as { id: string } | null;
+  const prError = prInsertResult.error as { message?: string } | null;
+
+  if (prError || !pr) {
+    // PR 记录创建失败 — head 版本已写入 essay_versions 表
+    // 但不影响 current_version，留为悬空版本（TECH_DEBT）
+    return {
+      success: false,
+      error: "创建 PR 失败：" + (prError?.message ?? "未知错误"),
+    };
+  }
+
+  return { success: true, prId: pr.id };
+}
+
+/**
+ * 合并批改请求
+ *
+ * 调用 merge_pull_request RPC（内部校验 owner 权限 + 创建新版本 + 更新 current_version）。
+ * 触发器自动通知 PR 创建者。
+ */
+export async function mergePr(prId: string): Promise<PrActionResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "请先登录" };
+  }
+
+  const supabase = await createClient();
+
+  // merge_pull_request RPC 内部完成：
+  // 1. 校验 PR 存在且 status = 'open'
+  // 2. 校验调用者是 essay owner
+  // 3. 从 head 内容创建新版本
+  // 4. 更新 essay current_version + latest_version
+  // 5. 更新 PR status = 'merged', merged_by, merged_at
+  // 6. 触发器通知 PR 创建者
+  const rpcResult = await supabase.rpc("merge_pull_request", {
+    p_pr_id: prId,
+  } as never);
+  const rpcError = rpcResult.error as { message?: string } | null;
+
+  if (rpcError) {
+    return { success: false, error: "合并失败：" + rpcError.message };
+  }
+
+  return { success: true };
+}
+
+/**
+ * 关闭批改请求
+ *
+ * 权限：PR 创建者或 essay author 可以关闭。
+ * UPDATE status = 'closed'（RLS 闸口：created_by 或 essay owner）。
+ */
+export async function closePr(prId: string): Promise<PrActionResult> {
+  const user = await getSessionUser();
+  if (!user) {
+    return { success: false, error: "请先登录" };
+  }
+
+  const supabase = await createClient();
+
+  // 查 PR（RLS 闸口：只有创建者或 essay 成员可见）
+  const prResult = await supabase
+    .from("pull_requests")
+    .select("id, status, created_by, essay_id")
+    .eq("id", prId)
+    .single();
+  const pr = (prResult.data ?? null) as {
+    id: string;
+    status: string;
+    created_by: string;
+    essay_id: string;
+  } | null;
+
+  if (!pr) {
+    return { success: false, error: "PR 不存在或无权访问" };
+  }
+
+  if (pr.status !== "open") {
+    return { success: false, error: "该 PR 已被关闭或合并" };
+  }
+
+  // 应用层校验：只有 PR 创建者或 essay author 可以关闭
+  const isCreator = pr.created_by === user.id;
+
+  if (!isCreator) {
+    // 查 essay 验证是否为 author
+    const essayResult = await supabase
+      .from("essays")
+      .select("author_id")
+      .eq("id", pr.essay_id)
+      .single();
+    const essayAuthor = (
+      essayResult.data as { author_id: string } | null
+    )?.author_id;
+
+    if (essayAuthor !== user.id) {
+      return {
+        success: false,
+        error: "只有 PR 创建者或作文作者可以关闭",
+      };
+    }
+  }
+
+  // UPDATE status = 'closed'
+  const updateResult = await supabase
+    .from("pull_requests")
+    .update({ status: "closed" } as never)
+    .eq("id", prId);
+  const updateError = updateResult.error as { message?: string } | null;
+
+  if (updateError) {
+    return { success: false, error: "关闭失败：" + updateError.message };
+  }
+
+  return { success: true };
 }

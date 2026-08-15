@@ -41,8 +41,8 @@ export default async function EssayDetailPage({
   const user = await getSessionUser();
   const supabase = await createClient();
 
-  // ── 1. 第一批查询（并行）：作文 / 全部版本 / 成员列表 / 我的身份 / 收藏状态 ──
-  const [essayResult, versionsResult, membersResult, memberResult, starResult] =
+  // ── 1. 第一批查询（并行）：作文 / 全部版本 / 成员列表 / 我的身份 / 收藏状态 / PR 列表 ──
+  const [essayResult, versionsResult, membersResult, memberResult, starResult, prsResult] =
     await Promise.all([
       supabase
         .from("essays")
@@ -75,6 +75,13 @@ export default async function EssayDetailPage({
         .eq("user_id", user!.id)
         .eq("essay_id", essayId)
         .maybeSingle(),
+      supabase
+        .from("pull_requests")
+        .select(
+          "id, title, status, created_at, profiles:profiles!pull_requests_created_by_fkey(username, avatar_initials)"
+        )
+        .eq("essay_id", essayId)
+        .order("created_at", { ascending: false }),
     ]);
 
   const essay = (essayResult.data ?? null) as {
@@ -154,6 +161,27 @@ export default async function EssayDetailPage({
       role: m.role,
     }));
 
+  // ── 7. 处理 PR 列表 ──
+  const rawPrs = (prsResult.data ?? []) as Array<{
+    id: string;
+    title: string;
+    status: string;
+    created_at: string;
+    profiles: { username: string; avatar_initials: string } | null;
+  }>;
+  const prs = rawPrs.map((p) => ({
+    id: p.id,
+    title: p.title,
+    status: p.status,
+    createdAt: formatDate(p.created_at),
+    creator: p.profiles
+      ? {
+          username: p.profiles.username,
+          avatar_initials: p.profiles.avatar_initials,
+        }
+      : null,
+  }));
+
   // ── 8. 传递给客户端组件 ──
   return (
     <DetailClient
@@ -177,6 +205,7 @@ export default async function EssayDetailPage({
         avatar_initials: author?.avatar_initials ?? "?",
       }}
       versions={versions}
+      prs={prs}
       isStarred={isStarred}
       isOwner={isOwner}
       canEdit={canEdit}

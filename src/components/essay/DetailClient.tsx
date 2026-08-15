@@ -22,6 +22,7 @@ import { EssayActions } from "./EssayActions";
 import { VersionSwitcher } from "./VersionSwitcher";
 import { VersionHistory } from "./VersionHistory";
 import { DetailSidebar } from "./DetailSidebar";
+import { PrList, type PrSummary } from "@/components/pr/PrList";
 import { restoreVersion } from "@/lib/essay-actions";
 
 type Tab = "content" | "history" | "reviews";
@@ -61,6 +62,7 @@ interface DetailClientProps {
     avatar_initials: string;
   };
   versions: VersionData[];
+  prs: PrSummary[];
   isStarred: boolean;
   isOwner: boolean;
   canEdit: boolean;
@@ -69,7 +71,7 @@ interface DetailClientProps {
 }
 
 export function DetailClient(props: DetailClientProps) {
-  const { essay, author, versions, isStarred, isOwner, canEdit, members, tagLabels } = props;
+  const { essay, author, versions, prs, isStarred, isOwner, canEdit, members, tagLabels } = props;
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<Tab>("content");
@@ -104,7 +106,7 @@ export function DetailClient(props: DetailClientProps) {
   const tabs: { key: Tab; label: string }[] = [
     { key: "content", label: "内容" },
     { key: "history", label: `版本历史 (${versions.length})` },
-    { key: "reviews", label: "批改记录" },
+    { key: "reviews", label: `批改记录${prs.length > 0 ? ` (${prs.length})` : ""}` },
   ];
 
   return (
@@ -241,9 +243,7 @@ export function DetailClient(props: DetailClientProps) {
           )}
 
           {activeTab === "reviews" && (
-            <div className="rounded-lg border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
-              批改记录将在 Step 8 PR 系统中实现
-            </div>
+            <PrList essayId={essay.id} prs={prs} canEdit={canEdit} />
           )}
         </div>
 
