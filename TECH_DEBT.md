@@ -48,6 +48,7 @@
 | 2026-08-15 | 数据: 热力图假数据 | dashboard/page.tsx 查 essays+essay_versions created_at 聚合为 182 天 levels 传 prop；Heatmap 改 props 驱动删假数组；ActivityPanel 查 notifications 最近 20 条渲染真实列表 | 50min |
 | 2026-08-15 | PR: base/head 需预先存在 | createPullRequest SA 内部调 create_essay_version 自动生成 head 版本（更新 latest_version 不动 current_version），提交 PR 即建版本 | Step 8 内完成 |
 | 2026-08-15 | PR 系统缺失（Step 8） | 新增 8 文件：diff.ts(LCS行级diff) / prs/new 页+PrEditorClient / prs/[prId] 页+loading / PrDiffView / PrActions / PrList；改 5 文件：essay-actions(+createPullRequest/mergePr/closePr) / DetailClient(reviews tab 接 PrList) / Detail 页(批次A加 PRs 查询) / Sidebar 标签 / TopBar 标题 | 3h |
+| 2026-08-15 | RLS 无限递归：essays ↔ essay_members 策略互相引用（创建作文报 infinite recursion） | 0002_fix_rls_recursion.sql：抽 4 个 SECURITY DEFINER 辅助函数（is_essay_member/is_essay_editor/is_essay_owner/can_view_essay）绕 RLS，重写 9 条互相引用策略 | 40min |
 | 2026-08-15 | 通知系统缺失（Step 9） | 新增 notification-config.ts(类型映射+相对时间，去重) + NotificationBell.tsx(铃铛+徽章+下拉面板+Realtime 订阅+已读+toast)；改 TopBar(插入铃铛) / layout(服务端未读计数) / ActivityPanel(import 共享配置) | 1h |
 | 2026-08-15 | 邀请协作缺失（Step 10） | 新增 InviteManager.tsx(邀请码管理弹窗) + JoinByCode.tsx(TopBar 凭码加入入口)；改 essay-actions(+generateInviteCode/joinByInviteCode/revokeInviteCode/removeMember) / DetailSidebar(接 InviteManager + 移除成员) / DetailClient(MemberData+user_id) / page.tsx(members+user_id) / TopBar(插 JoinByCode) | 1h |
 | 2026-08-15 | 数据: 连续天数假数据 | dashboard/page.tsx 新增 computeStreak()：复用热力图 countsByDate，东八区口径从今天（或昨天）往回数连续活跃天数，替换硬编码 0 | 20min |
