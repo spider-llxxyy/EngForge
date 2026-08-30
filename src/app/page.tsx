@@ -1,11 +1,10 @@
 import Link from "next/link";
 import {
-  GitFork,
+  FilePlus,
   GitPullRequest,
   Star,
   Sparkles,
   TrendingUp,
-  GitPullRequestArrow,
 } from "lucide-react";
 
 /**
@@ -18,23 +17,23 @@ import {
 /** 三个核心特性 — 对应设计稿 Features Section */
 const FEATURES = [
   {
-    icon: GitFork,
-    title: "Fork 借鉴",
-    desc: "一键复制高分范文到自己的工坊，在原文基础上修改练习。",
+    icon: FilePlus,
+    title: "写作 · 发布",
+    desc: "打开编辑器就能写，写完自动存为第一个版本。之后每次修改都会生成新版本，随时回看、随时恢复。",
     iconBg: "bg-primary-subtle",
     iconColor: "text-primary",
   },
   {
     icon: GitPullRequest,
-    title: "PR 互改",
-    desc: "邀请同学互相批改作文，生成新版本，追踪每一步改进。",
+    title: "邀请批改",
+    desc: "生成邀请码发给同学，对方就能进入你的作文提交批改——逐句对照，改了哪里一目了然。",
     iconBg: "bg-amber-light",
     iconColor: "text-amber",
   },
   {
     icon: Star,
-    title: "Star 收藏",
-    desc: "收藏值得反复读的范文，随时回看拆解学习。",
+    title: "采纳 · 借鉴",
+    desc: "满意的批改一键采纳，自动生成新版本；看到好范文可以借鉴一份到自己账号继续改。",
     iconBg: "bg-green-light",
     iconColor: "text-green",
   },
@@ -52,7 +51,7 @@ function ProductPreview() {
         <p className="text-sm font-semibold text-zinc-950">
           The Impact of AI on Education
         </p>
-        <p className="text-xs text-zinc-500">32 词 · 2 小时前 · 3 次复刻</p>
+        <p className="text-xs text-zinc-500">32 词 · 2 小时前 · 3 次借鉴</p>
       </div>
 
       {/* 预览 2：协作动态 */}
@@ -60,7 +59,7 @@ function ProductPreview() {
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green text-[11px] font-semibold text-white">
           C
         </span>
-        <p className="text-[13px] text-zinc-600">陈同学 复刻了你的作文</p>
+        <p className="text-[13px] text-zinc-600">陈同学 借鉴了你的作文</p>
       </div>
 
       {/* 预览 3：写作统计 */}
@@ -72,6 +71,15 @@ function ProductPreview() {
         <span className="flex items-center gap-1 rounded-full bg-green-light px-2.5 py-1 text-[11px] font-semibold text-green">
           <TrendingUp className="h-3 w-3" />
           +40%
+        </span>
+      </div>
+
+      {/* 预览 4：AI 替换建议 */}
+      <div className="flex items-center gap-2 rounded-lg bg-white p-3.5 shadow-card">
+        <span className="text-[13px] text-zinc-600">
+          替换建议：<span className="text-red line-through">depicted</span>
+          {" → "}
+          <span className="font-semibold text-primary">illustrated / portrayed</span>
         </span>
       </div>
     </div>
@@ -113,46 +121,36 @@ export default function Home() {
             href="/register"
             className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
           >
-            免费注册
+            开始使用
           </Link>
         </div>
       </header>
 
       {/* ── Hero：左文案 + 右产品预览 ── */}
-      <section className="flex flex-col items-center gap-16 bg-white px-16 py-20 lg:flex-row">
+      <section className="flex flex-col items-center gap-16 bg-zinc-50 px-16 py-20 lg:flex-row">
         {/* 左：文案 */}
-        <div className="flex max-w-[560px] flex-col gap-6">
+        <div className="flex max-w-[680px] flex-col gap-6">
           {/* 定位徽章 */}
           <span className="flex w-fit items-center gap-1.5 rounded-full bg-primary-subtle px-3 py-1.5 text-xs font-semibold text-primary">
             <Sparkles className="h-3.5 w-3.5" />
             考研英语 · 上海高考
           </span>
 
-          <h1 className="text-[44px] font-bold leading-[1.2] tracking-tight text-zinc-950">
-            用 GitHub 的方式
-            <br />
-            学英语写作
+          <h1 className="text-[40px] font-bold leading-[1.3] tracking-tight text-zinc-950">
+            写一遍不够？那就写十遍，每次都留痕
           </h1>
 
-          <p className="text-base leading-relaxed text-zinc-600">
-            版本可追溯，改动可对比，批改可沉淀——
-            <br />
-            把开源协作的精髓写进每一次练习。
+          <p className="text-base leading-[1.7] text-zinc-600">
+            每篇作文都有完整的版本历史——改了一笔就存一个版本，同学帮你批改的内容也能合并进来。想看进步轨迹？翻版本历史就行。
           </p>
 
-          <div className="mt-2 flex gap-3">
+          <div className="mt-2">
             <Link
               href="/register"
               className="rounded-lg bg-primary px-9 py-3 text-base font-semibold text-white transition-colors hover:bg-primary-dark"
             >
-              开始写作
+              开始使用
             </Link>
-            <Link
-              href="/login"
-              className="rounded-lg border border-zinc-200 bg-white px-9 py-3 text-base font-semibold text-zinc-950 transition-colors hover:bg-zinc-50"
-            >
-登录
-          </Link>
           </div>
         </div>
 
@@ -163,7 +161,7 @@ export default function Home() {
       {/* ── Features：三个核心动作 ── */}
       <section id="features" className="bg-zinc-50 px-16 py-20">
         <h2 className="mb-10 text-center text-[32px] font-bold text-zinc-950">
-          三个动作，掌握英语写作
+          三步，把作文从初稿改到满意
         </h2>
 
         <div className="mx-auto flex max-w-[1200px] gap-6">
@@ -197,17 +195,16 @@ export default function Home() {
         className="flex flex-col items-center gap-6 bg-white px-16 py-16"
       >
         <h2 className="text-[28px] font-semibold text-zinc-950">
-          从第一篇开始，让每次写作都有迹可循。
+          第一篇作文，现在就能开始
         </h2>
         <Link
           href="/register"
           className="rounded-lg bg-primary px-10 py-3 text-base font-semibold text-white transition-colors hover:bg-primary-dark"
         >
-          免费注册
+          开始使用
         </Link>
         <p className="flex items-center gap-1.5 text-sm text-zinc-500">
-          <GitPullRequestArrow className="h-4 w-4 text-primary" />
-          邀请制内测中，注册后即可创建你的工坊
+          邀请制内测中，注册后即可开始写作
         </p>
       </section>
 
@@ -220,7 +217,7 @@ export default function Home() {
           <span className="text-sm font-medium text-zinc-600">EngForge</span>
         </div>
         <p className="text-xs text-zinc-500">
-          © 2026 EngForge. 用 GitHub 的方式学英语。
+          © 2026 EngForge. 写一遍不够，就写十遍。
         </p>
       </footer>
     </div>

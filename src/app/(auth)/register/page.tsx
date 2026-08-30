@@ -150,7 +150,7 @@ export default function RegisterPage() {
     <div>
       <h1 className="mb-1 text-xl font-bold text-zinc-950">创建账号</h1>
       <p className="mb-6 text-sm text-zinc-500">
-        加入 EngForge，用 GitHub 的方式学英语
+        加入 EngForge，开始你的英语写作之旅
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">

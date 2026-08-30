@@ -29,10 +29,10 @@ export default function AppError({ error, reset }: AppErrorProps) {
           <AlertTriangle className="h-7 w-7 text-red" />
         </div>
         <h2 className="mb-2 text-lg font-bold text-zinc-950">
-          页面加载失败
+          出错了
         </h2>
         <p className="mb-6 text-sm text-zinc-500">
-          数据加载时出了点问题。可以重试，或返回工坊首页。
+          无法加载内容，请检查网络后重试
         </p>
         <div className="flex justify-center gap-3">
           <button

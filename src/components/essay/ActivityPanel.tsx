@@ -73,7 +73,7 @@ export function ActivityPanel({ activities }: ActivityPanelProps) {
       {/* 最近活动 */}
       <div className="overflow-hidden rounded-card bg-white shadow-card">
         <div className="border-b border-zinc-200 px-5 py-4">
-          <h3 className="text-[15px] font-semibold text-zinc-950">最近活动</h3>
+          <h3 className="text-[15px] font-semibold text-zinc-950">近期批改</h3>
         </div>
 
         {activities.length === 0 ? (

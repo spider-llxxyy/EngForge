@@ -4,8 +4,8 @@
  * Server Component：在服务端查询 Supabase 获取当前用户的真实数据，
  * 通过 props 传给子组件（StatsCards / EssayList / Heatmap / ActivityPanel）。
  *
- * 热力图：把 essays.created_at + essay_versions.created_at 按天聚合
- * 成 182 格（26 周 × 7 天）的等级数组。
+ * 热力图：把 essays.created_at + essay_versions.created_at 按周聚合
+ * 成 24 格（2 行 × 12 列）的等级数组。
  * 活动面板：notifications 表最近 20 条。
  */
 
@@ -29,13 +29,12 @@ function mapTag(tag: string): EssayTag {
   return (valid as string[]).includes(tag) ? (tag as EssayTag) : "other";
 }
 
-/* ── 热力图聚合 ──────────────────────────────── */
+/* ── 热力图聚合（周粒度） ──────────────────────── */
 
 /** 东八区偏移量 — 用户是中国用户，按北京时间分桶 */
 const UTC8_OFFSET_MS = 8 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
-const HEATMAP_WEEKS = 26;
-const HEATMAP_DAYS = 7;
+const HEATMAP_TOTAL_WEEKS = 24;  // 2 行 × 12 列 = 24 周
 
 /** Date → 东八区 "YYYY-MM-DD" 日期 key */
 function dateKey(date: Date): string {
@@ -49,7 +48,7 @@ function todayStart(): Date {
   return new Date(shifted.getTime() - UTC8_OFFSET_MS);
 }
 
-/** 当天活动数 → 颜色等级：0→空，1~3 递增，≥4 封顶 */
+/** 当周活动数 → 颜色等级：0→空，1~3 递增，≥4 封顶 */
 function countToLevel(count: number): HeatmapLevel {
   if (count >= 4) return "l4";
   if (count >= 1) return (`l${count}` as HeatmapLevel);
@@ -57,42 +56,64 @@ function countToLevel(count: number): HeatmapLevel {
 }
 
 /**
- * 把按天的计数聚合成热力图等级数组。
- * 网格 26 列（周）× 7 行（天），数组按行填充：
- * levels[day * 26 + week] = 第 week 周的第 day 天。
- * 最后一个格子是今天。
+ * 把按天的计数聚合成周粒度热力图等级数组。
+ * 24 格（2 行 × 12 列），按行填充：
+ * levels[0] = 23 周前（最旧），levels[23] = 本周（最新）。
+ * 每格代表连续 7 天的活动总量。
  */
-function buildHeatmapLevels(countsByDate: Map<string, number>): HeatmapLevel[] {
-  const windowStart = new Date(todayStart().getTime() - (HEATMAP_WEEKS * HEATMAP_DAYS - 1) * DAY_MS);
+function buildWeeklyHeatmapLevels(countsByDate: Map<string, number>): HeatmapLevel[] {
+  const today = todayStart();
   const levels: HeatmapLevel[] = [];
 
-  for (let day = 0; day < HEATMAP_DAYS; day++) {
-    for (let week = 0; week < HEATMAP_WEEKS; week++) {
-      const date = new Date(windowStart.getTime() + (week * HEATMAP_DAYS + day) * DAY_MS);
-      levels.push(countToLevel(countsByDate.get(dateKey(date)) ?? 0));
+  for (let week = 0; week < HEATMAP_TOTAL_WEEKS; week++) {
+    // Week 0 = oldest (23 weeks ago), Week 23 = current week
+    const startDaysAgo = (HEATMAP_TOTAL_WEEKS - 1 - week) * 7;
+
+    let weekCount = 0;
+    for (let day = 0; day < 7; day++) {
+      const date = new Date(today.getTime() - (startDaysAgo + day) * DAY_MS);
+      weekCount += countsByDate.get(dateKey(date)) ?? 0;
     }
+
+    levels.push(countToLevel(weekCount));
   }
 
   return levels;
 }
 
 /**
- * 当前连续活跃天数（东八区口径）。
- * 规则：从今天往回数连续有活动的天数；今天还没活动则从昨天起算
- * （今天"尚未打破"连续记录，与 GitHub Streak 的口径一致）。
+ * 本周活动总数 + 连续活跃周数。
+ * 规则：从本周往回数连续有活动的周数；本周还没活动则从上周起算。
  */
-function computeStreak(countsByDate: Map<string, number>): number {
-  const start = todayStart();
-  // 今天没有活动 → 从昨天开始数；有则从今天开始
-  const hasToday = (countsByDate.get(dateKey(start)) ?? 0) > 0;
-  let cursor = hasToday ? start : new Date(start.getTime() - DAY_MS);
+function computeWeeklyStats(countsByDate: Map<string, number>): { thisWeekCount: number; weeklyStreak: number } {
+  const today = todayStart();
 
-  let streak = 0;
-  while ((countsByDate.get(dateKey(cursor)) ?? 0) > 0) {
-    streak++;
-    cursor = new Date(cursor.getTime() - DAY_MS);
+  // 计算本周的活动数
+  let thisWeekCount = 0;
+  for (let day = 0; day < 7; day++) {
+    const date = new Date(today.getTime() - day * DAY_MS);
+    thisWeekCount += countsByDate.get(dateKey(date)) ?? 0;
   }
-  return streak;
+
+  // 计算连续周数（从本周或上周开始）
+  const startWeek = thisWeekCount > 0 ? 0 : 1;
+  let weeklyStreak = 0;
+
+  for (let week = startWeek; week < HEATMAP_TOTAL_WEEKS; week++) {
+    const startDaysAgo = week * 7;
+    let weekCount = 0;
+    for (let day = 0; day < 7; day++) {
+      const date = new Date(today.getTime() - (startDaysAgo + day) * DAY_MS);
+      weekCount += countsByDate.get(dateKey(date)) ?? 0;
+    }
+    if (weekCount > 0) {
+      weeklyStreak++;
+    } else {
+      break;
+    }
+  }
+
+  return { thisWeekCount, weeklyStreak };
 }
 
 // ──────────────────────────────────────────────
@@ -111,7 +132,7 @@ export default async function DashboardPage() {
   // 2. 查询当前用户的作文（按更新时间倒序；created_at 同时用于热力图聚合）
   const essaysResult = await supabase
     .from("essays")
-    .select("id, title, tags, word_count, star_count, updated_at, created_at")
+    .select("id, title, tags, word_count, star_count, current_version, updated_at, created_at")
     .eq("author_id", user.id)
     .order("updated_at", { ascending: false });
 
@@ -121,39 +142,31 @@ export default async function DashboardPage() {
     tags: string[];
     word_count: number;
     star_count: number;
+    current_version: number;
     updated_at: string;
     created_at: string;
   }>;
 
-  // 3. 转换为 DashboardEssay 格式
-  const essays: DashboardEssay[] = rawEssays.map((e) => ({
-    id: e.id,
-    title: e.title,
-    status: "published" as const,
-    tag: mapTag(e.tags?.[0] ?? "other"),
-    wordCount: e.word_count ?? 0,
-    updatedAt: e.updated_at,
-    href: `/essays/${e.id}`,
-  }));
-
-  // 4. 热力图窗口起点（182 天前的 0 点），用于过滤版本表查询
+  // 3. 热力图窗口起点（24 周 × 7 天 = 168 天前），用于过滤版本表查询
   const heatmapWindowStart = new Date(
-    todayStart().getTime() - (HEATMAP_WEEKS * HEATMAP_DAYS - 1) * DAY_MS
+    todayStart().getTime() - (HEATMAP_TOTAL_WEEKS * 7 - 1) * DAY_MS
   );
 
-  // 5. 三个独立查询并行执行：PR 数 / 版本活动日期 / 最近通知
-  const [prResult, versionsResult, notificationsResult] = await Promise.all([
-    // 收到的 PR 数（open 状态）
+  // 4. 三个独立查询并行执行：收到 PR / 提交 PR / 版本活动日期 / 最近通知
+  const [receivedPrsResult, submittedPrsResult, versionsResult, notificationsResult] = await Promise.all([
+    // 收到的 PR（open 状态，在我名下的作文上）— 取 essay_id 用于 per-essay 统计
     rawEssays.length > 0
       ? supabase
           .from("pull_requests")
-          .select("id", { count: "exact", head: true })
-          .in(
-            "essay_id",
-            rawEssays.map((e) => e.id),
-          )
+          .select("id, essay_id")
+          .in("essay_id", rawEssays.map((e) => e.id))
           .eq("status", "open")
-      : Promise.resolve({ count: 0, data: null, error: null }),
+      : Promise.resolve({ data: [], count: 0, error: null }),
+    // 提交的 PR（我创建的，任何状态）— 只需 count
+    supabase
+      .from("pull_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("created_by", user.id),
     // 我创建的所有版本（含发布/修改/Fork 复制），只取时间
     supabase
       .from("essay_versions")
@@ -169,9 +182,18 @@ export default async function DashboardPage() {
       .limit(20),
   ]);
 
-  const prCount = prResult.count ?? 0;
+  // 收到 PR 总数 + per-essay 计数
+  const receivedPrsData = (receivedPrsResult.data ?? []) as Array<{ id: string; essay_id: string }>;
+  const receivedPrCount = receivedPrsData.length;
+  const openPrsByEssay = new Map<string, number>();
+  receivedPrsData.forEach((pr) => {
+    openPrsByEssay.set(pr.essay_id, (openPrsByEssay.get(pr.essay_id) ?? 0) + 1);
+  });
 
-  // 6. 聚合热力图：作文创建数 + 版本创建数，按东八区日期分桶
+  // 提交 PR 总数
+  const submittedPrCount = submittedPrsResult.count ?? 0;
+
+  // 5. 聚合热力图：作文创建数 + 版本创建数，按东八区日期分桶
   const countsByDate = new Map<string, number>();
   const bump = (iso: string) => {
     const key = dateKey(new Date(iso));
@@ -180,10 +202,17 @@ export default async function DashboardPage() {
   rawEssays.forEach((e) => bump(e.created_at));
   const versionDates = (versionsResult.data ?? []) as Array<{ created_at: string }>;
   versionDates.forEach((v) => bump(v.created_at));
-  const heatmapLevels = buildHeatmapLevels(countsByDate);
-  const streak = computeStreak(countsByDate);
+  const heatmapLevels = buildWeeklyHeatmapLevels(countsByDate);
+  const { thisWeekCount, weeklyStreak } = computeWeeklyStats(countsByDate);
 
-  // 7. 通知 → ActivityItem
+  // 热力图底部统计文案
+  const summaryText = thisWeekCount > 0
+    ? `本周 ${thisWeekCount} 篇 · 连续 ${weeklyStreak} 周有产出`
+    : weeklyStreak > 0
+      ? `本周暂无 · 连续 ${weeklyStreak} 周有产出`
+      : "本周暂无";
+
+  // 6. 通知 → ActivityItem
   const rawNotifications = (notificationsResult.data ?? []) as Array<{
     id: string;
     type: string;
@@ -203,15 +232,36 @@ export default async function DashboardPage() {
     createdAt: n.created_at,
   }));
 
-  // 8. 计算统计数据
+  // 7. 转换为 DashboardEssay 格式（含版本号 + 状态 pill）
+  const essays: DashboardEssay[] = rawEssays.map((e) => {
+    const openPrCount = openPrsByEssay.get(e.id) ?? 0;
+    return {
+      id: e.id,
+      title: e.title,
+      status: "published" as const,
+      tag: mapTag(e.tags?.[0] ?? "other"),
+      wordCount: e.word_count ?? 0,
+      updatedAt: e.updated_at,
+      href: `/essays/${e.id}`,
+      versionNumber: e.current_version ?? 1,
+      statusPill: openPrCount > 0
+        ? {
+            label: `${openPrCount} 条新批改`,
+            className: "bg-amber-light text-amber",
+          }
+        : undefined,
+    };
+  });
+
+  // 8. 计算统计数据（顺序：我的作文 / 收到批改 / 提交批改 / 被收藏）
   const essayCount = essays.length;
   const totalStars = rawEssays.reduce((sum, e) => sum + (e.star_count ?? 0), 0);
 
   const stats = [
     { value: essayCount, sub: essayCount > 0 ? "已发布" : "去写第一篇" },
-    { value: prCount, sub: prCount > 0 ? "待处理" : "暂无" },
+    { value: receivedPrCount, sub: receivedPrCount > 0 ? "待处理" : "暂无" },
+    { value: submittedPrCount, sub: submittedPrCount > 0 ? "已提交" : "暂无" },
     { value: totalStars, sub: totalStars > 0 ? "被收藏" : "暂无" },
-    { value: streak, sub: streak > 0 ? "天连续活跃" : "今天写一篇" },
   ];
 
   // 9. 问候语（按时间段）
@@ -250,7 +300,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-[1fr_320px] gap-6">
         <div className="space-y-6">
           <EssayList essays={essays} />
-          <Heatmap levels={heatmapLevels} />
+          <Heatmap levels={heatmapLevels} summaryText={summaryText} />
         </div>
         <ActivityPanel activities={activities} />
       </div>

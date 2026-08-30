@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EngForge — 用 GitHub 的方式学英语",
+  title: "EngForge — 写一遍不够，就写十遍",
   description: "面向考研和上海高考英语的协作写作社区",
 };
 

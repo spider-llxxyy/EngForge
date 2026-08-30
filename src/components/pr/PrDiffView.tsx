@@ -31,21 +31,21 @@ export function PrDiffView({ diffText }: PrDiffViewProps) {
           line.type === "added" ? "+" : line.type === "removed" ? "-" : " ";
         const bgClass =
           line.type === "added"
-            ? "bg-green-50"
+            ? "bg-[#ECFDF5]"
             : line.type === "removed"
-              ? "bg-red-50"
+              ? "bg-[#FEF2F2]"
               : "";
         const textClass =
           line.type === "added"
-            ? "text-green-800"
+            ? "text-[#059669]"
             : line.type === "removed"
-              ? "text-red-800"
+              ? "text-[#B91C1C]"
               : "text-zinc-600";
         const prefixClass =
           line.type === "added"
-            ? "text-green-600"
+            ? "text-[#059669]"
             : line.type === "removed"
-              ? "text-red-600"
+              ? "text-[#B91C1C]"
               : "text-zinc-300";
 
         return (

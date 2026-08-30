@@ -45,13 +45,13 @@ export function EssayActions({
     const result = await forkEssay(essayId);
 
     if (result.success && result.newEssayId) {
-      toast.success("Fork 成功", {
+      toast.success("借鉴成功", {
         description: "已创建到你的工坊，正在跳转...",
       });
       router.push(`/essays/${result.newEssayId}`);
     } else {
-      setForkError(result.error ?? "Fork 失败");
-      toast.error("Fork 失败", {
+      setForkError(result.error ?? "借鉴失败");
+      toast.error("借鉴失败", {
         description: result.error ?? "请稍后重试",
       });
       setForking(false);
@@ -99,7 +99,7 @@ export function EssayActions({
             className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
           >
             <GitFork className="h-3.5 w-3.5" />
-            {forking ? "Fork 中..." : "Fork"}
+            {forking ? "借鉴中..." : "借鉴"}
           </button>
         )}
 

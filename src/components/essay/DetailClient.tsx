@@ -126,10 +126,10 @@ export function DetailClient(props: DetailClientProps) {
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-bold text-zinc-950">{essay.title}</h1>
 
-          {/* Fork 来源 */}
+          {/* 借鉴来源 */}
           {essay.forked_from && essay.forked_from_title && (
             <p className="mt-1 text-sm text-zinc-500">
-              Fork 自{" "}
+              借鉴自{" "}
               <Link
                 href={`/essays/${essay.forked_from}`}
                 className="text-primary hover:underline"
@@ -164,7 +164,9 @@ export function DetailClient(props: DetailClientProps) {
             </span>
             <span>{essay.created_at}</span>
             <span>{essay.word_count} 词</span>
-            <span>当前 v{essay.current_version}</span>
+            <span className="rounded-full bg-primary-subtle px-2.5 py-0.5 text-xs font-medium text-primary">
+              v{essay.current_version}
+            </span>
           </div>
         </div>
 

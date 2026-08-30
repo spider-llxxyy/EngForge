@@ -25,13 +25,13 @@ interface TopBarProps {
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "我的工坊",
-  "/editor": "作文编辑器",
+  "/editor": "新建作文",
 };
 
 export function TopBar({ user, unreadCount }: TopBarProps) {
   const pathname = usePathname();
   const title = PAGE_TITLES[pathname]
-    ?? (pathname.startsWith("/editor") ? "作文编辑器"
+    ?? (pathname.startsWith("/editor") ? "新建作文"
       : pathname.includes("/prs/") ? "批改请求"
       : pathname.startsWith("/essays") ? "作品详情"
       : "EngForge");

@@ -29,8 +29,7 @@ import {
   FilePlus,
   FileText,
   GitPullRequest,
-  Globe,
-  BookOpen,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,8 +43,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   "file-plus": FilePlus,
   "file-text": FileText,
   "git-pull-request": GitPullRequest,
-  "globe": Globe,
-  "book-open": BookOpen,
+  "star": Star,
 };
 
 /* ============================================================

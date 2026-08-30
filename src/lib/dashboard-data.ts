@@ -76,6 +76,8 @@ export interface DashboardEssay {
   wordCount: number;
   updatedAt: string;            // ISO 时间戳，由调用方格式化
   href: string;                 // 点击后跳转的路由
+  versionNumber: number;         // 当前版本号，如 3
+  statusPill?: { label: string; className: string };  // 状态标签，如"2 条新批改"
 }
 
 /** 活动记录的一个片段（用于控制加粗） */
@@ -105,13 +107,13 @@ export interface LearningGoal {
  * 查询后通过 props 传入子组件。
  * ============================================================ */
 
-/** 侧边栏导航 — 三组：工坊 / 协作 / 发现 */
+/** 侧边栏导航 — 两组：工坊 / 协作 */
 export const navGroups: NavGroup[] = [
   {
     title: '工坊',
     items: [
       { label: '我的工坊', icon: 'layout-dashboard', href: '/dashboard', active: true },
-      { label: '新建作文', icon: 'file-plus', href: '/editor' },
+      { label: '我的收藏', icon: 'star', href: '#', disabled: true, disabledLabel: 'Phase 2' },
     ],
   },
   {
@@ -121,21 +123,14 @@ export const navGroups: NavGroup[] = [
       { label: '批改请求', icon: 'git-pull-request', href: '#', disabled: true, disabledLabel: 'Phase 2' },
     ],
   },
-  {
-    title: '发现',
-    items: [
-      { label: '广场', icon: 'globe', href: '#', disabled: true, disabledLabel: 'Phase 2.5' },
-      { label: '真题句子库', icon: 'book-open', href: '#', disabled: true, disabledLabel: 'Phase 2' },
-    ],
-  },
 ];
 
 /** 4 个统计卡片配置（label + colorClass 固定，value/sub 动态） */
 export const statCardConfig: { label: string; colorClass: string }[] = [
   { label: '我的作文', colorClass: '' },
   { label: '收到批改', colorClass: 'text-primary' },
-  { label: '被 Star', colorClass: 'text-green' },
-  { label: '连续天数', colorClass: 'text-amber' },
+  { label: '提交批改', colorClass: 'text-amber' },
+  { label: '被收藏', colorClass: 'text-green' },
 ];
 
 
@@ -148,7 +143,7 @@ export const statCardConfig: { label: string; colorClass: string }[] = [
 /** 作文状态 → 圆点颜色 + 中文标签 */
 export const statusConfig: Record<EssayStatus, { dotClass: string; label: string }> = {
   draft:     { dotClass: 'bg-gray-400',  label: '草稿' },
-  review:    { dotClass: 'bg-amber',     label: '审核中' },
+  review:    { dotClass: 'bg-amber',     label: '待审阅' },
   published: { dotClass: 'bg-green',    label: '已发布' },
 };
 

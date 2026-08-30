@@ -62,14 +62,14 @@ export default function DashboardLoading() {
           <div className="overflow-hidden rounded-card bg-white shadow-card">
             <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
               <div className="h-5 w-28 animate-pulse rounded bg-zinc-100" />
-              <div className="h-4 w-20 animate-pulse rounded bg-zinc-100" />
+              <div className="h-4 w-32 animate-pulse rounded bg-zinc-100" />
             </div>
             <div className="p-5">
-              <div className="grid grid-cols-[repeat(26,minmax(0,1fr))] gap-[3px]">
-                {Array.from({ length: 182 }).map((_, i) => (
+              <div className="grid grid-cols-12 gap-[6px]">
+                {Array.from({ length: 24 }).map((_, i) => (
                   <div
                     key={i}
-                    className="aspect-square animate-pulse rounded-sm bg-zinc-100"
+                    className="aspect-square animate-pulse rounded-md bg-zinc-100"
                   />
                 ))}
               </div>
